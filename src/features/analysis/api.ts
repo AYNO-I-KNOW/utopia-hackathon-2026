@@ -1,12 +1,18 @@
 import { copy } from "@/content";
 import {
   parseAnalysis,
+  parseChatReply,
+  trimChatMessages,
   type AnalysisContext,
   type AnalysisResult,
+  type ChatMessage,
+  type ChatReply,
+  type ChatResult,
 } from "./parse";
 
 const ANALYZE_TIMEOUT_MS = 30_000;
 const SPEAK_TIMEOUT_MS = 15_000;
+const CHAT_TIMEOUT_MS = 30_000;
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 // Read at build time; Next inlines only the literal `process.env.NEXT_PUBLIC_*` form.
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(
@@ -56,6 +62,12 @@ function kindForStatus(status: number): ApiErrorKind {
   return "generic";
 }
 
+function kindForChatStatus(status: number): ApiErrorKind {
+  if (status === 429) return "busy";
+  if (status === 503) return "unavailable";
+  return "generic";
+}
+
 /**
  * fetch + read the body under one timeout/abort scope: the timer and the outside
  * `signal` forwarder stay armed until `read` has finished, not just the headers.
@@ -67,6 +79,7 @@ async function request<T>(
   timeoutMs: number,
   read: (response: Response) => Promise<T>,
   signal?: AbortSignal,
+  kindOf: (status: number) => ApiErrorKind = kindForStatus,
 ): Promise<T> {
   if (!API_BASE) throw new ApiError("config");
   const controller = new AbortController();
@@ -83,7 +96,7 @@ async function request<T>(
       ...init,
       signal: controller.signal,
     });
-    if (!response.ok) throw new ApiError(kindForStatus(response.status));
+    if (!response.ok) throw new ApiError(kindOf(response.status));
     return await read(response);
   } catch (error) {
     if (error instanceof ApiError) throw error;
@@ -139,5 +152,34 @@ export function speak(
     SPEAK_TIMEOUT_MS,
     (response) => response.blob(),
     signal,
+  );
+}
+
+/** `messages` must end with a user message; older ones are trimmed to the backend limits. */
+export function chat(
+  messages: ChatMessage[],
+  result: ChatResult | null,
+  lang: "th",
+  signal?: AbortSignal,
+): Promise<ChatReply> {
+  return request(
+    "/chat",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lang,
+        result,
+        messages: trimChatMessages(messages),
+      }),
+    },
+    CHAT_TIMEOUT_MS,
+    async (response) => {
+      const parsed = parseChatReply(await response.json().catch(() => null));
+      if (!parsed) throw new ApiError("generic");
+      return parsed;
+    },
+    signal,
+    kindForChatStatus,
   );
 }

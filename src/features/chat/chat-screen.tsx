@@ -1,19 +1,33 @@
 "use client";
+// Chat layout adapted from the UI generated in U-bot's U-Code (ubot-export/).
+// Answers come from our own backend (POST /chat); U-bot is only a handoff link.
 import { Button } from "@/components/button";
 import { copy } from "@/content";
 import { summarizeRecent } from "@/features/activities/context";
 import { loadActivities } from "@/features/activities/storage";
+import { headline } from "@/features/analysis/analysis-result";
 import type { AnalysisResult } from "@/features/analysis/parse";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import {
+  ErrorBubble,
+  MessageBubble,
+  ResultCard,
+  TypingBubble,
+} from "./chat-parts";
 import { copyText } from "./clipboard";
 import { buildPrompt } from "./ubot-prompt";
+import { useChat } from "./use-chat";
 import "./styles.css";
 
 const UBOT_URL = "https://u.bot/";
-const FRAME_TIMEOUT_MS = 8000;
-const FRAME_ALLOW = "clipboard-write";
+const MAX_INPUT_CHARS = 1000;
+const QUICK_REPLIES = [
+  copy.chatQuickNext,
+  copy.chatQuickStill,
+  copy.chatQuickDoctor,
+];
 
-function initialPrompt(result: AnalysisResult) {
+function handoffPrompt(result: AnalysisResult) {
   let items: ReturnType<typeof loadActivities> = [];
   try {
     items = loadActivities();
@@ -30,21 +44,31 @@ export function ChatScreen({
   result: AnalysisResult;
   onBack: () => void;
 }) {
-  const [prompt, setPrompt] = useState(() => initialPrompt(result));
-  const [loaded, setLoaded] = useState(false);
-  const [frameFailed, setFrameFailed] = useState(
-    () => navigator.onLine === false,
-  );
+  const { bubbles, loading, error, send, retry } = useChat(result);
+  const [input, setInput] = useState("");
   const [status, setStatus] = useState("");
   const [blocked, setBlocked] = useState(false);
+  const bottom = useRef<HTMLDivElement>(null);
+  const { title, chip } = headline(result);
+  const last = bubbles[bubbles.length - 1];
+  const announcement = last?.role === "assistant" ? last.content : "";
+
   useEffect(() => {
-    if (loaded || frameFailed) return;
-    const timer = setTimeout(() => setFrameFailed(true), FRAME_TIMEOUT_MS);
-    return () => clearTimeout(timer);
-  }, [loaded, frameFailed]);
+    const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    bottom.current?.scrollIntoView({
+      behavior: calm ? "auto" : "smooth",
+      block: "end",
+    });
+  }, [bubbles, loading, error]);
+
+  function submit(text: string) {
+    if (!text.trim() || loading) return;
+    send(text);
+    setInput("");
+  }
   function handoff() {
     // Both calls stay synchronous in the click so the new tab is not popup-blocked.
-    const copied = copyText(prompt);
+    const copied = copyText(handoffPrompt(result));
     const tab = window.open(UBOT_URL, "_blank");
     if (tab) tab.opener = null;
     setBlocked(!tab);
@@ -54,47 +78,82 @@ export function ChatScreen({
       ),
     );
   }
+
   return (
-    <div className="ubot-chat">
-      <header className="ubot-header">
-        <button className="ubot-back" aria-label={copy.back} onClick={onBack}>
+    <div className="chat">
+      <header className="chat-header">
+        <button className="chat-back" aria-label={copy.back} onClick={onBack}>
           <img src="/images/chat/back.svg" alt="" />
         </button>
-        <div className="ubot-avatar" aria-hidden="true">
-          U
-        </div>
-        <div className="ubot-identity">
+        <div className="chat-identity">
           <h1>{copy.botName}</h1>
           <p>{copy.botStatus}</p>
         </div>
+        <div className="chat-avatar" aria-hidden="true">
+          👶
+        </div>
       </header>
-      <div className="ubot-body">
-        <details className="ubot-context" open={frameFailed}>
-          <summary>{copy.ubotContext}</summary>
-          <textarea
-            rows={8}
-            aria-label={copy.ubotPromptLabel}
-            value={prompt}
-            onChange={(event) => setPrompt(event.target.value)}
-          />
-        </details>
-        {frameFailed ? (
-          <p className="ubot-note">{copy.ubotFallback}</p>
-        ) : (
-          <>
-            <p className="ubot-note">{copy.ubotHint}</p>
-            <iframe
-              className="ubot-frame"
-              src={UBOT_URL}
-              title={copy.ubotFrameTitle}
-              allow={FRAME_ALLOW}
-              onLoad={() => setLoaded(true)}
-            />
-          </>
-        )}
+      <ResultCard title={title} chip={chip} />
+      <p className="sr-only" aria-live="polite">
+        {announcement}
+      </p>
+      <div className="chat-list">
+        {bubbles.map((message) => (
+          <MessageBubble key={message.id} message={message} />
+        ))}
+        {loading && <TypingBubble />}
+        {error && <ErrorBubble text={error} onRetry={retry} />}
+        <div ref={bottom} />
       </div>
-      <footer className="ubot-composer">
-        <p role="status" className="ubot-note ubot-status">
+      <div className="chat-quick" role="group" aria-label={copy.chatQuickLabel}>
+        {QUICK_REPLIES.map((text) => (
+          <button
+            key={text}
+            className="chat-chip"
+            disabled={loading}
+            onClick={() => submit(text)}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+      <footer className="chat-composer">
+        <form
+          className="chat-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            submit(input);
+          }}
+        >
+          <input
+            className="chat-input"
+            type="text"
+            value={input}
+            maxLength={MAX_INPUT_CHARS}
+            placeholder={copy.chatPlaceholder}
+            aria-label={copy.chatInputLabel}
+            autoComplete="off"
+            enterKeyHint="send"
+            onChange={(event) => setInput(event.target.value)}
+          />
+          <button
+            className="chat-send"
+            type="submit"
+            aria-label={copy.chatSend}
+            disabled={!input.trim() || loading}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"
+              />
+            </svg>
+          </button>
+        </form>
+        <Button variant="ghost" className="chat-handoff" onClick={handoff}>
+          {copy.ubotGo}
+        </Button>
+        <p role="status" className="chat-note">
           {status}
           {blocked && " "}
           {blocked && (
@@ -103,9 +162,7 @@ export function ChatScreen({
             </a>
           )}
         </p>
-        <Button variant="primary" onClick={handoff}>
-          {copy.ubotGo}
-        </Button>
+        <p className="chat-note">{copy.chatCredit}</p>
       </footer>
     </div>
   );

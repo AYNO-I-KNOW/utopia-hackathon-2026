@@ -74,3 +74,50 @@ export function parseAnalysis(value: unknown): AnalysisResult | null {
     see_doctor: value.see_doctor,
   };
 }
+
+export type ChatRole = "user" | "assistant";
+export type ChatMessage = { role: ChatRole; content: string };
+/** Latest analysis as /chat expects it: confidence is a 0-100 percentage. */
+export type ChatResult = {
+  label: CryLabel;
+  confidence: number;
+  case: AnalysisCase;
+};
+export type ChatReply = { reply: string; source: "llm" | "template" };
+
+const CHAT_REPLY_MAX_CHARS = 600;
+const CHAT_MAX_MESSAGES = 8;
+const CHAT_MAX_TOTAL_CHARS = 4000;
+
+/**
+ * Newest messages that fit the /chat limits (8 messages, 4000 characters in
+ * total); the last one is always kept, older ones are dropped first.
+ */
+export function trimChatMessages(messages: ChatMessage[]): ChatMessage[] {
+  const kept: ChatMessage[] = [];
+  let chars = 0;
+  for (const message of messages.slice().reverse()) {
+    chars += message.content.length;
+    if (
+      kept.length >= CHAT_MAX_MESSAGES ||
+      (kept.length && chars > CHAT_MAX_TOTAL_CHARS)
+    )
+      break;
+    kept.unshift(message);
+  }
+  return kept;
+}
+
+/** Narrow an untrusted /chat body; returns null when the shape is wrong. */
+export function parseChatReply(value: unknown): ChatReply | null {
+  if (!isRecord(value)) return null;
+  const { reply, source } = value;
+  if (
+    typeof reply !== "string" ||
+    !reply.trim() ||
+    reply.length > CHAT_REPLY_MAX_CHARS ||
+    (source !== "llm" && source !== "template")
+  )
+    return null;
+  return { reply, source };
+}
