@@ -1,0 +1,47 @@
+.crying-baby {
+  display: block;
+  position: relative;
+}
+.crying-baby > img,
+.crying-baby > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.crying-baby > canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.crying-baby[data-animated="true"] > canvas {
+  opacity: 1;
+}
+.crying-baby[data-animated="true"] > img {
+  opacity: 0;
+}
+.result-baby-mask .crying-baby {
+  position: absolute;
+  width: 151px;
+  height: 151px;
+  left: -12px;
+  top: 16px;
+}
+.result-baby-mask .crying-baby > img {
+  position: static;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.analysis-loading-baby:has(.crying-baby) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .crying-baby[data-animated="true"] > img {
+    opacity: 1;
+  }
+  .crying-baby > canvas {
+    display: none;
+  }
+}

@@ -1,3 +1,4 @@
+import { CryingBaby } from "@/components/crying-baby";
 import { ChevronLeft, Pause, Play } from "lucide-react";
 import { copy } from "@/content";
 import { SceneLink } from "@/components/scene-navigation";
@@ -62,9 +63,8 @@ export function AnalysisCapture({
         </p>
       </div>
       <div className="analysis-illustration">
-        <img
+        <CryingBaby
           className="analysis-baby"
-          src="/images/analysis/baby.png"
           alt={recording ? "" : copy.cryingBabyAlt}
         />
       </div>

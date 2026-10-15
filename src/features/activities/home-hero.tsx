@@ -1,3 +1,4 @@
+import { CryingBaby } from "@/components/crying-baby";
 import { SceneLink } from "@/components/scene-navigation";
 import { copy } from "@/content";
 import { growthCopy as text } from "@/content/development";
@@ -21,11 +22,7 @@ export function HomeHero() {
         className="home-hero-scene"
         aria-label={copy.viewDevelopment}
       >
-        <img
-          className="home-hero-baby"
-          src="/images/analysis/baby.png"
-          alt={copy.cryingBabyAlt}
-        />
+        <CryingBaby className="home-hero-baby" alt={copy.cryingBabyAlt} />
       </SceneLink>
     </div>
   );

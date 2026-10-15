@@ -1,3 +1,4 @@
+import { CryingBaby } from "@/components/crying-baby";
 import { X } from "lucide-react";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -26,7 +27,7 @@ export function AnalysisResult({
         </button>
         <div className="result-summary">
           <div className="result-baby-mask">
-            <img src="/images/analysis/baby.png" alt={copy.cryingBabyAlt} />
+            <CryingBaby alt={copy.cryingBabyAlt} />
           </div>
           <h1>{copy.resultTitle}</h1>
           <span className="result-confidence">

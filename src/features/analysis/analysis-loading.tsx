@@ -1,7 +1,5 @@
+import { CryingBaby } from "@/components/crying-baby";
 import { copy } from "@/content";
-
-// Add matching character poses here when more illustrations are available.
-const analysisIllustrations = ["/images/analysis/baby.png"];
 
 export function AnalysisLoading() {
   return (
@@ -11,7 +9,7 @@ export function AnalysisLoading() {
           className="result-baby-mask analysis-loading-baby"
           aria-hidden="true"
         >
-          <img src={analysisIllustrations[0]} alt="" />
+          <CryingBaby />
         </div>
         <h1>{copy.analyzing}</h1>
         <div className="analysis-loading-dots" aria-hidden="true">
