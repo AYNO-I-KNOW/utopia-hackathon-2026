@@ -59,11 +59,13 @@ export function AnalysisCapture({
       data-recording={recording}
       data-paused={paused}
     >
-      <img
-        className="analysis-background"
-        src="/images/analysis/background.png"
-        alt=""
-      />
+      <div className="analysis-backdrop" aria-hidden="true">
+        <img
+          className="analysis-background"
+          src="/images/analysis/background.png"
+          alt=""
+        />
+      </div>
       {recording ? (
         <button
           className="analysis-back"

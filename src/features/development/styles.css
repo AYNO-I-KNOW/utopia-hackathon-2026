@@ -437,9 +437,15 @@
   padding: 24px 16px 0;
   min-height: 288px;
 }
+.home-hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
 .home-hero-background {
   position: absolute;
-  z-index: -1;
   width: 591px;
   height: 646px;
   max-width: none;
@@ -793,7 +799,8 @@ dialog.growth-overlay:not([open]) {
   transform: translateX(-50%);
   view-transition-name: scene-baby;
 }
-.home-hero-background {
+.home-hero-backdrop {
+  /* Named on the clipping box so the snapshot keeps the clip. */
   view-transition-name: scene-background;
 }
 .home-record-fab {
@@ -812,6 +819,11 @@ dialog.growth-overlay {
   overflow: hidden;
   pointer-events: none;
   mask-image: linear-gradient(black 45%, transparent);
+  /* Named on the clipping container so the snapshot keeps the clip and fade. */
+  view-transition-name: scene-background;
+}
+.growth-overview .growth-header {
+  view-transition-name: scene-growth-header;
 }
 .growth-scene-background {
   position: absolute;
@@ -822,7 +834,6 @@ dialog.growth-overlay {
   top: -480px;
   transform: translateX(-50%);
   object-fit: cover;
-  view-transition-name: scene-background;
 }
 html[data-scene-flow="growth"] .growth-overview .growth-content {
   animation: growth-content-arrive 460ms 140ms both

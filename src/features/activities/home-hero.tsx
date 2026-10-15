@@ -5,11 +5,13 @@ import { growthCopy as text } from "@/content/development";
 export function HomeHero() {
   return (
     <div className="home-hero">
-      <img
-        className="home-hero-background"
-        src="/images/analysis/background.png"
-        alt=""
-      />
+      <div className="home-hero-backdrop" aria-hidden="true">
+        <img
+          className="home-hero-background"
+          src="/images/analysis/background.png"
+          alt=""
+        />
+      </div>
       <div className="home-hero-greeting">
         <img src="/images/development/3-705-imgEllipse6.svg" alt="" />
         <div>

@@ -450,9 +450,15 @@ input {
   color: var(--color-text);
 }
 
+.analysis-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
 .analysis-background {
   position: absolute;
-  z-index: -1;
   left: 50%;
   top: -40px;
   transform: translateX(-50%);
@@ -1105,7 +1111,7 @@ h2 {
   view-transition-name: scene-microphone;
   isolation: isolate;
 }
-.analysis-background {
+.analysis-backdrop {
   view-transition-name: scene-background;
 }
 .analysis-ready[data-recording="false"] .analysis-baby {
@@ -1241,6 +1247,12 @@ html[data-scene-direction] .analysis-intro {
   animation: scene-copy-in 240ms 160ms ease-out both;
 }
 ::view-transition-old(scene-greeting) {
+  animation: scene-exit 100ms ease-out both;
+}
+::view-transition-new(scene-growth-header) {
+  animation: scene-copy-in 240ms 120ms ease-out both;
+}
+::view-transition-old(scene-growth-header) {
   animation: scene-exit 100ms ease-out both;
 }
 @keyframes scene-exit {
