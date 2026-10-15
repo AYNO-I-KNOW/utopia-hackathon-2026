@@ -362,3 +362,40 @@
 .measurement-modal .activity-picker-options {
   bottom: 8px;
 }
+
+/* Measurement choices expand in flow, so the bottom-anchored sheet grows upward. */
+.measurement-modal .activity-picker::details-content {
+  position: static;
+  interpolate-size: allow-keywords;
+  block-size: 0;
+  overflow: clip;
+  opacity: 0;
+  transform: none;
+  transition:
+    block-size 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 180ms ease,
+    content-visibility 260ms allow-discrete;
+}
+.measurement-modal .activity-picker[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+.measurement-modal .activity-picker-options {
+  position: relative;
+  top: auto;
+  bottom: auto;
+  margin-top: 8px;
+  max-height: none;
+  box-shadow: none;
+}
+.measurement-modal .activity-picker-options button {
+  padding: 6px 10px;
+}
+.measurement-modal .content:has(.activity-picker[open]) {
+  overflow-y: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .measurement-modal .activity-picker::details-content {
+    transition: none;
+  }
+}
