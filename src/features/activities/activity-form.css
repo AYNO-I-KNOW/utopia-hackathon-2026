@@ -401,8 +401,8 @@
   padding: 0;
   border: 0;
   border-radius: 12px;
-  background: var(--color-brand-soft);
-  color: var(--color-brand);
+  background: transparent;
+  color: var(--color-text-muted);
   transition: transform 140ms ease;
 }
 .measurement-stepper button:active {
