@@ -91,6 +91,11 @@
 .result-listen > * {
   grid-area: 1 / 1;
 }
+.result-listen-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
 .result-listen-label[data-active="false"] {
   visibility: hidden;
 }

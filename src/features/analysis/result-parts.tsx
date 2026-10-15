@@ -1,4 +1,5 @@
 "use client";
+import { Volume2 } from "lucide-react";
 import { copy } from "@/content";
 import { capitalize, labelCopy, toPercent } from "./labels";
 import type { AnalysisContext, AskKey, TopItem } from "./parse";
@@ -89,7 +90,8 @@ export function ListenButton({ text }: { text: string }) {
           data-active={status === "idle"}
           aria-hidden="true"
         >
-          🔊 {copy.listen}
+          <Volume2 size={20} strokeWidth={1.75} aria-hidden="true" />
+          {copy.listen}
         </span>
         <span
           className="result-listen-label"
