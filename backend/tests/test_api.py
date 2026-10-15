@@ -60,7 +60,7 @@ class TestAnalyze:
         assert body["ask"] == ["last_feed", "last_diaper"]
 
     def test_no_cry_skips_llm(self, make_client, wav_bytes, fake_llm):
-        body = post_analyze(make_client(model=FakeModel(cry_prob=0.05)), wav_bytes).json()
+        body = post_analyze(make_client(model=FakeModel(cry_prob=0.01)), wav_bytes).json()
         assert body["case"] == "no_cry"
         assert body["top"] == [] and body["suggest_lullaby"] is False
         assert len(body["checklist"]) == 3

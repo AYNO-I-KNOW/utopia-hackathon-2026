@@ -25,9 +25,8 @@ CHECKPOINT_URL = "https://zenodo.org/record/3987831/files/Cnn14_mAP%3D0.431.pth?
 LABELS_CSV_URL = (
     "https://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv"
 )
-# TODO: set to the real sha256 of Cnn14_mAP=0.431.pth (shasum -a 256 on a trusted download).
-# While None, the checkpoint is NOT integrity-checked.
-CHECKPOINT_SHA256: str | None = None
+# sha256 of Cnn14_mAP=0.431.pth; download matched Zenodo's md5 541141fa2ee191a88f24a3219fff024e.
+CHECKPOINT_SHA256: str | None = "0dc499e40e9761ef5ea061ffc77697697f277f6a960894903df3ada000e34b31"
 MIN_CHECKPOINT_BYTES = 3 * 10**8  # same sanity threshold panns_inference uses
 DOWNLOAD_TIMEOUT_S = 120
 

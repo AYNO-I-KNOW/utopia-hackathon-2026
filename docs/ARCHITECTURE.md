@@ -120,8 +120,9 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 **Model (ตาม paper แบบเบา)**
 1. PANNs CNN14 (`panns_inference`, input 32 kHz mono) → `clipwise_output` (527 AudioSet classes) + `embedding` (2048-d)
-2. **Cry detect:** prob ของ "Baby cry, infant cry" ≥ `CRY_THRESHOLD` (เริ่ม 0.3, tune บน val) ไม่ถึง → `no_cry`
-3. **Reason:** `embedding` → LogisticRegression (`class_weight="balanced"`) → prob ต่อคลาส
+2. **Cry detect:** prob ของ "Baby cry, infant cry" ≥ `CRY_THRESHOLD` = **0.05** ไม่ถึง → `no_cry`
+   (tune แล้ว: 5th percentile ของ cry ใน Baidu train split → held-out recall 96.7%; non-cry 241 clips (speech, music, silence, ESC-50) ผ่าน 0/241, สูงสุด 0.014. ค่าเดิม 0.3 ตัด cry จริงทิ้ง 28%. ลอง max ของ {Baby cry, Crying sobbing, Whimper} แล้ว recall 97.8% แต่ประตูไม้ลั่นได้ 0.039 → margin บางกว่า)
+3. **Reason:** `embedding` → LogisticRegression (`class_weight="balanced"`, isotonic-calibrated cv=5) → prob ต่อคลาส
 
 **Data**
 - v1 **6 คลาส** — Baidu Baby_Crying (HF copy `p-j-r-1-2-3/Baby-Cry-Classification-Baidu`, 918 clips): `hungry, hug, awake, uncomfortable, sleepy, diaper`
@@ -142,7 +143,7 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 **Case logic**
 | case | เงื่อนไข (หลังปรับ prior) |
 |---|---|
-| `no_cry` | cry prob < `CRY_THRESHOLD` |
+| `no_cry` | cry prob < `CRY_THRESHOLD` (0.05) |
 | `unsure` | top1 < 0.40 |
 | `close` | top1 ≥ 0.40 และ top1 − top2 < 0.15 |
 | `confident` | top1 ≥ 0.40 และ top1 − top2 ≥ 0.15 |

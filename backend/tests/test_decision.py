@@ -154,7 +154,7 @@ class TestDecide:
         assert d.case == "unsure" and d.suggest_lullaby is True
 
     def test_no_lullaby_for_no_cry(self):
-        d = decide(0.1, {"sleepy": 0.9, "hungry": 0.1}, {})
+        d = decide(C.CRY_THRESHOLD / 2, {"sleepy": 0.9, "hungry": 0.1}, {})
         assert d.case == "no_cry" and d.suggest_lullaby is False
 
     def test_decide_does_not_mutate_inputs(self):

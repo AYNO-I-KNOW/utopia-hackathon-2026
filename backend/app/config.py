@@ -22,7 +22,9 @@ LABELS_9 = (
 LANGS = ("th", "en")
 
 # --- decision thresholds (§4) ---
-CRY_THRESHOLD = 0.3
+# 5th percentile of "Baby cry, infant cry" on Baidu train-split cries: keeps 96.7% of held-out cries;
+# 0/241 non-cries (speech, music, silence, ESC-50) pass (max 0.014). 0.3 dropped 28% of real cries.
+CRY_THRESHOLD = 0.05
 CLOSE_MARGIN = 0.15
 UNSURE_MAX = 0.40
 LULLABY_LABELS = frozenset({"sleepy", "hug", "awake"})
