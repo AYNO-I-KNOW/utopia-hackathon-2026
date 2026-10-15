@@ -3,6 +3,7 @@ import { copy } from "@/content";
 import { useEffect, useRef, useState } from "react";
 import { MobileShell } from "@/components/mobile-shell";
 import { ChatScreen } from "@/features/chat/chat-screen";
+import { AnalysisLoading } from "./analysis-loading";
 import { AnalysisResult } from "./analysis-result";
 import { AnalysisCapture } from "./analysis-capture";
 type Step = "ready" | "record" | "loading" | "result" | "chat";
@@ -87,12 +88,7 @@ export function AnalysisScreen() {
       {step === "chat" ? (
         <ChatScreen onBack={() => setStep("result")} />
       ) : step === "loading" ? (
-        <section className="content loading-content">
-          <div className="center" role="status">
-            <div className="spinner" />
-            <h1>{copy.analyzing}</h1>
-          </div>
-        </section>
+        <AnalysisLoading />
       ) : step === "result" ? (
         <AnalysisResult onChat={() => setStep("chat")} onRetry={start} />
       ) : null}

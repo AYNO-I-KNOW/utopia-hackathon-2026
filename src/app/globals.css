@@ -1416,3 +1416,65 @@ html[data-scene-direction] .analysis-intro {
     transform: none;
   }
 }
+
+.analysis-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+.analysis-loading h1 {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  font-weight: 500;
+}
+.analysis-loading-baby {
+  animation: analysis-baby-float 2.4s ease-in-out infinite;
+}
+.analysis-loading-dots {
+  display: flex;
+  gap: 6px;
+}
+.analysis-loading-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  animation: analysis-loading-dot 1.2s ease-in-out infinite;
+}
+.analysis-loading-dots span:nth-child(2) {
+  animation-delay: 150ms;
+}
+.analysis-loading-dots span:nth-child(3) {
+  animation-delay: 300ms;
+}
+@keyframes analysis-baby-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .analysis-loading-baby,
+  .analysis-loading-dots span {
+    animation: none;
+  }
+}
+
+@keyframes analysis-loading-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-4px);
+  }
+}
