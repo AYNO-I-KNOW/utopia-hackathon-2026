@@ -6,4 +6,4 @@ Use shared components for repeated layouts and controls. Remove obsolete code in
 
 Run `npm run check` after meaningful code changes. Run `npm run build` for route, dependency or structural changes. Review the diff before committing. For UI changes, check the running screen and relevant interaction; report any untested microphone/device behavior rather than treating compilation as acceptance. Never claim production readiness from focused checks.
 
-Current limits: analysis and chat use mock results, doctor/development screens are placeholders, and data is browser-local. Live microphone volume is supported; no audio file is recorded/uploaded. Manual microphone response must be checked on the actual target browser/device. The project has focused unit tests, not full end-to-end or WCAG certification.
+Current limits: doctor/development screens are placeholders and data is browser-local. Analysis needs the FastAPI backend (`NEXT_PUBLIC_API_BASE_URL`); chat embeds U-bot, whose login inside an iframe is untested. Manual microphone response must be checked on the actual target browser/device. The project has focused unit tests, not full end-to-end or WCAG certification.

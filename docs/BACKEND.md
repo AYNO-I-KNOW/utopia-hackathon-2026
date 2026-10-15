@@ -34,6 +34,7 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 ```
 
 **หลักการ**
+
 - Secrets อยู่ backend เท่านั้น (`OPENAI_API_KEY`, `ELEVENLABS_API_KEY`) — frontend ไม่มี key ใด ๆ
 - Frontend คง pattern เดิมของ repo: **buildless HTML/JS** ไม่มี framework, deploy static ได้ทันที
 - ไม่มี database: activity log อยู่ใน localStorage ตามเดิม (YAGNI สำหรับ 24 ชม.)
@@ -86,32 +87,44 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 ### `POST /analyze` — `multipart/form-data`
 
-| field | type | หมายเหตุ |
-|---|---|---|
-| `audio` | file | webm/opus (Chrome), mp4/aac (Safari), wav; ≤ 30 s, ≤ 5 MB |
-| `lang` | `th` \| `en` | |
+| field     | type                   | หมายเหตุ                                                                                                                      |
+| --------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `audio`   | file                   | webm/opus (Chrome), mp4/aac (Safari), wav; ≤ 30 s, ≤ 5 MB                                                                     |
+| `lang`    | `th` \| `en`           |                                                                                                                               |
 | `context` | JSON string (optional) | จาก activity log: `{"last_feed_min": 45, "last_diaper_min": 120, "last_sleep_end_min": 90}` (นาทีที่ผ่านมา, `null` = ไม่ทราบ) |
 
 **200**
+
 ```json
 {
   "case": "confident | close | unsure | no_cry",
   "cry_prob": 0.97,
-  "top": [{"label": "hungry", "prob": 0.72}, {"label": "sleepy", "prob": 0.18}, {"label": "diaper", "prob": 0.05}],
+  "top": [
+    { "label": "hungry", "prob": 0.72 },
+    { "label": "sleepy", "prob": 0.18 },
+    { "label": "diaper", "prob": 0.05 }
+  ],
   "ask": ["last_feed", "last_diaper"],
   "summary": "น้องน่าจะหิว ลองสังเกตการดูดมือ แล้วให้นมดูนะคะ",
-  "checklist": ["สังเกตการดูดมือหรือหันหาเต้า", "เช็กเวลาให้นมครั้งล่าสุด", "ถ้ายังร้อง ลองเช็กผ้าอ้อม"],
+  "checklist": [
+    "สังเกตการดูดมือหรือหันหาเต้า",
+    "เช็กเวลาให้นมครั้งล่าสุด",
+    "ถ้ายังร้อง ลองเช็กผ้าอ้อม"
+  ],
   "suggest_lullaby": false,
   "see_doctor": false
 }
 ```
+
 - `ask` มีค่าเฉพาะ `case=close` และ `context` ไม่มีข้อมูลนั้น → frontend แสดงปุ่มแตะ แล้วเรียก `/analyze` ซ้ำพร้อม context
 - **400** ไฟล์เสีย/สั้นเกิน 1 s · **413** ใหญ่เกิน · **502** LLM ล่ม → ยังคืน `top`/`case` และใช้ `summary` สำรองจาก advice ไฟล์
 
 ### `POST /speak` — JSON `{"text": "...", "lang": "th"}` → `audio/mpeg`
+
 แยกจาก `/analyze` เพื่อให้ UI แสดงผลข้อความก่อน แล้วเล่นเสียงตามมา
 
 ### `GET /health` → `{"ok": true, "model_loaded": true}`
+
 ใช้ปลุก Space ก่อน pitch
 
 ---
@@ -119,12 +132,14 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 ## 4. ML + decision
 
 **Model (ตาม paper แบบเบา)**
+
 1. PANNs CNN14 (`panns_inference`, input 32 kHz mono) → `clipwise_output` (527 AudioSet classes) + `embedding` (2048-d)
 2. **Cry detect:** prob ของ "Baby cry, infant cry" ≥ `CRY_THRESHOLD` = **0.05** ไม่ถึง → `no_cry`
    (tune แล้ว: 5th percentile ของ cry ใน Baidu train split → held-out recall 96.7%; non-cry 241 clips (speech, music, silence, ESC-50) ผ่าน 0/241, สูงสุด 0.014. ค่าเดิม 0.3 ตัด cry จริงทิ้ง 28%. ลอง max ของ {Baby cry, Crying sobbing, Whimper} แล้ว recall 97.8% แต่ประตูไม้ลั่นได้ 0.039 → margin บางกว่า)
 3. **Reason:** `embedding` → LogisticRegression (`class_weight="balanced"`, isotonic-calibrated cv=5) → prob ต่อคลาส
 
 **Data**
+
 - v1 **6 คลาส** — Baidu Baby_Crying (HF copy `p-j-r-1-2-3/Baby-Cry-Classification-Baidu`, 918 clips): `hungry, hug, awake, uncomfortable, sleepy, diaper`
 - v2 **9 คลาส** — + Kaggle Baby Cry Sense (CC BY-SA 4.0): เพิ่ม `belly_pain, burping, cold_hot` (`tired→sleepy`, `discomfort→uncomfortable`, ตัด `scared`/`lonely`)
 - ใช้ v2 ถ้า macro-F1 ไม่ต่ำกว่า v1 เกิน ~5 pts; cap `hungry` ที่ ~160
@@ -132,29 +147,32 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 - ⚠️ license ของ Baidu set ไม่ชัด → ระบุใน pitch ว่าเป็น research prototype
 
 **Activity priors** (`decision.py`) — ใช้ log ที่แอปมีอยู่แล้วแทนการถาม
-| context | ปรับ |
-|---|---|
-| `last_feed_min < 60` | `hungry × 0.5` |
-| `last_feed_min > 180` | `hungry × 1.5` |
-| `last_diaper_min < 30` | `diaper × 0.5` |
-| `last_sleep_end_min > 120` | `sleepy × 1.3` |
-แล้ว normalize ใหม่ (ค่าตั้งต้น ปรับได้ใน `config.py`)
+
+| context                                                | ปรับ           |
+| ------------------------------------------------------ | -------------- |
+| `last_feed_min < 60`                                   | `hungry × 0.5` |
+| `last_feed_min > 180`                                  | `hungry × 1.5` |
+| `last_diaper_min < 30`                                 | `diaper × 0.5` |
+| `last_sleep_end_min > 120`                             | `sleepy × 1.3` |
+| แล้ว normalize ใหม่ (ค่าตั้งต้น ปรับได้ใน `config.py`) |
 
 **Case logic**
-| case | เงื่อนไข (หลังปรับ prior) |
-|---|---|
-| `no_cry` | cry prob < `CRY_THRESHOLD` (0.05) |
-| `unsure` | top1 < 0.40 |
-| `close` | top1 ≥ 0.40 และ top1 − top2 < 0.15 |
-| `confident` | top1 ≥ 0.40 และ top1 − top2 ≥ 0.15 |
-ลำดับตรวจ: `no_cry` → `unsure` → `close` → `confident`
-`suggest_lullaby = top1 ∈ {sleepy, hug, awake}` หรือ `case=unsure`
+
+| case                                                               | เงื่อนไข (หลังปรับ prior)          |
+| ------------------------------------------------------------------ | ---------------------------------- |
+| `no_cry`                                                           | cry prob < `CRY_THRESHOLD` (0.05)  |
+| `unsure`                                                           | top1 < 0.40                        |
+| `close`                                                            | top1 ≥ 0.40 และ top1 − top2 < 0.15 |
+| `confident`                                                        | top1 ≥ 0.40 และ top1 − top2 ≥ 0.15 |
+| ลำดับตรวจ: `no_cry` → `unsure` → `close` → `confident`             |
+| `suggest_lullaby = top1 ∈ {sleepy, hug, awake}` หรือ `case=unsure` |
 
 ---
 
 ## 5. LLM + Voice
 
 **LLM (`llm.py`)** — OpenAI รุ่น mini ล่าสุดที่รองรับ Structured Outputs (เช็กชื่อรุ่นตอนเริ่ม)
+
 - Input: `case`, `top[]`, `context`, `lang`, เนื้อหา `knowledge/advice/{top1,top2}.{lang}.md`
 - System prompt: สรุปจาก advice ที่ให้**เท่านั้น**, ห้ามวินิจฉัยโรค, ≤ 3 ประโยค (เพื่ออ่านออกเสียง), ถ้า advice ระบุ red flag → `see_doctor=true`
 - Output JSON schema: `{summary, checklist[3], see_doctor}`
@@ -170,33 +188,34 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 ข้อเท็จจริง: guide ไม่มี API/SDK/widget · `https://u.bot/` (Vercel) **ไม่ส่ง** `X-Frame-Options` / CSP `frame-ancestors` → iframe ไม่ถูก header บล็อก · U-Code รันบน Sandpack (CodeSandbox) และ `fetch` ข้าม origin ได้
 
-| # | วิธี | สถานะ |
-|---|---|---|
-| A | **Context handoff:** ปุ่ม "ปรึกษา U-bot" → สร้าง prompt (ผลวิเคราะห์ + activity 24 ชม.) → copy ลง clipboard → เปิด U-bot | ✅ ทำได้แน่ — **baseline** |
-| B | **Embed:** หน้า handoff (แทนหน้า "พูดคุยกับ AI" จำลองใน wireframe v1) ฝัง `<iframe src="https://u.bot">` + ปุ่ม paste context | 🧪 ต้องทดสอบ login ใน iframe (third-party cookie อาจโดนบล็อก) → ไม่ได้ก็ fallback A แบบเปิดแท็บ |
-| C | **Prefill URL:** `u.bot/?q=...` | 🧪 ไม่มีใน guide — ลองเองใน browser, ถ้าได้ใช้แทน clipboard |
-| D | **Result card:** export ผลเป็น PNG → ใช้ฟีเจอร์ Photos ของ U-bot อ่าน / ให้ U-bot ทำ PDF สรุปไปหาหมอ (Documents) | ⭐ stretch — ใช้ความสามารถที่ U-bot มีจริง |
-| E | **U-Code:** designer สร้าง component/หน้า (เช่น หน้า Development / ปรึกษาคุณหมอ) ใน U-Code แล้ว port เข้า repo | ✅ ใช้ U-bot ในกระบวนการสร้าง |
-| F | **ขอ partner API จาก staff** | ❓ ถามที่งาน — ถ้ามี → ส่ง context ตรง |
-| ✗ | Reverse-engineer API ภายในของ u.bot / ดึง session token | ไม่ทำ — ผิด ToS + เสี่ยงโดนตัดสิทธิ์ |
+| #   | วิธี                                                                                                                          | สถานะ                                                                                           |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| A   | **Context handoff:** ปุ่ม "ปรึกษา U-bot" → สร้าง prompt (ผลวิเคราะห์ + activity 24 ชม.) → copy ลง clipboard → เปิด U-bot      | ✅ ทำได้แน่ — **baseline**                                                                      |
+| B   | **Embed:** หน้า handoff (แทนหน้า "พูดคุยกับ AI" จำลองใน wireframe v1) ฝัง `<iframe src="https://u.bot">` + ปุ่ม paste context | 🧪 ต้องทดสอบ login ใน iframe (third-party cookie อาจโดนบล็อก) → ไม่ได้ก็ fallback A แบบเปิดแท็บ |
+| C   | **Prefill URL:** `u.bot/?q=...`                                                                                               | 🧪 ไม่มีใน guide — ลองเองใน browser, ถ้าได้ใช้แทน clipboard                                     |
+| D   | **Result card:** export ผลเป็น PNG → ใช้ฟีเจอร์ Photos ของ U-bot อ่าน / ให้ U-bot ทำ PDF สรุปไปหาหมอ (Documents)              | ⭐ stretch — ใช้ความสามารถที่ U-bot มีจริง                                                      |
+| E   | **U-Code:** designer สร้าง component/หน้า (เช่น หน้า Development / ปรึกษาคุณหมอ) ใน U-Code แล้ว port เข้า repo                | ✅ ใช้ U-bot ในกระบวนการสร้าง                                                                   |
+| F   | **ขอ partner API จาก staff**                                                                                                  | ❓ ถามที่งาน — ถ้ามี → ส่ง context ตรง                                                          |
+| ✗   | Reverse-engineer API ภายในของ u.bot / ดึง session token                                                                       | ไม่ทำ — ผิด ToS + เสี่ยงโดนตัดสิทธิ์                                                            |
 
 **Prompt template (A/B/C)**
+
 ```
 ฉันเป็นพ่อ/แม่ ใช้แอป Cry for ur MOM วิเคราะห์เสียงลูกร้อง
 ผล: {top1} {p1}% / {top2} {p2}% (case: {case})
 24 ชม.ล่าสุด: ให้นม {n} ครั้ง ล่าสุด {last_feed} · ผ้าอ้อม ล่าสุด {last_diaper} · นอน {sleep_total}
-อยากปรึกษาต่อ: 
+อยากปรึกษาต่อ:
 ```
 
 ---
 
 ## 7. Deploy & config
 
-| ส่วน | ที่ไหน | config |
-|---|---|---|
-| Frontend | Vercel (static, root = repo root) | `js/config.js` → `API_BASE_URL` |
-| Backend | Hugging Face Spaces (Docker, CPU basic) | Secrets: `OPENAI_API_KEY`, `OPENAI_MODEL`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID_TH`, `ELEVENLABS_VOICE_ID_EN`, `ALLOWED_ORIGINS` |
-| PANNs checkpoint (~300 MB) | download ตอน build Docker image | ห้าม commit |
+| ส่วน                       | ที่ไหน                                  | config                                                                                                                                 |
+| -------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend                   | Vercel (static, root = repo root)       | `js/config.js` → `API_BASE_URL`                                                                                                        |
+| Backend                    | Hugging Face Spaces (Docker, CPU basic) | Secrets: `OPENAI_API_KEY`, `OPENAI_MODEL`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID_TH`, `ELEVENLABS_VOICE_ID_EN`, `ALLOWED_ORIGINS` |
+| PANNs checkpoint (~300 MB) | download ตอน build Docker image         | ห้าม commit                                                                                                                            |
 
 `ALLOWED_ORIGINS` = Vercel domain, `http://127.0.0.1:4175`, `https://*.codesandbox.io`
 
@@ -206,14 +225,14 @@ Submission (hub.team1.network): GitHub repo (public ✅) · demo = Vercel URL ·
 
 ## 8. แผนเวลา
 
-| ชม. | Dev (+ agent) | Designer | Business |
-|---|---|---|---|
-| 0–3 | backend skeleton, `ml/` download + embeddings | UI จาก wireframe → hi-fi | ลงทะเบียน Hub, รับ ElevenLabs coupon, OpenAI key |
-| 3–6 | train 6/9 คลาส, `/analyze` ใช้งานได้ | หน้า result 4 กรณี | เขียน `knowledge/advice/*` TH/EN |
-| 6–10 | LLM + TTS + lullabies, deploy HF | lullaby player, U-bot handoff UI | หาคลิปร้องจริงสำหรับ demo |
-| 10–16 | ต่อ frontend ↔ backend, deploy Vercel → **submit v1** | screenshots | pitch deck v1 |
-| 16–22 | tune threshold, U-bot B/C/D | polish | ซ้อม pitch |
-| 22–24 | freeze — แก้ bug เท่านั้น, **submit final ก่อน 14:00** | | |
+| ชม.   | Dev (+ agent)                                          | Designer                         | Business                                         |
+| ----- | ------------------------------------------------------ | -------------------------------- | ------------------------------------------------ |
+| 0–3   | backend skeleton, `ml/` download + embeddings          | UI จาก wireframe → hi-fi         | ลงทะเบียน Hub, รับ ElevenLabs coupon, OpenAI key |
+| 3–6   | train 6/9 คลาส, `/analyze` ใช้งานได้                   | หน้า result 4 กรณี               | เขียน `knowledge/advice/*` TH/EN                 |
+| 6–10  | LLM + TTS + lullabies, deploy HF                       | lullaby player, U-bot handoff UI | หาคลิปร้องจริงสำหรับ demo                        |
+| 10–16 | ต่อ frontend ↔ backend, deploy Vercel → **submit v1**  | screenshots                      | pitch deck v1                                    |
+| 16–22 | tune threshold, U-bot B/C/D                            | polish                           | ซ้อม pitch                                       |
+| 22–24 | freeze — แก้ bug เท่านั้น, **submit final ก่อน 14:00** |                                  |                                                  |
 
 **ตัดเมื่อไม่ทัน (บนสุดตัดก่อน):** U-bot B/C/D → คลาส 7–9 → ภาษาอังกฤษ → ปุ่มแตะ `close` → เพลงกล่อม
 **ห้ามตัด:** อัดเสียง → `/analyze` → ผล + % → เสียงคำแนะนำ → ปุ่ม U-bot (A)
@@ -222,11 +241,11 @@ Submission (hub.team1.network): GitHub repo (public ✅) · demo = Vercel URL ·
 
 ## 9. ความเสี่ยง
 
-| ความเสี่ยง | รับมือ |
-|---|---|
+| ความเสี่ยง             | รับมือ                                                               |
+| ---------------------- | -------------------------------------------------------------------- |
 | ความแม่นของสาเหตุ ~70% | 4 กรณี + activity priors + disclaimer "ไม่ใช่การวินิจฉัยทางการแพทย์" |
-| ห้องแข่งเสียงดัง | upload คลิปตัวอย่างระหว่าง pitch |
-| Safari อัดเป็น mp4 | backend decode ผ่าน ffmpeg ทุก format |
-| HF Space cold start | เรียก `/health` 5 นาทีก่อน pitch |
-| ElevenLabs/OpenAI ล่ม | fallback ข้อความจาก advice ไฟล์, ไม่มีเสียงก็ยังใช้ได้ |
-| ไมค์ต้องใช้ HTTPS | Vercel เป็น HTTPS อยู่แล้ว; local ใช้ `127.0.0.1` |
+| ห้องแข่งเสียงดัง       | upload คลิปตัวอย่างระหว่าง pitch                                     |
+| Safari อัดเป็น mp4     | backend decode ผ่าน ffmpeg ทุก format                                |
+| HF Space cold start    | เรียก `/health` 5 นาทีก่อน pitch                                     |
+| ElevenLabs/OpenAI ล่ม  | fallback ข้อความจาก advice ไฟล์, ไม่มีเสียงก็ยังใช้ได้               |
+| ไมค์ต้องใช้ HTTPS      | Vercel เป็น HTTPS อยู่แล้ว; local ใช้ `127.0.0.1`                    |

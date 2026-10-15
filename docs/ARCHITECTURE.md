@@ -14,9 +14,9 @@
 
 Dates use Asia/Bangkok. Each activity currently has one date, a start time, and an end time; equal times represent a single event. Cross-midnight duration semantics remain a product decision before implementing duration reporting.
 
-## Mock boundaries
+## Backend integration
 
-`analysis/mock.ts` provides the fixed example result. Recording requests microphone permission and measures live RMS volume for the waveform via `use-audio-level.ts`. It does not persist or upload audio clips. Microphone tracks and AudioContext are released when leaving the capture state. Chat demonstrates left/right messages and local sends, not real AI. No invented medical backend, API endpoint, authentication, or scheduling service is included.
+`analysis/api.ts` calls the FastAPI backend at `NEXT_PUBLIC_API_BASE_URL` (see `.env.example`; unset shows an explicit error state, never a mock). `/analyze` receives the MediaRecorder blob (3–10 s, same mic stream as the waveform) or an uploaded file (≤ 5 MB) plus `context` from `activities/context.ts` (saved entries only). Results render by `case`; `close` offers tap-to-answer questions that re-POST the same blob. `/speak` plays the summary and hides when the backend returns 503. Chat embeds `https://u.bot/` and offers a copy-and-open handoff built from the result and the last 24 h of activities; it falls back to handoff-only if the iframe does not load. Audio is never persisted client-side.
 
 ## Suggested next work
 
