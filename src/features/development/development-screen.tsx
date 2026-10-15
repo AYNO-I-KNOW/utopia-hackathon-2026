@@ -7,6 +7,7 @@ import { copy } from "@/content";
 import { growthCopy as text } from "@/content/development";
 import {
   metrics,
+  metricIds,
   parseEntries,
   type GrowthEntry,
   type MetricId,
@@ -148,16 +149,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
                 </button>
               </div>
               <div className="growth-card-grid">
-                {(
-                  [
-                    "weight",
-                    "height",
-                    "sleep",
-                    "feeding",
-                    "sleep",
-                    "feeding",
-                  ] as MetricId[]
-                ).map((id, index) => {
+                {metricIds.map((id) => {
                   const config = metrics[id],
                     entry = entries
                       .filter((e) => e.metric === id)
@@ -168,7 +160,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
                     <Link
                       href={"/development/" + id}
                       className="growth-metric-card"
-                      key={id + index}
+                      key={id}
                     >
                       <MetricIcon metric={id} />
                       <h2>{config.label}</h2>
