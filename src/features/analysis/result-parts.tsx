@@ -2,6 +2,7 @@
 import { copy } from "@/content";
 import { capitalize, labelCopy, toPercent } from "./labels";
 import type { AnalysisContext, AskKey, TopItem } from "./parse";
+import { ListenWave } from "./listen-wave";
 import { useSpeech } from "./use-speech";
 
 const ASK: Record<
@@ -72,20 +73,32 @@ export function TopBars({ top }: { top: TopItem[] }) {
 }
 
 export function ListenButton({ text }: { text: string }) {
-  const { status, error, toggle } = useSpeech(text);
+  const { status, error, toggle, readLevels } = useSpeech(text);
   if (status === "hidden") return null;
   return (
     <>
       <button
         className="result-listen"
         onClick={toggle}
-        aria-pressed={status === "playing"}
+        aria-label={copy.listen}
+        aria-pressed={status !== "idle"}
       >
-        {status === "loading"
-          ? copy.listenLoading
-          : status === "playing"
-            ? copy.listenStop
-            : `🔊 ${copy.listen}`}
+        {/* All states share one grid cell so the widest label sizes the button. */}
+        <span
+          className="result-listen-label"
+          data-active={status === "idle"}
+          aria-hidden="true"
+        >
+          🔊 {copy.listen}
+        </span>
+        <span
+          className="result-listen-label"
+          data-active={status === "loading"}
+          aria-hidden="true"
+        >
+          {copy.listenLoading}
+        </span>
+        {status === "playing" && <ListenWave readLevels={readLevels} />}
       </button>
       {error && <p role="alert">{error}</p>}
     </>
