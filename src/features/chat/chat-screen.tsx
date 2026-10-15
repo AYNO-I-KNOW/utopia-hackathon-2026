@@ -30,7 +30,7 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
     },
     [],
   );
-  function send(text: string) {
+  function send(text: string, fromSuggestion = false) {
     const trimmed = text.trim();
     if (!trimmed || replyTimer.current) return;
     following.current = true;
@@ -44,19 +44,27 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
       setReplying(false);
       replyTimer.current = null;
     }, 1200);
-    setDraft("");
-    input.current?.focus();
+    if (!fromSuggestion) {
+      setDraft("");
+      input.current?.focus();
+    }
   }
   return (
     <div className="ubot-chat">
       <header className="ubot-header">
         <button className="ubot-back" aria-label={copy.back} onClick={onBack}>
-          <img src="/images/chat/back.svg" alt="" />
+          <img src="/images/analysis/back.svg" alt="" />
         </button>
-        <img className="ubot-avatar" src="/images/chat/assistant.svg" alt="" />
-        <div className="ubot-identity">
-          <h1>{copy.botName}</h1>
-          <span className="ubot-verified" aria-hidden="true" />
+        <div className="ubot-profile">
+          <img
+            className="ubot-avatar"
+            src="/images/chat/assistant.svg"
+            alt=""
+          />
+          <div className="ubot-identity">
+            <h1>{copy.botName}</h1>
+            <span className="ubot-verified" aria-hidden="true" />
+          </div>
         </div>
       </header>
       <div
@@ -93,6 +101,22 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
         )}
       </div>
       <footer className="ubot-composer">
+        <div
+          className="ubot-quick-prompts"
+          role="group"
+          aria-label={copy.chatSuggestions}
+        >
+          {copy.chatSuggestedQuestions.map((question) => (
+            <button
+              key={question}
+              type="button"
+              disabled={replying}
+              onClick={() => send(question, true)}
+            >
+              {question}
+            </button>
+          ))}
+        </div>
         <form
           onSubmit={(event) => {
             event.preventDefault();

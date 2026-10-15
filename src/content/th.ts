@@ -33,7 +33,12 @@ export const th = {
   botName: "ผู้ช่วยส่วนตัว",
   botStatus: "ผู้ช่วยดูแลลูกน้อย",
   chatSuggestions: "คำถามแนะนำ",
-  chatSuggestedQuestions: ["ควรสังเกตอาการอะไรเพิ่ม?", "จะปลอบลูกอย่างไรดี?"],
+  chatSuggestedQuestions: [
+    "ลูกยังร้องอยู่ ทำอย่างไรดี?",
+    "ผลวิเคราะห์ไม่ตรง",
+    "ควรสังเกตอาการอะไรเพิ่ม?",
+    "ช่วยแนะนำวิธีปลอบลูก",
+  ],
   message: "ข้อความ",
   messagePlaceholder: "พิมพ์ข้อความ…",
   send: "ส่ง",
