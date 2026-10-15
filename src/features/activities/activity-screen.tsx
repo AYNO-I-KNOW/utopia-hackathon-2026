@@ -1,6 +1,5 @@
 "use client";
 import { HomeHero } from "./home-hero";
-import { ActivityIcon } from "./activity-icon";
 import { growthCopy } from "@/content/development";
 import { copy } from "@/content";
 import { useEffect, useState } from "react";
@@ -17,6 +16,7 @@ export function ActivityScreen() {
   const [date, setDate] = useState(""),
     [items, setItems] = useState<Activity[]>([]),
     [editing, setEditing] = useState(false),
+    [showHistory, setShowHistory] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
     setDate(dateKey());
@@ -59,41 +59,6 @@ export function ActivityScreen() {
     <MobileShell>
       <section className="content timeline-content home-timeline">
         <HomeHero />
-        <details className="home-history">
-          <summary>{growthCopy.history}</summary>
-          <div className="calendar-top">
-            {" "}
-            <div className="week">
-              {Array.from({ length: 7 }, (_, i) => {
-                const d = new Date(start);
-                d.setDate(d.getDate() + i);
-                const key = dateKey(d);
-                return (
-                  <button
-                    key={key}
-                    className={key === date ? "primary" : ""}
-                    onClick={() => setDate(key)}
-                  >
-                    <small>
-                      {
-                        [
-                          copy.sun,
-                          copy.mon,
-                          copy.tue,
-                          copy.wed,
-                          copy.thu,
-                          copy.fri,
-                          copy.sat,
-                        ][d.getDay()]
-                      }
-                    </small>
-                    <b>{d.getDate()}</b>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </details>
         <div className="home-shortcuts">
           <Link href="/analysis" className="shortcut primary">
             <svg
@@ -131,12 +96,56 @@ export function ActivityScreen() {
         <div className="activities-heading">
           <h2>{growthCopy.daily}</h2>
           <button
+            className="home-history-toggle"
+            aria-expanded={showHistory}
+            aria-controls="home-history"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            {growthCopy.history}
+          </button>
+          <button
             aria-label={copy.addActivity}
             onClick={() => setEditing(true)}
           >
             +
           </button>
         </div>
+        {showHistory && (
+          <div id="home-history" className="home-history">
+            <div className="calendar-top">
+              {" "}
+              <div className="week">
+                {Array.from({ length: 7 }, (_, i) => {
+                  const d = new Date(start);
+                  d.setDate(d.getDate() + i);
+                  const key = dateKey(d);
+                  return (
+                    <button
+                      key={key}
+                      className={key === date ? "primary" : ""}
+                      onClick={() => setDate(key)}
+                    >
+                      <small>
+                        {
+                          [
+                            copy.sun,
+                            copy.mon,
+                            copy.tue,
+                            copy.wed,
+                            copy.thu,
+                            copy.fri,
+                            copy.sat,
+                          ][d.getDay()]
+                        }
+                      </small>
+                      <b>{d.getDate()}</b>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
         {error && <p role="alert">{error}</p>}
         <div className="activity-list">
           {items
@@ -144,7 +153,6 @@ export function ActivityScreen() {
             .sort((a, b) => a.from.localeCompare(b.from))
             .map((item) => (
               <article key={item.id} className="card activity-card">
-                <ActivityIcon kind={item.activity} />
                 <div className="home-activity-body">
                   <h2>{activityLabel(item.activity)}</h2>
                   <p>
