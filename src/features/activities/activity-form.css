@@ -342,60 +342,92 @@
   border-radius: 0 0 24px 24px;
 }
 
-/* Open menus must escape the form scroller and remain above its footer. */
-.activity-modal .content:has(.activity-picker[open]) {
-  overflow: visible;
-  position: relative;
-  z-index: 3;
-}
-.measurement-modal .activity-picker-options {
-  top: auto;
-  bottom: calc(100% + 8px);
-  max-height: min(280px, 50dvh);
-}
+/* Menus float without resizing the sheet or moving its form fields. */
 .measurement-modal .activity-picker::details-content {
   position: absolute;
-  top: 0;
+  top: 100%;
   left: 0;
   right: 0;
-}
-.measurement-modal .activity-picker-options {
-  bottom: 8px;
-}
-
-/* Measurement choices expand in flow, so the bottom-anchored sheet grows upward. */
-.measurement-modal .activity-picker::details-content {
-  position: static;
-  interpolate-size: allow-keywords;
-  block-size: 0;
-  overflow: clip;
+  block-size: auto;
+  overflow: visible;
   opacity: 0;
-  transform: none;
+  transform: translateY(-4px);
   transition:
-    block-size 260ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 180ms ease,
-    content-visibility 260ms allow-discrete;
+    opacity 140ms ease,
+    transform 160ms ease,
+    content-visibility 160ms allow-discrete;
 }
 .measurement-modal .activity-picker[open]::details-content {
   block-size: auto;
   opacity: 1;
+  transform: translateY(0);
 }
 .measurement-modal .activity-picker-options {
   position: relative;
   top: auto;
   bottom: auto;
   margin-top: 8px;
-  max-height: none;
-  box-shadow: none;
-}
-.measurement-modal .activity-picker-options button {
-  padding: 6px 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: 0 12px 32px #30265b16;
 }
 .measurement-modal .content:has(.activity-picker[open]) {
-  overflow-y: auto;
+  overflow: visible;
 }
 @media (prefers-reduced-motion: reduce) {
   .measurement-modal .activity-picker::details-content {
+    transition: none;
+    transform: none;
+  }
+}
+
+.measurement-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #e4e0ef;
+  border-radius: 16px;
+  background: white;
+}
+.measurement-stepper button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  transition: transform 140ms ease;
+}
+.measurement-stepper button:active {
+  transform: scale(0.94);
+}
+.activity-editor .measurement-stepper input {
+  border: 0;
+  padding: 6px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  appearance: textfield;
+}
+.measurement-stepper input::-webkit-inner-spin-button,
+.measurement-stepper input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+.measurement-modal .content:has(.activity-picker[open]) {
+  position: relative;
+  z-index: 3;
+}
+@media (prefers-reduced-motion: reduce) {
+  .measurement-stepper button {
     transition: none;
   }
 }

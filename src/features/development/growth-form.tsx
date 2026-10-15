@@ -1,5 +1,5 @@
 "use client";
-import { CalendarDays, ChevronDown, X } from "lucide-react";
+import { CalendarDays, ChevronDown, Minus, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { growthCopy as text } from "@/content/development";
 import { dateKey } from "@/lib/date";
@@ -8,14 +8,42 @@ import "@/features/activities/activity-form.css";
 import { metrics, metricIds, type GrowthEntry, type MetricId } from "./data";
 export function GrowthForm({
   initial,
+  entries,
   onSave,
   onClose,
 }: {
   initial: MetricId;
+  entries: GrowthEntry[];
   onSave: (entry: GrowthEntry) => void;
   onClose: () => void;
 }) {
   const [kind, setKind] = useState(initial);
+  const [values, setValues] = useState<Record<MetricId, string>>(
+    () =>
+      Object.fromEntries(
+        metricIds.map((id) => {
+          const latest = entries
+            .filter((entry) => entry.metric === id)
+            .reverse()
+            .sort((a, b) => b.date.localeCompare(a.date))[0];
+          return [id, String(latest?.value ?? metrics[id].value)];
+        }),
+      ) as Record<MetricId, string>,
+  );
+  const step = kind === "feeding" ? 1 : kind === "sleep" ? 0.5 : 0.1;
+  function adjust(direction: number) {
+    const value = Number(values[kind]);
+    const next = Math.min(
+      1000,
+      Math.max(
+        step,
+        Math.round(
+          ((Number.isFinite(value) ? value : 0) + direction * step) * 100,
+        ) / 100,
+      ),
+    );
+    setValues((previous) => ({ ...previous, [kind]: String(next) }));
+  }
   const [closing, setClosing] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const picker = useRef<HTMLDetailsElement>(null);
@@ -122,16 +150,42 @@ export function GrowthForm({
             </div>
             <label>
               {text.value} ({metrics[kind].unit})
-              <input
-                name="value"
-                type="number"
-                inputMode="decimal"
-                placeholder="0.0"
-                min="0.01"
-                max="1000"
-                step="0.01"
-                required
-              />
+              <div className="measurement-stepper">
+                <button
+                  type="button"
+                  aria-label="Decrease value"
+                  onClick={() => adjust(-1)}
+                  disabled={Number(values[kind]) <= step}
+                >
+                  <Minus size={20} strokeWidth={1.75} />
+                </button>
+                <input
+                  name="value"
+                  aria-label={`${text.value} (${metrics[kind].unit})`}
+                  value={values[kind]}
+                  onChange={(event) =>
+                    setValues((previous) => ({
+                      ...previous,
+                      [kind]: event.target.value,
+                    }))
+                  }
+                  type="number"
+                  inputMode="decimal"
+                  placeholder="0.0"
+                  min="0.01"
+                  max="1000"
+                  step={step}
+                  required
+                />
+                <button
+                  type="button"
+                  aria-label="Increase value"
+                  onClick={() => adjust(1)}
+                  disabled={Number(values[kind]) >= 1000}
+                >
+                  <Plus size={20} strokeWidth={1.75} />
+                </button>
+              </div>
             </label>
             <label>
               {text.date}

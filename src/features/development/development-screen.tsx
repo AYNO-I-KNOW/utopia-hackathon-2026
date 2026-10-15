@@ -194,6 +194,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
       </div>
       {showForm && (
         <GrowthForm
+          entries={entries}
           initial={metric ?? "weight"}
           onSave={save}
           onClose={() => setShowForm(false)}
