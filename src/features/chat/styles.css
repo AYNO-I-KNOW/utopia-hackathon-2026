@@ -174,3 +174,13 @@
     animation: none;
   }
 }
+
+/* Focus belongs to the composed pill, not the rectangular inner input. */
+.ubot-input-wrap:focus-within {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+.ubot-input-wrap input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
