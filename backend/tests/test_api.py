@@ -77,8 +77,8 @@ class TestAnalyze:
         assert res.status_code == 400
         assert "short" in res.json()["detail"]
 
-    def test_too_long_audio_400(self, make_client):
-        assert post_analyze(make_client(), make_wav(31, rate=8000)).status_code == 400
+    def test_long_audio_truncated_200(self, make_client):
+        assert post_analyze(make_client(), make_wav(39, rate=8000)).status_code == 200
 
     def test_garbage_audio_400(self, make_client):
         assert post_analyze(make_client(), b"not audio at all" * 50).status_code == 400

@@ -22,10 +22,6 @@ class AudioTooShortError(AudioError):
     pass
 
 
-class AudioTooLongError(AudioError):
-    pass
-
-
 class DecoderUnavailableError(RuntimeError):
     """ffmpeg is not installed on the server (maps to HTTP 503)."""
 
@@ -59,8 +55,8 @@ def _run_ffmpeg(ffmpeg: str, path: str) -> bytes:
         "-protocol_whitelist", "file", "-format_whitelist", FFMPEG_FORMAT_WHITELIST,
         "-threads", "1",
         "-i", path,
-        # read 1 s past the cap so over-long files are detected without decoding them fully
-        "-t", str(MAX_AUDIO_SECONDS + 1),
+        # parents' clips often run long: analyse only the first MAX_AUDIO_SECONDS instead of rejecting
+        "-t", str(MAX_AUDIO_SECONDS),
         "-vn", "-ac", "1", "-ar", str(SAMPLE_RATE), "-f", "f32le", "pipe:1",
     ]  # fmt: skip
     try:
@@ -76,6 +72,4 @@ def _check_duration(waveform: np.ndarray) -> np.ndarray:
     seconds = waveform.size / SAMPLE_RATE
     if seconds < MIN_AUDIO_SECONDS:
         raise AudioTooShortError(f"audio too short: {seconds:.2f}s (min {MIN_AUDIO_SECONDS:g}s)")
-    if seconds > MAX_AUDIO_SECONDS:
-        raise AudioTooLongError(f"audio too long (max {MAX_AUDIO_SECONDS:g}s)")
     return np.nan_to_num(waveform, nan=0.0, posinf=0.0, neginf=0.0)

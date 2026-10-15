@@ -4,8 +4,8 @@ import subprocess
 import numpy as np
 import pytest
 
-from app.audio import AudioDecodeError, AudioTooLongError, AudioTooShortError, decode_audio
-from app.config import SAMPLE_RATE
+from app.audio import AudioDecodeError, AudioTooShortError, decode_audio
+from app.config import MAX_AUDIO_SECONDS, SAMPLE_RATE
 from tests.conftest import make_wav
 
 pytestmark = pytest.mark.skipif(shutil.which("ffmpeg") is None, reason="ffmpeg not on PATH")
@@ -23,9 +23,9 @@ def test_rejects_short_audio():
         decode_audio(make_wav(0.5))
 
 
-def test_rejects_long_audio():
-    with pytest.raises(AudioTooLongError):
-        decode_audio(make_wav(31, rate=8000))
+def test_truncates_long_audio_to_max_seconds():
+    out = decode_audio(make_wav(39, rate=8000))
+    assert abs(out.size - MAX_AUDIO_SECONDS * SAMPLE_RATE) < SAMPLE_RATE * 0.05
 
 
 def test_accepts_boundary_lengths():
