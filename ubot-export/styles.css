@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #e8e4f5;
+  font-family: 'Noto Sans Thai', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer shell centers the phone */
+.shell {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d9d3f0 0%, #ede9fb 100%);
+}
+
+/* Phone frame */
+.phone {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  background: #f5f3fc;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(108,92,231,0.18);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  background: #fff;
+  border-bottom: 1px solid #ede9fb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.back-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: #f0edfb;
+  border-radius: 12px;
+  color: #6C5CE7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.back-btn:hover { background: #e0d9f7; }
+
+.header-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.header-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2d2460;
+  line-height: 1.2;
+}
+.header-sub {
+  font-size: 0.72rem;
+  color: #9b8ec4;
+  margin-top: 1px;
+}
+.header-avatar {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  background: #ede9fb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Result card ── */
+.result-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 14px 4px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #6C5CE7 0%, #a29bfe 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(108,92,231,0.25);
+  flex-shrink: 0;
+}
+.result-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+.result-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.result-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+.confidence-chip {
+  display: inline-block;
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  width: fit-content;
+  letter-spacing: 0.02em;
+}
+
+/* ── Message list ── */
+.msg-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scroll-behavior: smooth;
+}
+
+.bubble-row {
+  display: flex;
+  width: 100%;
+}
+.bubble-row.left  { justify-content: flex-start; }
+.bubble-row.right { justify-content: flex-end; }
+
+.bubble {
+  max-width: 78%;
+  padding: 10px 14px 6px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  word-break: break-word;
+}
+.bubble.assistant {
+  background: #ede9fb;
+  color: #2d2460;
+  border-bottom-left-radius: 4px;
+}
+.bubble.user {
+  background: #6C5CE7;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.bubble-text {
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.bubble-time {
+  font-size: 0.65rem;
+  color: rgba(0,0,0,0.35);
+  align-self: flex-end;
+}
+.bubble.user .bubble-time { color: rgba(255,255,255,0.6); }
+
+/* Typing indicator */
+.typing-bubble {
+  padding: 12px 16px;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  min-width: 56px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  background: #9b8ec4;
+  border-radius: 50%;
+  display: inline-block;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40%            { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Error bubble */
+.error-bubble {
+  background: #fff0f0;
+  border: 1.5px solid #ffb3b3;
+  color: #c0392b;
+  border-bottom-left-radius: 4px;
+  gap: 8px;
+}
+.retry-btn {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 5px 14px;
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 32px;
+  transition: background 0.15s;
+}
+.retry-btn:hover { background: #a93226; }
+
+/* ── Quick replies ── */
+.quick-replies {
+  display: flex;
+  gap: 8px;
+  padding: 8px 14px 6px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.quick-replies::-webkit-scrollbar { display: none; }
+
+.quick-chip {
+  white-space: nowrap;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1.5px solid #c4b8f5;
+  color: #6C5CE7;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 36px;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.quick-chip:hover:not(:disabled) { background: #ede9fb; border-color: #6C5CE7; }
+.quick-chip:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── Input bar ── */
+.input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 14px;
+  background: #fff;
+  border-top: 1px solid #ede9fb;
+  flex-shrink: 0;
+}
+
+.text-input {
+  flex: 1;
+  height: 46px;
+  padding: 0 16px;
+  border: 1.5px solid #d4cdf5;
+  border-radius: 23px;
+  background: #f5f3fc;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: #2d2460;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.text-input::placeholder { color: #b0a4d8; }
+.text-input:focus { border-color: #6C5CE7; background: #fff; }
+.text-input:disabled { opacity: 0.6; }
+
+.send-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #6C5CE7;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, transform 0.1s;
+}
+.send-btn:hover:not(:disabled) { background: #5a4bd1; transform: scale(1.06); }
+.send-btn:disabled { background: #c4b8f5; cursor: not-allowed; transform: none; }
+
+button:hover { filter: none; }

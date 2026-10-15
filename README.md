@@ -1,18 +1,59 @@
-# utopia-hackathon-2026
-AYNO team - U-topia Hackathon
+# Crybaby
 
-## Mobile wireframe
+Mobile-first low-fidelity prototype for AYNO · Utopia Hackathon 2026.
 
-Buildless HTML prototype. Run locally:
+## Start
+
+Node.js 24 LTS (`nvm use`), npm, then:
 
 ```sh
-python3 -m http.server 4175 --bind 127.0.0.1
+npm ci
+npm run dev
 ```
 
-Open http://127.0.0.1:4175. No installation or build is required.
+Open http://127.0.0.1:4175. Refresh always opens the activity home screen at `/`.
 
-The starting screen is the activity timeline. Bottom navigation links to child development, cry-pattern analysis, and doctor consultation. The latter two unfinished sections (development and consultation) are placeholders.
+```sh
+npm run typecheck
+npm test
+npm run build
+npm start
+```
 
-Cry-analysis flow: microphone → recording → confirm → loading → result → chat or save activity. Recording waveform, analysis results, and AI replies are simulated; no microphone or AI service is connected. The timer tracks elapsed time. Activity date/time defaults to the current Bangkok time and can be edited. Activities persist only in this browser's localStorage, not in a backend.
+## Structure
 
-Keep this first pass low fidelity, mobile only, and concise. Current layout follows the reviewed wireframe rather than a final visual design.
+```text
+src/
+  app/                  Next.js App Router, layouts, routes, global wireframe CSS
+    page.tsx            / — activity home
+    analysis/           /analysis — recording, result, chat
+    development/        /development — placeholder
+    doctor/             /doctor — placeholder
+  components/           Shared mobile shell and bottom navigation
+  features/
+    activities/         Timeline, entry form, Activity type and storage adapter
+    analysis/           Analysis flow and isolated mock result
+    chat/               In-app chat answered by the backend `/chat` (layout designed with U-bot U-Code)
+  lib/                  Shared Bangkok date/time helpers and boundary tests
+docs/
+  ARCHITECTURE.md        Implementation boundaries and next steps
+  wireframe/index.html  Preserved HTML reference before React migration
+```
+
+## Current scope
+
+Next.js + React + strict TypeScript. No UI framework or external font dependency. Home → activity entry and analysis → recording → loading → result → chat / activity entry are interactive. Bottom navigation uses real routes. Existing `baby-activities` browser data is reused.
+
+The waveform measures live microphone volume after permission; audio clips are not saved or uploaded. Analysis and chat replies come from the backend (no OpenAI key = fixed advice templates). Backend, authentication, doctor consultation are not implemented. Activity entries live only in this browser's localStorage. Do not describe this prototype as a health assessment.
+
+## Working conventions
+
+Keep route files thin; put feature logic under `features/<feature>`. Reuse `components` only for genuinely shared UI. Put external-service calls behind feature adapters. Use Bangkok dates for activity defaults. Keep UI copy concise and layouts mobile only. Never commit credentials or `.env` files. Run the commands above before handing changes to the team.
+
+## Design system and copy
+
+See `docs/DESIGN-SYSTEM.md`. Tokens: `src/design-system/tokens.css`; live reference: `/design-system`. Nunito is the global primary font with Noto Sans Thai as the Thai glyph fallback. Product copy is centralized in `src/content/th.ts`; refine Thai before adding a complete English dictionary for release.
+
+Run `npm run check` before handing off changes (strict types, formatting, boundary tests), then `npm run build`. See `docs/QUALITY.md`.
+
+Development tracking: `/development` links to `/development/weight`, `/development/height`, `/development/sleep`, and `/development/feeding`. Figma examples are labeled; local growth entries use `crybaby-growth` and are filtered by period without mixing demo values. See the development section in `docs/ARCHITECTURE.md`.

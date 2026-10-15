@@ -1,0 +1,33 @@
+{
+  "name": "crybaby",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 4175",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 4175",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/lib/*.test.ts src/features/activities/*.test.ts src/features/development/*.test.ts src/features/analysis/*.test.ts src/features/chat/*.test.ts",
+    "format": "prettier --write src docs/*.md README.md",
+    "format:check": "prettier --check src docs/*.md README.md",
+    "check": "npm run typecheck && npm run format:check && npm test"
+  },
+  "dependencies": {
+    "@fontsource-variable/noto-sans-thai": "^5.3.0",
+    "@fontsource-variable/nunito": "^5.3.0",
+    "next": "^16.4.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  },
+  "type": "module"
+}
