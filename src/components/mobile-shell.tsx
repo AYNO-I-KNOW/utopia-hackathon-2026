@@ -3,7 +3,6 @@ export function MobileShell({
   title,
 }: {
   children: React.ReactNode;
-  active?: string;
   title?: string;
 }) {
   return (

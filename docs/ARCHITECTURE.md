@@ -16,7 +16,7 @@ Dates use Asia/Bangkok. Each activity currently has one date, a start time, and 
 
 ## Mock boundaries
 
-`analysis/mock.ts` provides the fixed example result. Recording currently measures elapsed wall time and renders an animated sample waveform; it does not request microphone permission or capture audio. Chat demonstrates left/right messages and local sends, not real AI. No invented medical backend, API endpoint, authentication, or scheduling service is included.
+`analysis/mock.ts` provides the fixed example result. Recording requests microphone permission and measures live RMS volume for the waveform via `use-audio-level.ts`. It does not persist or upload audio clips. Microphone tracks and AudioContext are released when leaving the capture state. Chat demonstrates left/right messages and local sends, not real AI. No invented medical backend, API endpoint, authentication, or scheduling service is included.
 
 ## Suggested next work
 
@@ -29,3 +29,13 @@ Dates use Asia/Bangkok. Each activity currently has one date, a start time, and 
 ## Validation
 
 `npm run typecheck`, `npm test`, and `npm run build`. The date tests cover Bangkok midnight and timer minute/hour rollover. Browser QA should confirm the mobile layout and real navigation after UI changes; compilation alone does not establish UI acceptance.
+
+## Development flow (Figma references)
+
+Home hero: 3:705. Overview: 3:582. Details: weight 3:430, height 3:506, sleep 3:260, feeding 3:345. Existing home calendar is available under history; local activities are preserved. Navigation and device status decorations remain excluded per the approved web direction.
+
+`features/development` owns metric definitions, shared icon/chart/form components, local `crybaby-growth` entries, and period selection. `content/development.ts` is the Thai copy source for this feature. Detail routes use `[metric]` with validated static parameters. Data has no backend.
+
+When no saved metric exists, Figma example cards/charts are labeled as examples. As soon as that metric is recorded, its header and plot use the real local entries for the selected time range; no example points or comparison norms are mixed into recorded data. Recommendations remain prototype copy. No clinical normal-range or growth diagnosis is implemented. Source graph labels/units had inconsistencies; labels follow the selected metric rather than repeating sleep labels on weight/feeding screens.
+
+Use `npm run check` and `npm run build`. The period-boundary test ensures that actual saved series exclude other metrics and demo values. Manual browser checks should include home entry, all metric routes, period tabs, form validation and back navigation. Preserve explicit sample labels for release until real data is available.

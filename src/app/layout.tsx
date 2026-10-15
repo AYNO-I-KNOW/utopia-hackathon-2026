@@ -3,6 +3,7 @@ import "@fontsource-variable/nunito";
 import "@fontsource-variable/noto-sans-thai";
 import "@/design-system/tokens.css";
 import "./globals.css";
+import "@/features/development/styles.css";
 import "@/design-system/components.css";
 import { activeLocale } from "@/content";
 export const metadata: Metadata = {

@@ -44,7 +44,7 @@ docs/
 
 Next.js + React + strict TypeScript. No UI framework or external font dependency. Home → activity entry and analysis → recording → loading → result → chat / activity entry are interactive. Bottom navigation uses real routes. Existing `baby-activities` browser data is reused.
 
-Audio waveform, analysis, and chat replies are simulated. Microphone capture, backend, authentication, doctor consultation, and development tracking are not implemented. Activity entries live only in this browser's localStorage. Do not describe this prototype as a health assessment.
+The waveform measures live microphone volume after permission; audio clips are not saved or uploaded. Analysis and chat replies are simulated. Backend, authentication, doctor consultation are not implemented. Activity entries live only in this browser's localStorage. Do not describe this prototype as a health assessment.
 
 ## Working conventions
 
@@ -53,3 +53,7 @@ Keep route files thin; put feature logic under `features/<feature>`. Reuse `comp
 ## Design system and copy
 
 See `docs/DESIGN-SYSTEM.md`. Tokens: `src/design-system/tokens.css`; live reference: `/design-system`. Nunito is the global primary font with Noto Sans Thai as the Thai glyph fallback. Product copy is centralized in `src/content/th.ts`; refine Thai before adding a complete English dictionary for release.
+
+Run `npm run check` before handing off changes (strict types, formatting, boundary tests), then `npm run build`. See `docs/QUALITY.md`.
+
+Development tracking: `/development` links to `/development/weight`, `/development/height`, `/development/sleep`, and `/development/feeding`. Figma examples are labeled; local growth entries use `crybaby-growth` and are filtered by period without mixing demo values. See the development section in `docs/ARCHITECTURE.md`.

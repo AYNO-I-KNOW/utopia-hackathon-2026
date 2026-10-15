@@ -1,11 +1,4 @@
-import { copy } from "@/content";
-import { MobileShell } from "@/components/mobile-shell";
+import { DevelopmentScreen } from "@/features/development/development-screen";
 export default function Page() {
-  return (
-    <MobileShell active="/development">
-      <section className="content">
-        <h1>{copy.development}</h1>
-      </section>
-    </MobileShell>
-  );
+  return <DevelopmentScreen />;
 }

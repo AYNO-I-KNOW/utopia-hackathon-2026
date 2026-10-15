@@ -1,4 +1,7 @@
 "use client";
+import { HomeHero } from "./home-hero";
+import { ActivityIcon } from "./activity-icon";
+import { growthCopy } from "@/content/development";
 import { copy } from "@/content";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -53,47 +56,44 @@ export function ActivityScreen() {
   const start = new Date(selected);
   start.setDate(start.getDate() - start.getDay());
   return (
-    <MobileShell active="/">
-      <section className="content timeline-content">
-        <div className="calendar-top">
-          <div className="greeting">
-            <div className="profile-circle" />
-            <div>
-              <h2>{copy.greeting}</h2>
-              <p>{copy.greetingSubtitle}</p>
+    <MobileShell>
+      <section className="content timeline-content home-timeline">
+        <HomeHero />
+        <details className="home-history">
+          <summary>{growthCopy.history}</summary>
+          <div className="calendar-top">
+            {" "}
+            <div className="week">
+              {Array.from({ length: 7 }, (_, i) => {
+                const d = new Date(start);
+                d.setDate(d.getDate() + i);
+                const key = dateKey(d);
+                return (
+                  <button
+                    key={key}
+                    className={key === date ? "primary" : ""}
+                    onClick={() => setDate(key)}
+                  >
+                    <small>
+                      {
+                        [
+                          copy.sun,
+                          copy.mon,
+                          copy.tue,
+                          copy.wed,
+                          copy.thu,
+                          copy.fri,
+                          copy.sat,
+                        ][d.getDay()]
+                      }
+                    </small>
+                    <b>{d.getDate()}</b>
+                  </button>
+                );
+              })}
             </div>
           </div>
-          <div className="week">
-            {Array.from({ length: 7 }, (_, i) => {
-              const d = new Date(start);
-              d.setDate(d.getDate() + i);
-              const key = dateKey(d);
-              return (
-                <button
-                  key={key}
-                  className={key === date ? "primary" : ""}
-                  onClick={() => setDate(key)}
-                >
-                  <small>
-                    {
-                      [
-                        copy.sun,
-                        copy.mon,
-                        copy.tue,
-                        copy.wed,
-                        copy.thu,
-                        copy.fri,
-                        copy.sat,
-                      ][d.getDay()]
-                    }
-                  </small>
-                  <b>{d.getDate()}</b>
-                </button>
-              );
-            })}
-          </div>
-          <div className="calendar-handle" />
-        </div>
+        </details>
         <div className="home-shortcuts">
           <Link href="/analysis" className="shortcut primary">
             <svg
@@ -129,7 +129,7 @@ export function ActivityScreen() {
           </Link>
         </div>
         <div className="activities-heading">
-          <h2>{copy.activities}</h2>
+          <h2>{growthCopy.daily}</h2>
           <button
             aria-label={copy.addActivity}
             onClick={() => setEditing(true)}
@@ -144,14 +144,17 @@ export function ActivityScreen() {
             .sort((a, b) => a.from.localeCompare(b.from))
             .map((item) => (
               <article key={item.id} className="card activity-card">
-                <h2>{activityLabel(item.activity)}</h2>
-                <p>
-                  {item.from === item.to
-                    ? item.from
-                    : `${item.from} – ${item.to}`}{" "}
-                  {copy.timeSuffix}
-                </p>
-                {item.note && <p>{item.note}</p>}
+                <ActivityIcon kind={item.activity} />
+                <div className="home-activity-body">
+                  <h2>{activityLabel(item.activity)}</h2>
+                  <p>
+                    {item.from === item.to
+                      ? item.from
+                      : `${item.from} – ${item.to}`}{" "}
+                    {copy.timeSuffix}
+                  </p>
+                  {item.note && <p>{item.note}</p>}
+                </div>
               </article>
             ))}
           {!items.some((item) => item.date === date) && (

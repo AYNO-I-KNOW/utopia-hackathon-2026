@@ -1,5 +1,24 @@
 /** Thai drafting source. Refine here before English translation. */
 export const th = {
+  resultTitle: "เด็กน้อยคุณอาจกำลังหิว",
+  highConfidence: "ความมั่นใจสูง",
+  resultExplanation:
+    "ผลตัวอย่างจากรูปแบบเสียงร้อง\nลองสังเกตอาการของลูกร่วมด้วย",
+  resultAdviceTitle: "คำแนะนำ : ทานอาหาร",
+  resultAdvice:
+    "ลองสังเกตว่าลูกดูดมือหรือหันหาเต้านม และเช็กเวลาให้นมครั้งล่าสุด",
+  resultCareTitle: "เคล็ดลับการดูแล",
+  resultCare:
+    "ทารกมักแสดงความหิวด้วยการหันหาเต้านมหรือเลียริมฝีปาก หากไม่แน่ใจ ลองสังเกตสัญญาณเหล่านี้ร่วมด้วย",
+  retry: "ลองใหม่อีกครั้ง",
+  addAction: "เพิ่มการกระทำ",
+  pause: "พัก",
+  recordingPaused: "พักการบันทึก",
+  finish: "สิ้นสุด",
+  exit: "ออก",
+  stopRecording: "หยุดบันทึกและวิเคราะห์",
+  cancel: "ยกเลิก",
+  microphoneError: "เปิดไมโครโฟนไม่ได้ กรุณาอนุญาตแล้วลองใหม่",
   home: "หน้าแรก",
   development: "พัฒนาการลูก",
   analysisMenu: "วิเคราะห์แพทเทิร์นเสียง",

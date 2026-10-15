@@ -10,9 +10,10 @@
     "build": "next build",
     "start": "next start --hostname 127.0.0.1 --port 4175",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/lib/date.test.ts",
-    "format": "prettier --write src README.md docs/ARCHITECTURE.md",
-    "format:check": "prettier --check src README.md docs/ARCHITECTURE.md"
+    "test": "node --experimental-strip-types --test src/lib/*.test.ts src/features/activities/*.test.ts src/features/development/*.test.ts",
+    "format": "prettier --write src docs/*.md README.md",
+    "format:check": "prettier --check src docs/*.md README.md",
+    "check": "npm run typecheck && npm run format:check && npm test"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-thai": "^5.3.0",

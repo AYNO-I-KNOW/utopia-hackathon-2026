@@ -1,5 +1,17 @@
 /* Single source of truth. Feature geometry (Figma percentages) stays in feature CSS. */
 :root {
+  --color-growth-background: #ebeffc;
+  --color-growth-chip: #f1ecff;
+  --color-growth-chip-text: #291a68;
+  --color-growth-link: #6549f7;
+  --color-growth-weight: #a795f5;
+  --color-growth-height: #f07a88;
+  --color-growth-sleep: #94b3fb;
+  --color-growth-feeding: #b3cb8a;
+  --color-growth-grid: #d4d5dc;
+  --color-growth-comparison: #7a86a7;
+  --color-growth-highlight: #e1f5fe;
+  --color-growth-feeding-highlight: #e8f0d9;
   --font-family-ui: "Nunito Variable", "Noto Sans Thai Variable", sans-serif;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -13,6 +25,12 @@
   --font-weight-bold: 700;
   --line-height-body: 1.6;
   --line-height-heading: 1.4;
+  --color-result-background: #f3f4fd;
+  --color-advice-background: #edd1ff;
+  --color-advice-text: #33293d;
+  --color-confidence-background: #c8efcf;
+  --color-confidence-text: #023604;
+  --color-result-action: #6e76fe;
   --color-brand: #776dfd;
   --color-brand-hover: #665ae8;
   --color-brand-pressed: #5746cf;
