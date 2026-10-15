@@ -13,9 +13,7 @@
   padding-top: max(16px, env(safe-area-inset-top));
   background: var(--color-surface);
 }
-.ubot-back,
-.ubot-more,
-.ubot-send {
+.ubot-back {
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -24,12 +22,9 @@
   padding: 0;
   border: 0;
   border-radius: 999px;
-}
-.ubot-back {
   background: transparent;
 }
-.ubot-back img,
-.ubot-send img {
+.ubot-back img {
   width: 24px;
   height: 24px;
 }
@@ -54,102 +49,56 @@
   font-size: 12px;
   color: var(--color-text-secondary);
 }
-.ubot-messages {
+.ubot-body {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 24px 16px;
-  overscroll-behavior: contain;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  overflow-y: auto;
 }
-.ubot-bubble {
+.ubot-context {
   flex-shrink: 0;
-  max-width: 84%;
-  padding: 8px 12px;
-  border-radius: 20px 20px 20px 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
-  color: var(--color-text);
-  font-size: 14px;
-  line-height: normal;
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-  animation: ubot-message-in 220ms ease-out both;
+  font-size: var(--font-size-sm);
 }
-.ubot-user {
-  align-self: flex-end;
-  border-radius: 20px 20px 0 20px;
-  background: var(--color-brand-pressed);
-  color: var(--color-on-brand);
+.ubot-context summary {
+  cursor: pointer;
+  color: var(--color-brand-pressed);
+  font-weight: var(--font-weight-semibold);
+}
+.ubot-context textarea {
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  resize: vertical;
+}
+.ubot-note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: normal;
+}
+.ubot-frame {
+  flex: 1;
+  min-height: 320px;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.ubot-status:not(:empty) {
+  margin-bottom: var(--space-2);
 }
 .ubot-composer {
+  display: flex;
+  flex-direction: column;
   padding: 16px 24px;
   padding-bottom: max(16px, env(safe-area-inset-bottom));
   background: var(--color-surface);
-}
-.ubot-composer form {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.ubot-more {
-  background: var(--color-brand-soft);
-  color: var(--color-brand-pressed);
-  font-size: 28px;
-}
-.ubot-input-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: var(--color-brand-soft);
-}
-.ubot-input-wrap input {
-  flex: 1;
-  width: 0;
-  min-width: 0;
-  padding: 8px;
-  border: 0;
-  background: transparent;
-  font-size: 16px;
-}
-.ubot-send {
-  background: var(--color-brand-pressed);
-}
-.ubot-send:disabled {
-  opacity: 0.45;
-}
-.ubot-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-bottom: 16px;
-}
-.ubot-suggestions button {
-  border: 0;
-  border-radius: 999px;
-  background: var(--color-brand-soft);
-  color: var(--color-brand-pressed);
-  padding: 8px 12px;
-  font-size: 14px;
-}
-@keyframes ubot-message-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ubot-bubble {
-    animation: none;
-  }
 }
