@@ -76,9 +76,11 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
               </div>
               <div
                 className="growth-tabs"
+                data-period={period}
                 role="tablist"
                 aria-label={text.title}
               >
+                <span className="growth-tab-indicator" aria-hidden="true" />
                 {(["week", "month", "year"] as const).map((id, index) => (
                   <button
                     key={id}
@@ -105,7 +107,6 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
                     }}
                     onClick={() => setPeriod(id)}
                   >
-                    <span className={period === id ? "active" : ""} />
                     <b>{[text.week, text.month, text.year][index]}</b>
                   </button>
                 ))}
