@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -21,7 +22,7 @@ export function AnalysisResult({
           aria-label={copy.backHome}
           onClick={() => dialog.current?.showModal()}
         >
-          <img src="/images/result/close.svg" alt="" />
+          <X size={22} strokeWidth={1.75} />
         </button>
         <div className="result-summary">
           <div className="result-baby-mask">
@@ -50,7 +51,7 @@ export function AnalysisResult({
           </article>
         </div>
         <button type="button" className="result-retry" onClick={onRetry}>
-          วิเคราะห์อีกครั้ง
+          Analyze again
         </button>
       </section>
       <dialog
@@ -59,15 +60,15 @@ export function AnalysisResult({
         aria-labelledby="result-exit-title"
         aria-describedby="result-exit-description"
       >
-        <h2 id="result-exit-title">ปิดผลวิเคราะห์?</h2>
+        <h2 id="result-exit-title">Close this result?</h2>
         <p id="result-exit-description">
-          ผลครั้งนี้ยังไม่ได้บันทึก หากปิดจะต้องวิเคราะห์ใหม่
+          This result has not been saved. Closing it will discard this analysis.
         </p>
         <div className="result-exit-actions">
           <button autoFocus onClick={() => dialog.current?.close()}>
-            ดูผลต่อ
+            Keep viewing
           </button>
-          <button onClick={() => router.push("/")}>ปิดโดยไม่บันทึก</button>
+          <button onClick={() => router.push("/")}>Close without saving</button>
         </div>
       </dialog>
       <footer className="result-actions">

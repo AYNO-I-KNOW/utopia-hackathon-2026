@@ -1,4 +1,5 @@
 "use client";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { growthCopy as text } from "@/content/development";
 import { dateKey } from "@/lib/date";
@@ -50,19 +51,22 @@ export function GrowthForm({
         >
           <label>
             {text.metric}
-            <select
-              value={kind}
-              onChange={(e) => {
-                if (isMetric(e.target.value)) setKind(e.target.value);
-              }}
-              autoFocus
-            >
-              {metricIds.map((id) => (
-                <option value={id} key={id}>
-                  {metrics[id].label}
-                </option>
-              ))}
-            </select>
+            <div className="lucide-select">
+              <ChevronDown size={18} aria-hidden="true" />
+              <select
+                value={kind}
+                onChange={(e) => {
+                  if (isMetric(e.target.value)) setKind(e.target.value);
+                }}
+                autoFocus
+              >
+                {metricIds.map((id) => (
+                  <option value={id} key={id}>
+                    {metrics[id].label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </label>
           <label>
             {text.value} ({metrics[kind].unit})

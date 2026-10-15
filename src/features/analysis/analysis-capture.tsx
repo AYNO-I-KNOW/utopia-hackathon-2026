@@ -1,3 +1,4 @@
+import { ChevronLeft, Pause, Play } from "lucide-react";
 import { copy } from "@/content";
 import { SceneLink } from "@/components/scene-navigation";
 import { formatElapsed } from "@/lib/date";
@@ -41,7 +42,7 @@ export function AnalysisCapture({
           aria-label={copy.cancelRecording}
           onClick={onCancel}
         >
-          <img src="/images/analysis/back.svg" alt="" />
+          <ChevronLeft size={22} strokeWidth={1.75} />
         </button>
       ) : (
         <SceneLink
@@ -49,7 +50,7 @@ export function AnalysisCapture({
           className="analysis-back"
           aria-label={copy.backHome}
         >
-          <img src="/images/analysis/back.svg" alt="" />
+          <ChevronLeft size={22} strokeWidth={1.75} />
         </SceneLink>
       )}
       <div className="analysis-heading">
@@ -96,22 +97,11 @@ export function AnalysisCapture({
               tabIndex={recording ? 0 : -1}
               aria-hidden={!recording}
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                {paused ? (
-                  <path d="M7 4v16l14-8z" />
-                ) : (
-                  <>
-                    <rect x="5" y="4" width="5" height="16" rx="1" />
-                    <rect x="14" y="4" width="5" height="16" rx="1" />
-                  </>
-                )}
-              </svg>
+              {paused ? (
+                <Play size={20} fill="currentColor" />
+              ) : (
+                <Pause size={20} fill="currentColor" />
+              )}
               <span>{paused ? copy.continueRecording : copy.pause}</span>
             </button>
           </div>

@@ -1,4 +1,5 @@
 "use client";
+import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MobileShell } from "@/components/mobile-shell";
@@ -54,7 +55,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
             href={metric ? "/development" : "/"}
             aria-label={copy.back}
           >
-            <img src="/images/analysis/back.svg" alt="" />
+            <ChevronLeft size={22} strokeWidth={1.75} />
           </Link>
         </header>
         <section className="growth-content">

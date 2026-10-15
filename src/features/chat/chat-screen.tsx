@@ -1,22 +1,23 @@
 "use client";
+import { ChevronLeft, ArrowUp } from "lucide-react";
 import { copy } from "@/content";
 import { useEffect, useRef, useState } from "react";
 import "./styles.css";
 
 function getDemoReply(text: string) {
-  if (/ไม่ตรง|ไม่ใช่|ผิด/.test(text))
-    return "ขอบคุณที่บอกค่ะ ผลวิเคราะห์เป็นเพียงการคาดการณ์ ตอนนี้ลูกมีท่าทางหรือเสียงร้องต่างจากที่ผลบอกอย่างไรบ้างคะ?";
-  if (/ยังร้อง|ร้องไม่หยุด/.test(text))
-    return "ลูกยังร้องอยู่ใช่ไหมคะ ร้องมานานแค่ไหนแล้ว และก่อนหน้านี้ลองทำอะไรไปบ้างคะ?";
-  if (/สังเกต|อาการ/.test(text))
-    return "เล่าได้เลยค่ะ ตอนร้องลูกมีท่าทางอย่างไร และมีอะไรเปลี่ยนไปจากปกติบ้างคะ?";
-  if (/ปลอบ|อุ้ม/.test(text))
-    return "ก่อนหน้านี้ลองปลอบลูกด้วยวิธีไหนบ้างคะ แล้วลูกตอบสนองอย่างไร เล่าให้ฟังทีละอย่างได้เลยค่ะ";
-  if (/ขอบคุณ/.test(text))
-    return "ยินดีค่ะ ถ้ามีอะไรเปลี่ยนไป หรืออยากเล่าเพิ่มเติม พิมพ์ต่อได้เลยนะคะ";
+  if (/wrong|not right|incorrect/i.test(text))
+    return "Thanks for letting me know. The result is only an estimate. What are you noticing that seems different?";
+  if (/still crying|won.t stop/i.test(text))
+    return "How long has your baby been crying, and what have you tried so far?";
+  if (/look for|symptom|notice/i.test(text))
+    return "What is your baby doing while crying? Have you noticed anything different from usual?";
+  if (/soothe|hold|comfort/i.test(text))
+    return "What have you tried to soothe your baby, and how did they respond?";
+  if (/thank/i.test(text))
+    return "You’re welcome. If anything changes, you can tell me here.";
   if (text.trim().length < 4)
-    return "อยากถามเรื่องไหนเกี่ยวกับลูกคะ พิมพ์เล่าเพิ่มอีกนิด หรือเลือกคำถามด้านล่างได้เลยค่ะ";
-  return "รับทราบค่ะ เรื่องนี้เริ่มตั้งแต่เมื่อไหร่ และตอนนี้ลูกเป็นอย่างไรบ้างคะ?";
+    return "What would you like help with? Tell me a little more, or choose a question below.";
+  return "When did this start, and how is your baby doing right now?";
 }
 
 type Message = { text: string; user: boolean };
@@ -69,7 +70,7 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
     <div className="ubot-chat">
       <header className="ubot-header">
         <button className="ubot-back" aria-label={copy.back} onClick={onBack}>
-          <img src="/images/analysis/back.svg" alt="" />
+          <ChevronLeft size={22} strokeWidth={1.75} />
         </button>
         <div className="ubot-profile">
           <img
@@ -154,7 +155,7 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
               aria-label={copy.send}
               disabled={!draft.trim() || replying}
             >
-              <img src="/images/chat/send.svg" alt="" />
+              <ArrowUp size={22} strokeWidth={1.75} />
             </button>
           </div>
         </form>

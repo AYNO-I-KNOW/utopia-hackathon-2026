@@ -1,0 +1,187 @@
+.activity-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--color-surface-subtle);
+}
+.activity-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 12px;
+}
+.activity-editor-header button {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-text);
+  background: white;
+}
+.activity-editor-header h1 {
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0;
+}
+.activity-editor .content {
+  padding: 20px 24px 28px;
+}
+.activity-editor .activity-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.activity-editor label,
+.activity-picker-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 400;
+}
+.activity-editor input,
+.activity-editor textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #e4e0ef;
+  border-radius: 16px;
+  background: white;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 400;
+  padding: 14px 16px;
+}
+.activity-editor textarea {
+  resize: vertical;
+  min-height: 112px;
+}
+.activity-editor .time-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.activity-picker {
+  position: relative;
+}
+.activity-picker summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid #e4e0ef;
+  border-radius: 18px;
+  cursor: pointer;
+  color: var(--color-text);
+  font-size: 16px;
+  list-style: none;
+}
+.activity-picker summary::-webkit-details-marker {
+  display: none;
+}
+.activity-picker summary > svg {
+  margin-left: auto;
+  color: var(--color-text-muted);
+  transition: transform 180ms;
+}
+.activity-picker[open] summary > svg {
+  transform: rotate(180deg);
+}
+.activity-editor .growth-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+}
+.activity-editor .growth-icon-image {
+  width: 30px;
+  height: 30px;
+}
+.activity-picker-options {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  padding: 6px;
+  background: white;
+  border: 1px solid #e4e0ef;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px #30265b16;
+  animation: ubot-message-in 160ms ease-out;
+}
+.activity-picker-options button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-text);
+}
+.activity-picker-options button[aria-pressed="true"],
+.activity-picker-options button:hover {
+  background: var(--color-brand-soft);
+}
+.editor-input-icon {
+  position: relative;
+}
+.editor-input-icon > svg {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-text-muted);
+}
+.editor-input-icon input {
+  padding-right: 42px;
+}
+.editor-input-icon input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 8px;
+  opacity: 0;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.activity-editor .footer {
+  padding: 16px 24px max(20px, env(safe-area-inset-bottom));
+  background: var(--color-surface-subtle);
+  border: 0;
+}
+.activity-editor .footer button {
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  min-height: 52px;
+  background: var(--color-brand);
+  font-size: 15px;
+  font-weight: 400;
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-picker-options {
+    animation: none;
+  }
+  .activity-picker summary > svg {
+    transition: none;
+  }
+}
+.activity-editor .growth-icon-bg {
+  width: 100%;
+  height: 100%;
+}
+.activity-editor .growth-icon-image {
+  left: 5px;
+  top: 5px;
+}

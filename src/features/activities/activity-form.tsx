@@ -1,7 +1,10 @@
 "use client";
 import { Button } from "@/components/button";
 import { copy } from "@/content";
-import { useState } from "react";
+import { ChevronLeft, ChevronDown, CalendarDays, Clock3 } from "lucide-react";
+import { ActivityIcon } from "./activity-icon";
+import "./activity-form.css";
+import { useRef, useState } from "react";
 import { DEMO_CURRENT_DATE } from "./demo";
 import { currentTime, dateKey } from "@/lib/date";
 import { activityKinds, activityLabel } from "./options";
@@ -18,13 +21,19 @@ export function ActivityForm({
   initialActivity?: string;
 }) {
   const [time] = useState(currentTime);
+  const [kind, setKind] = useState(
+    activityKinds.includes(initialActivity as (typeof activityKinds)[number])
+      ? initialActivity
+      : "sleepy",
+  );
+  const picker = useRef<HTMLDetailsElement>(null);
   return (
-    <>
-      <header className="top">
+    <div className="activity-editor">
+      <header className="activity-editor-header">
         <button onClick={onCancel} aria-label={copy.back}>
-          ‹
+          <ChevronLeft size={22} strokeWidth={1.75} />
         </button>
-        <b>{copy.saveActivity}</b>
+        <h1>{copy.saveActivity}</h1>
       </header>
       <section className="content">
         <form
@@ -43,43 +52,77 @@ export function ActivityForm({
             });
           }}
         >
-          <label>
-            {copy.activities}
-            <select
-              name="activity"
-              defaultValue={
-                activityKinds.includes(
-                  initialActivity as (typeof activityKinds)[number],
-                )
-                  ? initialActivity
-                  : "sleepy"
-              }
+          <div className="activity-picker-field">
+            <span id="activity-label">{copy.activities}</span>
+            <input type="hidden" name="activity" value={kind} />
+            <details
+              ref={picker}
+              className="activity-picker"
+              onKeyDown={(event) => {
+                if (event.key === "Escape" && picker.current) {
+                  picker.current.open = false;
+                  picker.current.querySelector("summary")?.focus();
+                }
+              }}
             >
-              {activityKinds.map((kind) => (
-                <option key={kind} value={kind}>
-                  {activityLabel(kind)}
-                </option>
-              ))}
-            </select>
-          </label>
+              <summary aria-labelledby="activity-label activity-selected">
+                <ActivityIcon kind={kind} />
+                <span id="activity-selected">{activityLabel(kind)}</span>
+                <ChevronDown size={20} strokeWidth={1.75} />
+              </summary>
+              <div
+                className="activity-picker-options"
+                role="group"
+                aria-label={copy.activities}
+              >
+                {activityKinds.map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-label={activityLabel(value)}
+                    aria-pressed={kind === value}
+                    onClick={() => {
+                      setKind(value);
+                      if (picker.current) {
+                        picker.current.open = false;
+                        picker.current.querySelector("summary")?.focus();
+                      }
+                    }}
+                  >
+                    <ActivityIcon kind={value} />
+                    <span>{activityLabel(value)}</span>
+                  </button>
+                ))}
+              </div>
+            </details>
+          </div>
           <label>
             {copy.date}
-            <input
-              max={DEMO_CURRENT_DATE}
-              type="date"
-              name="date"
-              defaultValue={date || dateKey()}
-              required
-            />
+            <div className="editor-input-icon">
+              <CalendarDays size={19} aria-hidden="true" />
+              <input
+                max={DEMO_CURRENT_DATE}
+                type="date"
+                name="date"
+                defaultValue={date || dateKey()}
+                required
+              />
+            </div>
           </label>
           <div className="time-fields">
             <label>
               {copy.startTime}
-              <input name="from" type="time" defaultValue={time} required />
+              <div className="editor-input-icon">
+                <Clock3 size={19} aria-hidden="true" />
+                <input name="from" type="time" defaultValue={time} required />
+              </div>
             </label>
             <label>
               {copy.endTime}
-              <input name="to" type="time" defaultValue={time} required />
+              <div className="editor-input-icon">
+                <Clock3 size={19} aria-hidden="true" />
+                <input name="to" type="time" defaultValue={time} required />
+              </div>
             </label>
           </div>
           <label>
@@ -97,6 +140,6 @@ export function ActivityForm({
           {copy.save}
         </Button>
       </footer>
-    </>
+    </div>
   );
 }

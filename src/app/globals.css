@@ -1428,7 +1428,7 @@ html[data-scene-direction] .analysis-intro {
   margin: 0;
   color: var(--color-text-secondary);
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 400;
 }
 .analysis-loading-baby {
   animation: analysis-baby-float 2.4s ease-in-out infinite;
@@ -1477,4 +1477,25 @@ html[data-scene-direction] .analysis-intro {
     opacity: 1;
     transform: translateY(-4px);
   }
+}
+
+.analysis-back > svg,
+.growth-back > svg {
+  transform: rotate(180deg);
+}
+.lucide-select {
+  position: relative;
+}
+.lucide-select select {
+  appearance: none;
+  width: 100%;
+  padding-right: 40px;
+}
+.lucide-select > svg {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-text-muted);
 }

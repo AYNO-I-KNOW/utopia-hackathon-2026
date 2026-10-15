@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { copy } from "@/content";
 import { growthCopy } from "@/content/development";
@@ -167,8 +168,8 @@ export function ActivitySheet({
       <div className="activity-sheet-date-heading">
         <label className="activity-sheet-calendar">
           <h2>
-            {anchor.toLocaleDateString("th-TH", { month: "long" })}{" "}
-            {String(anchor.getFullYear() + 543).slice(-2)}
+            {anchor.toLocaleDateString("en-GB", { month: "long" })}{" "}
+            {anchor.getFullYear()}
           </h2>
           <input
             max={DEMO_CURRENT_DATE}
@@ -202,7 +203,8 @@ export function ActivitySheet({
           aria-label={copy.addActivity}
           onClick={onAdd}
         >
-          <span aria-hidden="true">+</span> {growthCopy.addShort}
+          <Plus size={18} strokeWidth={1.75} aria-hidden="true" />{" "}
+          {growthCopy.addShort}
         </button>
       </div>
       <WeekRail anchor={railDate} selected={selected} onSelect={onDate} />

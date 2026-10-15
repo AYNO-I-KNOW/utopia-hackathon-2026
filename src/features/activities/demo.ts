@@ -3,14 +3,14 @@ import type { Activity } from "./storage";
 /** Fixed prototype calendar; replace with server time when real data is connected. */
 export const DEMO_CURRENT_DATE = "2026-10-16";
 const dailySchedule = [
-  ["06:30", "awake", "ตื่นแล้ว ขยับตัวและเริ่มส่งเสียง"],
-  ["07:00", "hungry", "ดูดมือและหันหาเต้านม"],
-  ["09:15", "sleepy", "หาวและขยี้ตา พาเข้ามุมนอนเงียบๆ"],
-  ["11:40", "uncomfortable", "ผ้าอ้อมเปียก เปลี่ยนแล้วสบายตัวขึ้น"],
-  ["13:10", "hungry", "ร้องเป็นช่วงๆ ก่อนมื้อนม"],
-  ["15:20", "wantsHolding", "สงบลงเมื่ออุ้มและโยกเบาๆ"],
-  ["17:00", "awake", "ตื่นจากงีบช่วงบ่าย อารมณ์แจ่มใส"],
-  ["19:30", "sleepy", "เริ่มง่วง ลดแสงและเตรียมเข้านอน"],
+  ["06:30", "awake", "Woke up, stretching and making sounds"],
+  ["07:00", "hungry", "Sucking hands and showing rooting cues"],
+  ["09:15", "sleepy", "Yawning and rubbing eyes; settled in a quiet space"],
+  ["11:40", "uncomfortable", "Wet diaper; more comfortable after changing"],
+  ["13:10", "hungry", "Crying on and off before a feed"],
+  ["15:20", "wantsHolding", "Settled when held and gently rocked"],
+  ["17:00", "awake", "Woke from an afternoon nap in a happy mood"],
+  ["19:30", "sleepy", "Getting sleepy; dimmed the lights for bedtime"],
 ] as const;
 
 export const demoActivities: Activity[] = Array.from(

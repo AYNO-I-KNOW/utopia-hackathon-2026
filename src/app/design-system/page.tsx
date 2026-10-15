@@ -19,9 +19,9 @@ export default function DesignSystem() {
   return (
     <main className="ds-page">
       <h1>Crybaby · Design System</h1>
-      <p>Nunito · ภาษาไทยสำหรับเกลาคำก่อนแปลอังกฤษ</p>
+      <p>Nunito · English UI reference</p>
       <section className="ds-section">
-        <h2>สี</h2>
+        <h2>Colors</h2>
         <div className="ds-grid">
           {colors.map((color) => (
             <div className="ds-swatch" key={color}>
@@ -35,37 +35,37 @@ export default function DesignSystem() {
         </div>
       </section>
       <section className="ds-section">
-        <h2>ตัวอักษร</h2>
+        <h2>Typography</h2>
         <div className="ds-example">
-          <h1>เข้าใจเสียงร้องของลูก</h1>
+          <h1>Understand your baby’s cry</h1>
           <h2>Understand your baby</h2>
-          <p>ข้อความหลัก · Body copy · 0123456789</p>
-          <p className="note">ข้อความประกอบ · Caption</p>
+          <p>Main text · Body copy · 0123456789</p>
+          <p className="note">Supporting text · Caption</p>
         </div>
       </section>
       <section className="ds-section">
-        <h2>ปุ่มและสถานะ</h2>
+        <h2>Buttons and states</h2>
         <div className="ds-controls">
-          <Button variant="primary">บันทึก</Button>
-          <Button>วิเคราะห์อีกครั้ง</Button>
-          <Button variant="ghost">ย้อนกลับ</Button>
+          <Button variant="primary">Save</Button>
+          <Button>Analyze again</Button>
+          <Button variant="ghost">Back</Button>
           <Button variant="primary" disabled>
-            บันทึกไม่ได้
+            Save unavailable
           </Button>
         </div>
       </section>
       <section className="ds-section">
-        <h2>ฟอร์มและการ์ด</h2>
+        <h2>Forms and cards</h2>
         <div className="ds-example activity-form">
           <label>
-            บันทึกเพิ่มเติม
-            <input placeholder="เพิ่มรายละเอียด" />
+            Notes
+            <input placeholder="Add details" />
           </label>
           <article className="card">
-            <h2>ให้นม</h2>
-            <p>14:30 น.</p>
+            <h2>Feeding</h2>
+            <p>14:30</p>
           </article>
-          <p role="alert">ตัวอย่างข้อความผิดพลาด</p>
+          <p role="alert">Example error message</p>
         </div>
       </section>
     </main>
