@@ -1292,8 +1292,7 @@ html[data-scene-direction] .analysis-intro {
 }
 .analysis-ready[data-paused="true"] .recording-status::before,
 .recording-status[data-error="true"]::before {
-  animation: none;
-  background: var(--color-text-muted);
+  display: none;
 }
 .recording-time {
   font-variant-numeric: tabular-nums;
