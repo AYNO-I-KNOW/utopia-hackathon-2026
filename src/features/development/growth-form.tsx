@@ -149,7 +149,7 @@ export function GrowthForm({
               </details>
             </div>
             <label>
-              {text.value} ({metrics[kind].unit})
+              {text.value}
               <div className="measurement-stepper">
                 <button
                   type="button"
@@ -159,24 +159,30 @@ export function GrowthForm({
                 >
                   <Minus size={20} strokeWidth={1.75} />
                 </button>
-                <input
-                  name="value"
-                  aria-label={`${text.value} (${metrics[kind].unit})`}
-                  value={values[kind]}
-                  onChange={(event) =>
-                    setValues((previous) => ({
-                      ...previous,
-                      [kind]: event.target.value,
-                    }))
-                  }
-                  type="number"
-                  inputMode="decimal"
-                  placeholder="0.0"
-                  min="0.01"
-                  max="1000"
-                  step={step}
-                  required
-                />
+                <div className="measurement-number">
+                  <input
+                    style={{
+                      width: `${Math.max(2, values[kind].length) + 0.5}ch`,
+                    }}
+                    name="value"
+                    aria-label={`${text.value} (${metrics[kind].unit})`}
+                    value={values[kind]}
+                    onChange={(event) =>
+                      setValues((previous) => ({
+                        ...previous,
+                        [kind]: event.target.value,
+                      }))
+                    }
+                    type="number"
+                    inputMode="decimal"
+                    placeholder="0.0"
+                    min="0.01"
+                    max="1000"
+                    step={step}
+                    required
+                  />
+                  <span className="measurement-unit">{metrics[kind].unit}</span>
+                </div>
                 <button
                   type="button"
                   aria-label="Increase value"

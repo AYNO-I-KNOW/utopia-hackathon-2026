@@ -431,3 +431,23 @@
     transition: none;
   }
 }
+
+.measurement-number {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+.activity-editor .measurement-number input {
+  flex: 0 1 auto;
+  max-width: 60%;
+  padding: 6px 0;
+}
+.measurement-unit {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
+}
