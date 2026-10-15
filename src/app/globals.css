@@ -498,7 +498,7 @@ input {
   margin: 0;
   text-align: center;
   font-size: var(--font-size-body);
-  color: var(--color-text);
+  color: var(--color-text-secondary);
 }
 
 body {
@@ -825,8 +825,8 @@ h2 {
 
 .analysis-baby {
   display: block;
-  width: 184px;
-  height: 184px;
+  width: 224px;
+  height: 224px;
   object-fit: contain;
   transition:
     opacity 200ms,
@@ -1178,4 +1178,98 @@ html[data-scene-direction="return"] .activity-sheet {
   display: none;
   width: 0;
   height: 0;
+}
+
+/* Each shared subject has a single visible snapshot, avoiding doubled icons. */
+::view-transition-old(scene-microphone),
+::view-transition-old(scene-baby),
+::view-transition-old(scene-background) {
+  display: none;
+}
+::view-transition-new(scene-microphone),
+::view-transition-new(scene-baby),
+::view-transition-new(scene-background) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  animation: scene-exit 120ms ease-out both;
+}
+::view-transition-new(root) {
+  animation: scene-copy-in 240ms 120ms ease-out both;
+}
+.analysis-ready[data-recording="false"] .analysis-heading {
+  view-transition-name: scene-heading;
+}
+.analysis-ready[data-recording="false"] .capture-start-caption {
+  view-transition-name: scene-caption;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+html[data-scene-direction] .analysis-heading h1,
+html[data-scene-direction] .analysis-intro {
+  animation: none;
+}
+::view-transition-new(scene-heading) {
+  animation: scene-copy-in 300ms 400ms ease-out both;
+}
+::view-transition-new(scene-caption) {
+  animation: scene-copy-in 260ms 540ms ease-out both;
+}
+::view-transition-old(scene-heading),
+::view-transition-old(scene-caption) {
+  animation: scene-exit 100ms ease-out both;
+}
+.activity-sheet {
+  view-transition-name: scene-sheet;
+}
+.home-hero-greeting {
+  view-transition-name: scene-greeting;
+}
+::view-transition-old(scene-sheet) {
+  animation: scene-sheet-out 200ms ease-out both;
+}
+::view-transition-new(scene-sheet) {
+  animation: scene-sheet-in 300ms 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+::view-transition-new(scene-greeting) {
+  animation: scene-copy-in 240ms 160ms ease-out both;
+}
+::view-transition-old(scene-greeting) {
+  animation: scene-exit 100ms ease-out both;
+}
+@keyframes scene-exit {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes scene-sheet-out {
+  to {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+}
+@keyframes scene-sheet-in {
+  from {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@media (max-height: 700px) {
+  .analysis-baby {
+    width: 200px;
+    height: 200px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s;
+    animation-delay: 0s;
+  }
 }
