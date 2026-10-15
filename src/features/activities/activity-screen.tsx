@@ -10,6 +10,8 @@ import { MobileShell } from "@/components/mobile-shell";
 import { DEMO_CURRENT_DATE, demoActivities } from "./demo";
 import { activityLabel } from "./options";
 import { ActivityForm } from "./activity-form";
+import { timelineForDate } from "./timeline";
+import { currentTime, dateKey } from "@/lib/date";
 import { loadActivities, saveActivities, type Activity } from "./storage";
 export function ActivityScreen() {
   const router = useRouter(),
@@ -17,9 +19,12 @@ export function ActivityScreen() {
   const [date, setDate] = useState(DEMO_CURRENT_DATE),
     [items, setItems] = useState<Activity[]>([]),
     [editing, setEditing] = useState(false),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    // Real clock is read after mount so SSR and hydration markup match.
+    [clock, setClock] = useState<{ today: string; now: string }>();
   useEffect(() => {
     setDate((current) => current || DEMO_CURRENT_DATE);
+    setClock({ today: dateKey(), now: currentTime() });
     try {
       setItems(loadActivities());
     } catch {
@@ -27,7 +32,13 @@ export function ActivityScreen() {
     }
     setEditing(params.get("add") === "1");
   }, [params]);
-  const visibleItems = [...demoActivities, ...items];
+  const visibleItems = timelineForDate({
+    demo: demoActivities,
+    user: items,
+    date,
+    today: clock?.today ?? "",
+    now: clock?.now ?? "",
+  });
   return (
     <MobileShell>
       {editing && (
@@ -64,25 +75,22 @@ export function ActivityScreen() {
         >
           {error && !editing && <p role="alert">{error}</p>}
           <div className="activity-list">
-            {visibleItems
-              .filter((item) => item.date === date)
-              .sort((a, b) => a.from.localeCompare(b.from))
-              .map((item) => (
-                <article key={item.id} className="card activity-card">
-                  <ActivityIcon kind={item.activity} />
-                  <div className="home-activity-body">
-                    <h2>{activityLabel(item.activity)}</h2>
-                    {item.note && <p>{item.note}</p>}
-                    <span className="activity-time-chip">
-                      {item.from === item.to
-                        ? item.from
-                        : `${item.from} – ${item.to}`}{" "}
-                      {copy.timeSuffix}
-                    </span>
-                  </div>
-                </article>
-              ))}
-            {!visibleItems.some((item) => item.date === date) && (
+            {visibleItems.map((item) => (
+              <article key={item.id} className="card activity-card">
+                <ActivityIcon kind={item.activity} />
+                <div className="home-activity-body">
+                  <h2>{activityLabel(item.activity)}</h2>
+                  {item.note && <p>{item.note}</p>}
+                  <span className="activity-time-chip">
+                    {item.from === item.to
+                      ? item.from
+                      : `${item.from} – ${item.to}`}{" "}
+                    {copy.timeSuffix}
+                  </span>
+                </div>
+              </article>
+            ))}
+            {visibleItems.length === 0 && (
               <p className="center">{copy.noActivities}</p>
             )}
           </div>
