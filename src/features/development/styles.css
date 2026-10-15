@@ -513,21 +513,48 @@
 }
 .home-timeline .activity-card {
   display: flex;
+  align-items: flex-start;
   gap: 16px;
   border: 0;
   border-radius: 24px;
-  padding: 16px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  margin: 0 0 12px;
 }
 .home-activity-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
   flex: 1;
   min-width: 0;
 }
 .home-activity-body h2 {
+  margin: 0;
   font-size: 18px;
   font-weight: 600;
+  color: #000;
+  line-height: normal;
 }
 .home-activity-body p {
+  margin: 0;
   font-size: 14px;
+  color: #2d2d2d;
+  line-height: normal;
+}
+.activity-time-chip {
+  display: inline-flex;
+  padding: 6px 8px;
+  background: var(--color-growth-chip);
+  color: var(--color-growth-chip-text);
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: normal;
+}
+.home-timeline .activity-card::before {
+  background: var(--color-growth-link);
+  top: 50%;
+  transform: translateY(-50%);
 }
 @keyframes growth-enter {
   from {

@@ -71,13 +71,13 @@ export function ActivityScreen() {
                   <ActivityIcon kind={item.activity} />
                   <div className="home-activity-body">
                     <h2>{activityLabel(item.activity)}</h2>
-                    <p>
+                    {item.note && <p>{item.note}</p>}
+                    <span className="activity-time-chip">
                       {item.from === item.to
                         ? item.from
                         : `${item.from} – ${item.to}`}{" "}
                       {copy.timeSuffix}
-                    </p>
-                    {item.note && <p>{item.note}</p>}
+                    </span>
                   </div>
                 </article>
               ))}
