@@ -22,3 +22,7 @@ export function formatElapsed(total: number) {
     ? `${String(hours).padStart(2, "0")}:${minutes}:${seconds}`
     : `${minutes}:${seconds}`;
 }
+/** Epoch ms of a Bangkok wall-clock date and HH:mm (UTC+7, no DST). */
+export function bangkokInstant(date: string, time: string) {
+  return Date.parse(`${date}T${time}:00+07:00`);
+}

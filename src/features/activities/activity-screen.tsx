@@ -33,6 +33,7 @@ export function ActivityScreen() {
         <ActivityForm
           date={date}
           initialActivity={params.get("state") ?? "sleepy"}
+          initialNote={params.get("note") ?? ""}
           onCancel={() => {
             setEditing(false);
             router.replace("/");

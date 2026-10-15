@@ -2,7 +2,6 @@
 import { Button } from "@/components/button";
 import { copy } from "@/content";
 import { useState } from "react";
-import { DEMO_CURRENT_DATE } from "./demo";
 import { currentTime, dateKey } from "@/lib/date";
 import { activityKinds, activityLabel } from "./options";
 import type { Activity } from "./storage";
@@ -11,13 +10,17 @@ export function ActivityForm({
   onCancel,
   date,
   initialActivity = "sleepy",
+  initialNote = "",
 }: {
   onSave: (item: Activity) => void;
   onCancel: () => void;
   date: string;
   initialActivity?: string;
+  initialNote?: string;
 }) {
   const [time] = useState(currentTime);
+  // Same real clock as buildContext: never default or allow entries after today.
+  const today = dateKey();
   return (
     <>
       <header className="top">
@@ -65,10 +68,10 @@ export function ActivityForm({
           <label>
             {copy.date}
             <input
-              max={DEMO_CURRENT_DATE}
+              max={today}
               type="date"
               name="date"
-              defaultValue={date || dateKey()}
+              defaultValue={date && date <= today ? date : today}
               required
             />
           </label>
@@ -87,6 +90,7 @@ export function ActivityForm({
             <textarea
               name="note"
               rows={3}
+              defaultValue={initialNote}
               placeholder={copy.notesPlaceholder}
             />
           </label>
