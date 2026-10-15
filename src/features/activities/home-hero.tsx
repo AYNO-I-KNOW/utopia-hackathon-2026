@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SceneLink } from "@/components/scene-navigation";
 import { copy } from "@/content";
 import { growthCopy as text } from "@/content/development";
 export function HomeHero() {
@@ -16,7 +16,7 @@ export function HomeHero() {
           <p>{text.greetingSubtitle}</p>
         </div>
       </div>
-      <Link
+      <SceneLink
         href="/development"
         className="home-hero-scene"
         aria-label={copy.viewDevelopment}
@@ -26,7 +26,7 @@ export function HomeHero() {
           src="/images/analysis/baby.png"
           alt={copy.cryingBabyAlt}
         />
-      </Link>
+      </SceneLink>
     </div>
   );
 }

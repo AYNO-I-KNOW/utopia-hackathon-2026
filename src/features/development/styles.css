@@ -804,3 +804,42 @@ dialog.growth-overlay:not([open]) {
 dialog.growth-overlay {
   padding-bottom: max(24px, env(safe-area-inset-bottom));
 }
+
+.growth-shared-scene {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 150px;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(black 45%, transparent);
+}
+.growth-scene-background {
+  position: absolute;
+  width: 591px;
+  height: 646px;
+  max-width: none;
+  left: 50%;
+  top: -480px;
+  transform: translateX(-50%);
+  object-fit: cover;
+  view-transition-name: scene-background;
+}
+html[data-scene-flow="growth"] .growth-overview .growth-content {
+  animation: growth-content-arrive 460ms 140ms both
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes growth-content-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-scene-flow="growth"] .growth-overview .growth-content {
+    animation: none;
+  }
+}

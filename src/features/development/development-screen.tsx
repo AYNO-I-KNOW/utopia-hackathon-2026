@@ -2,6 +2,7 @@
 import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { SceneLink } from "@/components/scene-navigation";
 import { MobileShell } from "@/components/mobile-shell";
 import { copy } from "@/content";
 import { growthCopy as text } from "@/content/development";
@@ -50,14 +51,23 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
   return (
     <MobileShell>
       <div className={"growth-page " + (!metric ? "growth-overview" : "")}>
+        {!metric && (
+          <div className="growth-shared-scene" aria-hidden="true">
+            <img
+              src="/images/analysis/background.png"
+              className="growth-scene-background"
+              alt=""
+            />
+          </div>
+        )}
         <header className="growth-header">
-          <Link
+          <SceneLink
             className="growth-back"
             href={metric ? "/development" : "/"}
             aria-label={copy.back}
           >
             <ChevronLeft size={22} strokeWidth={1.75} />
-          </Link>
+          </SceneLink>
         </header>
         <section className="growth-content">
           {metric && item ? (

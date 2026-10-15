@@ -1519,3 +1519,16 @@ textarea:focus-visible {
 textarea:focus {
   border-color: #a6a5af;
 }
+
+html[data-scene-flow="growth"][data-scene-direction="forward"]::view-transition-old(
+    scene-baby
+  ) {
+  display: block;
+  animation: growth-baby-leave 420ms ease both;
+}
+@keyframes growth-baby-leave {
+  to {
+    opacity: 0;
+    transform: translateY(-100px) scale(0.92);
+  }
+}
