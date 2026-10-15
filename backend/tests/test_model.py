@@ -74,3 +74,43 @@ def test_download_without_checksum_skips_verification(tmp_path, monkeypatch):
 def test_all_download_urls_are_https():
     assert model_mod.LABELS_CSV_URL.startswith("https://")
     assert model_mod.CHECKPOINT_URL.startswith("https://")
+
+
+class FakeTagger:
+    def inference(self, audio):
+        return np.ones((1, 1), dtype=np.float32), np.zeros((1, 2048), dtype=np.float32)
+
+
+def _use_fake_tagger(monkeypatch):
+    def load(self):
+        self._tagger, self._cry_index = FakeTagger(), 0
+
+    monkeypatch.setattr(PannsCryModel, "_load_tagger", load)
+
+
+def test_missing_finetuned_model_is_unavailable(tmp_path, monkeypatch):
+    _use_fake_tagger(monkeypatch)
+    model = PannsCryModel(make_settings(finetuned_model=str(tmp_path / "nope.pt")), models_dir=tmp_path)
+    with pytest.raises(ModelUnavailableError):
+        model.predict(np.zeros(SAMPLE_RATE * 2, dtype=np.float32))
+
+
+def test_finetuned_model_replaces_joblib_classifier(tmp_path, monkeypatch):
+    torch = pytest.importorskip("torch")
+    import json
+
+    class Net(torch.nn.Module):
+        def forward(self, wav):
+            return torch.softmax(torch.stack([wav.mean(dim=1), wav.mean(dim=1) + 1.0], dim=1), dim=1)
+
+    probe = torch.zeros(1, MODEL_CLIP_SECONDS * SAMPLE_RATE)
+    path = tmp_path / "cry_net.pt"
+    torch.jit.save(torch.jit.trace(Net(), probe), str(path), _extra_files={"labels.json": json.dumps(["a", "b"])})
+    _use_fake_tagger(monkeypatch)
+    model = PannsCryModel(make_settings(finetuned_model=str(path)), models_dir=tmp_path)  # no joblib in tmp_path
+
+    cry_prob, probs = model.predict(np.zeros(SAMPLE_RATE * 2, dtype=np.float32))
+
+    assert cry_prob == 1.0
+    assert set(probs) == {"a", "b"} and probs["b"] > probs["a"]
+    assert abs(sum(probs.values()) - 1.0) < 1e-6

@@ -86,6 +86,7 @@ class Settings:
     panns_checkpoint: str | None
     tts_daily_char_budget: int = DEFAULT_TTS_DAILY_CHAR_BUDGET
     trusted_proxy_hops: int = 0  # 0 = ignore X-Forwarded-For
+    finetuned_model: str | None = None  # TorchScript from ml/finetune_cnn14.py; None = joblib
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -104,6 +105,7 @@ class Settings:
             panns_checkpoint=env("PANNS_CHECKPOINT") or None,
             tts_daily_char_budget=_int_env("TTS_DAILY_CHAR_BUDGET", DEFAULT_TTS_DAILY_CHAR_BUDGET, 0),
             trusted_proxy_hops=_int_env("TRUSTED_PROXY_HOPS", 0, 1),
+            finetuned_model=env("FINETUNED_MODEL") or None,
         )
 
     def voice_id(self, lang: str) -> str:

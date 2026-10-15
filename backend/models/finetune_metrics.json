@@ -1,0 +1,47 @@
+{
+  "model": "CNN14 fine-tuned + stats pooling (InfantCryNet-style)",
+  "classes": 6,
+  "n_fit": 623,
+  "n_val": 111,
+  "n_test": 184,
+  "temperature": 2.2115836421001203,
+  "accuracy": 0.4945652173913043,
+  "macro_f1": 0.4806719378302906,
+  "ece": 0.08514857211190723,
+  "cases": {
+    "confident": {
+      "n": 86,
+      "wrong": 31
+    },
+    "close": {
+      "n": 6,
+      "wrong": 2
+    },
+    "unsure": {
+      "n": 92,
+      "wrong": 60
+    }
+  },
+  "uncalibrated": {
+    "accuracy": 0.4945652173913043,
+    "macro_f1": 0.4806719378302906,
+    "ece": 0.16452550580320155,
+    "cases": {
+      "confident": {
+        "n": 144,
+        "wrong": 62
+      },
+      "close": {
+        "n": 15,
+        "wrong": 9
+      },
+      "unsure": {
+        "n": 25,
+        "wrong": 22
+      }
+    }
+  },
+  "torch": "2.14.1+cu130",
+  "smoke": false,
+  "source": "Colab T4 run of ml/finetune_cnn14.py (metrics embedded in cry_net.pt); test split = ml/train.py held-out 184 clips"
+}

@@ -49,6 +49,7 @@ fallback summary from the advice files; no ElevenLabs key/voice → `/speak` ret
 | `ELEVENLABS_VOICE_ID_TH` / `ELEVENLABS_VOICE_ID_EN` | voice ids used with `eleven_v3` |
 | `ALLOWED_ORIGINS` | comma list, e.g. `https://your-app.vercel.app,http://127.0.0.1:4175`. `https://*.codesandbox.io` is always allowed via regex |
 | `PANNS_CHECKPOINT` | optional path to `Cnn14_mAP=0.431.pth` |
+| `FINETUNED_MODEL` | optional TorchScript from `ml/finetune_cnn14.py` (e.g. `models/cry_net.pt`); unset = `classifier.joblib` |
 | `TTS_DAILY_CHAR_BUDGET` | max characters sent to ElevenLabs per UTC day, in-process (default `50000`); `/speak` returns 503 when used up |
 | `TRUSTED_PROXY_HOPS` | number N of trusted reverse proxies in front of the app (int ≥ 1). Unset = rate limits key on the TCP peer and ignore `X-Forwarded-For` |
 

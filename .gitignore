@@ -7,3 +7,4 @@ ml/data/
 ml/*.npz
 .pytest_cache/
 .DS_Store
+*.pt

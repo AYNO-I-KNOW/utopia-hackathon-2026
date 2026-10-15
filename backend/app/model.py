@@ -90,7 +90,7 @@ class PannsCryModel:
         self._infer_lock = threading.Lock()
         self._tagger = None
         self._cry_index = -1
-        self._classifier = None
+        self._reason = None  # (waveform (1, N), PANNs embedding (1, 2048)) -> class probabilities
         self._labels: list[str] = []
 
     @property
@@ -104,6 +104,9 @@ class PannsCryModel:
             logger.warning("model warm-up failed: %s", exc)
 
     def _load_classifier(self) -> None:
+        if self._settings.finetuned_model:
+            self._load_finetuned(Path(self._settings.finetuned_model))
+            return
         import joblib
 
         clf_path = self._models_dir / CLASSIFIER_FILE
@@ -117,7 +120,31 @@ class PannsCryModel:
             raise ModelUnavailableError("classifier files unreadable") from exc
         if len(labels) != len(classifier.classes_):
             raise ModelUnavailableError("labels.json does not match classifier classes")
-        self._classifier, self._labels = classifier, list(labels)
+        self._reason = lambda _audio, embedding: classifier.predict_proba(embedding)[0]
+        self._labels = list(labels)
+
+    def _load_finetuned(self, path: Path) -> None:
+        """TorchScript from ml/finetune_cnn14.py: waveform -> calibrated probabilities, labels inside."""
+        if not path.is_absolute():
+            path = self._models_dir.parent / path
+        if not path.is_file():
+            raise ModelUnavailableError(f"FINETUNED_MODEL not found: {path}")
+        try:
+            import torch
+
+            extra = {"labels.json": ""}
+            net = torch.jit.load(str(path), map_location="cpu", _extra_files=extra).eval()
+            labels = json.loads(extra["labels.json"])
+        except (ImportError, OSError, RuntimeError, ValueError) as exc:
+            raise ModelUnavailableError("fine-tuned model unreadable") from exc
+        if not labels:
+            raise ModelUnavailableError("fine-tuned model has no labels.json")
+
+        def reason(audio: np.ndarray, _embedding: np.ndarray) -> np.ndarray:
+            with torch.inference_mode():
+                return net(torch.from_numpy(audio)).numpy()[0]
+
+        self._reason, self._labels = reason, list(labels)
 
     def _load_tagger(self) -> None:
         checkpoint = Path(self._settings.panns_checkpoint or DEFAULT_CHECKPOINT)
@@ -145,8 +172,8 @@ class PannsCryModel:
         audio = fit_length(waveform).astype(np.float32)[None, :]
         with self._infer_lock:
             clipwise, embedding = self._tagger.inference(audio)
+            proba = self._reason(audio, embedding)
         cry_prob = float(clipwise[0, self._cry_index])
-        proba = self._classifier.predict_proba(embedding)[0]
         return cry_prob, {label: float(p) for label, p in zip(self._labels, proba)}
 
 
