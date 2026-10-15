@@ -216,3 +216,117 @@
   outline: none;
   box-shadow: none;
 }
+
+.activity-modal {
+  position: fixed;
+  inset: 0;
+  width: min(100%, var(--mobile-max-width));
+  height: 100dvh;
+  max-height: none;
+  max-width: none;
+  margin: auto;
+  padding: 16px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  overflow: auto;
+}
+.activity-modal[open] {
+  display: flex;
+  align-items: flex-end;
+}
+.activity-modal::backdrop {
+  background: #24203566;
+  animation: activity-backdrop-in 200ms ease both;
+}
+.activity-modal .activity-editor {
+  flex: 0 0 auto;
+  width: 100%;
+  max-height: calc(100dvh - 32px);
+  border-radius: 24px;
+  background: white;
+  animation: activity-modal-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 12px 48px #30265b20;
+}
+.activity-modal .activity-editor-header {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  padding: 20px 24px 0;
+}
+.activity-modal .activity-editor-header button {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  background: var(--color-surface-subtle);
+}
+.activity-modal .activity-editor-header h1 {
+  font-size: 20px;
+}
+.activity-modal .content {
+  overflow-y: auto;
+  flex: 1 1 auto;
+  padding-top: 20px;
+}
+.activity-modal .activity-form {
+  gap: 16px;
+}
+.activity-modal .activity-editor textarea {
+  min-height: 80px;
+}
+.activity-modal .footer {
+  background: white;
+  padding-top: 0;
+}
+.activity-modal .activity-picker-options {
+  max-height: 240px;
+  overflow-y: auto;
+}
+.activity-modal[data-closing="true"] .activity-editor {
+  animation: activity-modal-out 200ms ease both;
+  pointer-events: none;
+}
+.activity-modal[data-closing="true"]::backdrop {
+  animation: activity-backdrop-out 200ms ease both;
+}
+@keyframes activity-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes activity-modal-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+@keyframes activity-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes activity-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-modal .activity-editor,
+  .activity-modal::backdrop {
+    animation: none;
+  }
+}

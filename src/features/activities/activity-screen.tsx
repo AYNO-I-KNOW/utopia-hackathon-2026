@@ -27,9 +27,10 @@ export function ActivityScreen() {
     }
     setEditing(params.get("add") === "1");
   }, [params]);
-  if (editing)
-    return (
-      <MobileShell>
+  const visibleItems = [...demoActivities, ...items];
+  return (
+    <MobileShell>
+      {editing && (
         <ActivityForm
           date={date}
           initialActivity={params.get("state") ?? "sleepy"}
@@ -50,12 +51,7 @@ export function ActivityScreen() {
             }
           }}
         />
-        {error && <p role="alert">{error}</p>}
-      </MobileShell>
-    );
-  const visibleItems = [...demoActivities, ...items];
-  return (
-    <MobileShell>
+      )}
       <section className="home-dashboard home-timeline">
         <HomeHero />
         <ActivitySheet
