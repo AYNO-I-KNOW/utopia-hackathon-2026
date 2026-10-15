@@ -94,7 +94,7 @@ export function AnalysisScreen() {
           </div>
         </section>
       ) : step === "result" ? (
-        <AnalysisResult onChat={() => setStep("chat")} />
+        <AnalysisResult onChat={() => setStep("chat")} onRetry={start} />
       ) : null}
     </MobileShell>
   );

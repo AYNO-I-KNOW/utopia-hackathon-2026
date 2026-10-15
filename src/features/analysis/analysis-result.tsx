@@ -1,13 +1,28 @@
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { copy } from "@/content";
 import { MOCK_RESULT as result } from "./mock";
-export function AnalysisResult({ onChat }: { onChat: () => void }) {
+export function AnalysisResult({
+  onChat,
+  onRetry,
+}: {
+  onChat: () => void;
+  onRetry: () => void;
+}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const router = useRouter();
   return (
     <div className="analysis-result">
       <section className="result-content">
-        <Link href="/" className="result-close" aria-label={copy.backHome}>
+        <button
+          type="button"
+          className="result-close"
+          aria-label={copy.backHome}
+          onClick={() => dialog.current?.showModal()}
+        >
           <img src="/images/result/close.svg" alt="" />
-        </Link>
+        </button>
         <div className="result-summary">
           <div className="result-baby-mask">
             <img src="/images/analysis/baby.png" alt={copy.cryingBabyAlt} />
@@ -34,7 +49,27 @@ export function AnalysisResult({ onChat }: { onChat: () => void }) {
             </div>
           </article>
         </div>
+        <button type="button" className="result-retry" onClick={onRetry}>
+          วิเคราะห์อีกครั้ง
+        </button>
       </section>
+      <dialog
+        ref={dialog}
+        className="result-exit-dialog"
+        aria-labelledby="result-exit-title"
+        aria-describedby="result-exit-description"
+      >
+        <h2 id="result-exit-title">ปิดผลวิเคราะห์?</h2>
+        <p id="result-exit-description">
+          ผลครั้งนี้ยังไม่ได้บันทึก หากปิดจะต้องวิเคราะห์ใหม่
+        </p>
+        <div className="result-exit-actions">
+          <button autoFocus onClick={() => dialog.current?.close()}>
+            ดูผลต่อ
+          </button>
+          <button onClick={() => router.push("/")}>ปิดโดยไม่บันทึก</button>
+        </div>
+      </dialog>
       <footer className="result-actions">
         <button onClick={onChat}>{copy.chat}</button>
         <Link href="/?add=1&state=hungry">{copy.addAction}</Link>
