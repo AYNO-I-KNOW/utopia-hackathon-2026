@@ -35,12 +35,10 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
         <button className="ubot-back" aria-label={copy.back} onClick={onBack}>
           <img src="/images/chat/back.svg" alt="" />
         </button>
-        <div className="ubot-avatar" aria-hidden="true">
-          U
-        </div>
+        <img className="ubot-avatar" src="/images/chat/assistant.svg" alt="" />
         <div className="ubot-identity">
           <h1>{copy.botName}</h1>
-          <p>{copy.botStatus}</p>
+          <span className="ubot-verified" aria-hidden="true" />
         </div>
       </header>
       <div
