@@ -140,7 +140,6 @@ export const th = {
     no_cry: "ไม่พบเสียงร้อง",
   },
   ubotGo: "คุยต่อกับ U-bot",
-  ubotCopied: "คัดลอกแล้ว วางในแชท U-bot ได้เลย",
   ubotCopyFailed: "คัดลอกไม่สำเร็จ เลือกข้อความแล้วคัดลอกเอง",
   ubotBlocked: "เบราว์เซอร์บล็อกการเปิดแท็บใหม่ กดเปิด U-bot ด้านล่าง",
   ubotOpen: "เปิด U-bot",
@@ -155,7 +154,6 @@ export const th = {
   chatError: "ตอบไม่สำเร็จ ลองอีกครั้ง",
   chatQuickLabel: "คำถามที่พบบ่อย",
   chatLatestResult: "ผลวิเคราะห์ล่าสุด",
-  chatCredit: "ออกแบบหน้าแชทด้วย U-bot U-Code · ไม่ใช่การวินิจฉัยทางการแพทย์",
   promptIntro: "ฉันเป็นพ่อ/แม่ ใช้แอป Crybaby วิเคราะห์เสียงลูกร้อง",
   promptResult: "ผล: {list} (case: {case})",
   promptActivity:

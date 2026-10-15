@@ -73,9 +73,7 @@ export function ChatScreen({
     if (tab) tab.opener = null;
     setBlocked(!tab);
     void copied.then((ok) =>
-      setStatus(
-        !tab ? copy.ubotBlocked : ok ? copy.ubotCopied : copy.ubotCopyFailed,
-      ),
+      setStatus(!tab ? copy.ubotBlocked : ok ? "" : copy.ubotCopyFailed),
     );
   }
 
@@ -162,7 +160,6 @@ export function ChatScreen({
             </a>
           )}
         </p>
-        <p className="chat-note">{copy.chatCredit}</p>
       </footer>
     </div>
   );
