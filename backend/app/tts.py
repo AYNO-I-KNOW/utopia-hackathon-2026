@@ -1,9 +1,12 @@
 """ElevenLabs text-to-speech (eleven_v3 is the model that supports Thai)."""
 
+import hashlib
 import logging
+import os
 import threading
 from collections.abc import Callable
 from datetime import date, datetime, timezone
+from pathlib import Path
 from typing import Protocol
 
 import httpx
@@ -59,17 +62,48 @@ class Speaker(Protocol):
     async def synthesize(self, text: str, lang: str) -> bytes: ...
 
 
+def cache_key(model_id: str, voice_id: str, speed: float, text: str) -> str:
+    return hashlib.sha256(f"{model_id}|{voice_id}|{speed:g}|{text}".encode()).hexdigest()
+
+
 class TtsService:
     def __init__(self, settings: Settings, transport: httpx.AsyncBaseTransport | None = None):
         self._settings = settings
         self._transport = transport
         self._budget = DailyCharBudget(settings.tts_daily_char_budget)
 
+    def cache_path(self, text: str, lang: str) -> Path:
+        key = cache_key(
+            TTS_MODEL_ID, self._settings.voice_id(lang), self._settings.tts_speed, text[:TTS_MAX_CHARS]
+        )
+        return self._settings.tts_cache_dir / f"{key}.mp3"
+
+    def _read_cache(self, path: Path) -> bytes | None:
+        try:
+            return path.read_bytes() or None
+        except OSError:
+            return None
+
+    def _write_cache(self, path: Path, audio: bytes) -> None:
+        tmp = path.with_name(f"{path.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp.write_bytes(audio)
+            os.replace(tmp, path)  # atomic: readers never see a partial file
+        except OSError as exc:
+            logger.warning("TTS cache write failed: %s", type(exc).__name__)
+            tmp.unlink(missing_ok=True)
+
     async def synthesize(self, text: str, lang: str) -> bytes:
         voice_id = self._settings.voice_id(lang)
-        if not self._settings.elevenlabs_api_key or not voice_id:
+        if not voice_id:
             raise TtsUnavailableError("ElevenLabs key or voice id not configured")
         text = text[:TTS_MAX_CHARS]
+        path = self.cache_path(text, lang)
+        if (cached := self._read_cache(path)) is not None:
+            return cached  # no upstream call, no budget charge
+        if not self._settings.elevenlabs_api_key:
+            raise TtsUnavailableError("ElevenLabs key or voice id not configured")
         if not self._budget.try_spend(len(text)):
             raise TtsBudgetExhaustedError("daily text-to-speech budget exhausted")
         try:
@@ -93,4 +127,5 @@ class TtsService:
         except httpx.HTTPError as exc:
             logger.warning("ElevenLabs request failed: %s", type(exc).__name__)
             raise TtsUpstreamError("text-to-speech provider unreachable") from exc
+        self._write_cache(path, resp.content)
         return resp.content

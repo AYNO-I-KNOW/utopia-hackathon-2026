@@ -23,7 +23,7 @@ class StubClient:
 
 
 def service(client, key="k", model="m"):
-    return LlmService(make_settings(openai_api_key=key, openai_model=model), client=client)
+    return LlmService(make_settings(openai_api_key=key, openai_model=model, use_llm=True), client=client)
 
 
 def run(coro):

@@ -8,6 +8,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 ADVICE_DIR = BASE_DIR / "knowledge" / "advice"
 MODELS_DIR = BASE_DIR / "models"
+DEFAULT_TTS_CACHE_DIR = BASE_DIR / "tts_cache"
 
 LABELS_9 = (
     "hungry",
@@ -20,6 +21,7 @@ LABELS_9 = (
     "burping",
     "cold_hot",
 )
+UNSURE_TEMPLATE = "_unsure"  # advice/_unsure.{lang}.md: generic text for the 'unsure' case
 LANGS = ("th", "en")
 
 # --- decision thresholds (§4) ---
@@ -69,6 +71,9 @@ CODESANDBOX_ORIGIN_REGEX = r"https://[a-z0-9-]+\.(codesandbox\.io|csb\.app)"
 DEFAULT_ALLOWED_ORIGINS = "http://127.0.0.1:4175,http://localhost:4175"
 
 
+TRUTHY = frozenset({"1", "true", "yes"})
+
+
 def _int_env(name: str, default: int, minimum: int) -> int:
     """Int env var; unset, malformed or below `minimum` -> default (never crash startup)."""
     raw = os.environ.get(name, "").strip()
@@ -104,6 +109,8 @@ class Settings:
     tts_speed: float = DEFAULT_TTS_SPEED
     trusted_proxy_hops: int = 0  # 0 = ignore X-Forwarded-For
     finetuned_model: str | None = None  # TorchScript from ml/finetune_cnn14.py; None = joblib
+    use_llm: bool = False  # False = fixed advice templates only, /analyze never calls OpenAI
+    tts_cache_dir: Path = DEFAULT_TTS_CACHE_DIR
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -124,6 +131,8 @@ class Settings:
             tts_speed=_float_env("TTS_SPEED", DEFAULT_TTS_SPEED, TTS_SPEED_MIN, TTS_SPEED_MAX),
             trusted_proxy_hops=_int_env("TRUSTED_PROXY_HOPS", 0, 1),
             finetuned_model=env("FINETUNED_MODEL") or None,
+            use_llm=env("USE_LLM", "").strip().lower() in TRUTHY,
+            tts_cache_dir=Path(env("TTS_CACHE_DIR", "").strip() or DEFAULT_TTS_CACHE_DIR),
         )
 
     def voice_id(self, lang: str) -> str:

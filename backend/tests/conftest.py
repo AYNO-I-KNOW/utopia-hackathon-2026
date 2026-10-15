@@ -12,6 +12,9 @@ from app.main import create_app, get_llm, get_tts
 from app.model import ModelUnavailableError, get_model
 from app.tts import TtsService
 
+# per-test cache dir so TTS tests never touch (or hit) the committed backend/tts_cache
+TTS_CACHE = {"dir": None}
+
 PROBS = {"hungry": 0.72, "sleepy": 0.18, "diaper": 0.05, "hug": 0.03, "awake": 0.02}
 
 
@@ -24,6 +27,7 @@ def make_settings(**overrides) -> Settings:
         voice_id_en="",
         allowed_origins=("http://127.0.0.1:4175",),
         panns_checkpoint=None,
+        tts_cache_dir=TTS_CACHE["dir"],
     )
     return Settings(**{**base, **overrides})
 
@@ -66,6 +70,11 @@ class FakeLlm:
     async def summarise(self, case, top, context, lang):
         self.calls.append((case, top, context, lang))
         return SummaryResult("fake summary", ("a", "b", "c"), False)
+
+
+@pytest.fixture(autouse=True)
+def _isolated_tts_cache(tmp_path):
+    TTS_CACHE["dir"] = tmp_path / "tts_cache"
 
 
 @pytest.fixture

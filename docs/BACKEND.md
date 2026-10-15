@@ -178,6 +178,8 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 - Output JSON schema: `{summary, checklist[3], see_doctor}`
 - Fallback: LLM error/timeout 8 s → ใช้ย่อหน้าแรกของ advice ไฟล์
 
+**Template mode (default, `USE_LLM` ไม่เปิด)** — `/analyze` ไม่เรียก OpenAI: summary/checklist มาจาก advice ไฟล์แบบ deterministic (confident/close → ไฟล์ของ top1, unsure → `_unsure.{lang}.md`, no_cry → ข้อความคงที่) ดังนั้น (case, top1, lang) เดียวกันได้ summary เหมือนเดิมทุกไบต์ และ TTS cache ตรงเสมอ. `USE_LLM=1` เปิด LLM โดยมี template เป็น fallback. `/speak` เช็ก disk cache (`backend/tts_cache`, key = sha256 ของ model|voice|speed|text) ก่อนเรียก ElevenLabs — hit ไม่เสีย budget และใช้ offline ได้; เติม cache ด้วย `scripts/pregen_tts.py` แล้ว commit ไฟล์.
+
 **TTS (`tts.py`)** — ElevenLabs `eleven_v3` (รองรับไทย; `multilingual_v2`/`flash` ไม่รองรับ) · `ELEVENLABS_VOICE_ID_TH` / `_EN`
 
 **Lullabies (`scripts/generate_lullabies.py`)** — ElevenLabs Music API (`POST /v1/music`, ต้อง paid plan → ใช้ Creator coupon จาก hackathon), `force_instrumental`, 60–90 s, 3 เพลง × 2 ภาษา → `assets/lullabies/`

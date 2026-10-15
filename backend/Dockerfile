@@ -21,6 +21,7 @@ RUN pip install -r requirements.txt
 COPY --chown=user:user app ./app
 COPY --chown=user:user knowledge ./knowledge
 COPY --chown=user:user models ./models
+COPY --chown=user:user tts_cache ./tts_cache
 
 # Pre-fetch PANNs Cnn14 checkpoint (~327 MB) + AudioSet labels into ~/panns_data.
 # app.model.ensure_panns_files uses the same URLs panns_inference would `wget`.

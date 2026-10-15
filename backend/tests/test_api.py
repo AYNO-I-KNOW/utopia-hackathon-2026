@@ -112,7 +112,7 @@ class TestAnalyze:
                 async def parse(**_):
                     raise openai.APIConnectionError(request=httpx.Request("POST", "http://x"))
 
-        llm = LlmService(make_settings(openai_api_key="k", openai_model="m"), client=Boom())
+        llm = LlmService(make_settings(openai_api_key="k", openai_model="m", use_llm=True), client=Boom())
         res = post_analyze(make_client(llm=llm), wav_bytes, lang="en")
         assert res.status_code == 200
         body = res.json()
@@ -251,7 +251,6 @@ class TestSpeakAbuse:
 
     def test_daily_budget_exhausted_503(self, make_client):
         client = make_client(tts=self.tts(budget=10))
-        body = {"text": "123456", "lang": "en"}
-        assert client.post("/speak", json=body).status_code == 200
-        res = client.post("/speak", json=body)
+        assert client.post("/speak", json={"text": "123456", "lang": "en"}).status_code == 200
+        res = client.post("/speak", json={"text": "654321", "lang": "en"})
         assert res.status_code == 503

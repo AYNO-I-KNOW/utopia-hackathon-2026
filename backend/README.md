@@ -38,8 +38,8 @@ exist — train them with `ml/` (see `../ml/README.md`).
 
 ## Environment variables
 
-None are required to boot. Missing keys degrade features: no OpenAI key/model →
-fallback summary from the advice files; no ElevenLabs key/voice → `/speak` returns 503.
+None are required to boot. Missing keys degrade features: no OpenAI key/model (or `USE_LLM` off) →
+summary from the advice files; no ElevenLabs key/voice → `/speak` returns 503.
 
 | Name | Meaning |
 |---|---|
@@ -51,6 +51,8 @@ fallback summary from the advice files; no ElevenLabs key/voice → `/speak` ret
 | `PANNS_CHECKPOINT` | optional path to `Cnn14_mAP=0.431.pth` |
 | `FINETUNED_MODEL` | optional TorchScript from `ml/finetune_cnn14.py` (e.g. `models/cry_net.pt`); unset = `classifier.joblib` |
 | `TTS_DAILY_CHAR_BUDGET` | max characters sent to ElevenLabs per UTC day, in-process (default `50000`); `/speak` returns 503 when used up |
+| `USE_LLM` | `1`/`true`/`yes` = `/analyze` summaries come from OpenAI (templates stay as fallback). Default off: fixed text from `knowledge/advice/*.md`, no OpenAI call, same input = same summary |
+| `TTS_CACHE_DIR` | disk cache for `/speak` audio (default `backend/tts_cache`, committed). Hit = no ElevenLabs call and no budget spend; see `tts_cache/README.md` |
 | `TTS_SPEED` | ElevenLabs speaking speed (default `1.15`; clamped to `0.7`-`1.2`; malformed = default) |
 | `TRUSTED_PROXY_HOPS` | number N of trusted reverse proxies in front of the app (int ≥ 1). Unset = rate limits key on the TCP peer and ignore `X-Forwarded-For` |
 

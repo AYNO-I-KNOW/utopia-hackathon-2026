@@ -11,7 +11,15 @@ from typing import Any, Protocol
 from openai import AsyncOpenAI, OpenAIError
 from pydantic import BaseModel
 
-from app.config import ADVICE_DIR, LABELS_9, LANGS, LLM_TIMEOUT_S, TTS_MAX_CHARS, Settings
+from app.config import (
+    ADVICE_DIR,
+    LABELS_9,
+    LANGS,
+    LLM_TIMEOUT_S,
+    TTS_MAX_CHARS,
+    UNSURE_TEMPLATE,
+    Settings,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +91,7 @@ def no_cry_result(lang: str) -> SummaryResult:
 
 
 def load_advice(label: str, lang: str, advice_dir: Path = ADVICE_DIR) -> str | None:
-    if label not in LABELS_9 or lang not in LANGS:  # also blocks path traversal
+    if label not in (*LABELS_9, UNSURE_TEMPLATE) or lang not in LANGS:  # also blocks path traversal
         return None
     path = advice_dir / f"{label}.{lang}.md"
     try:
@@ -118,6 +126,15 @@ def fallback_result(label: str | None, lang: str, advice_dir: Path = ADVICE_DIR)
     return SummaryResult((summary or g_summary)[:TTS_MAX_CHARS], tuple(checklist), False)
 
 
+def template_result(
+    case: str, label: str | None, lang: str, advice_dir: Path = ADVICE_DIR
+) -> SummaryResult:
+    """Fixed text for (case bucket, top1 label, lang); same inputs always give identical output."""
+    if case == "no_cry":
+        return no_cry_result(lang)
+    return fallback_result(UNSURE_TEMPLATE if case == "unsure" else label, lang, advice_dir)
+
+
 class LlmService:
     def __init__(
         self, settings: Settings, advice_dir: Path = ADVICE_DIR, client: Any | None = None
@@ -128,7 +145,11 @@ class LlmService:
 
     @property
     def enabled(self) -> bool:
-        return bool(self._settings.openai_api_key and self._settings.openai_model)
+        return bool(
+            self._settings.use_llm
+            and self._settings.openai_api_key
+            and self._settings.openai_model
+        )
 
     def _get_client(self) -> Any:
         if self._client is None:
@@ -141,7 +162,7 @@ class LlmService:
         self, case: str, top: list[tuple[str, float]], context: dict[str, Any], lang: str
     ) -> SummaryResult:
         top1 = top[0][0] if top else None
-        fallback = fallback_result(top1, lang, self._advice_dir)
+        fallback = template_result(case, top1, lang, self._advice_dir)
         if not self.enabled or top1 is None:
             return fallback
         try:
