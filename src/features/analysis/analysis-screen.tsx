@@ -1,6 +1,7 @@
 "use client";
 import { copy } from "@/content";
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { MobileShell } from "@/components/mobile-shell";
 import { ChatScreen } from "@/features/chat/chat-screen";
 import { AnalysisLoading } from "./analysis-loading";
@@ -32,7 +33,19 @@ export function AnalysisScreen() {
   }, [step, started, paused]);
   useEffect(() => {
     if (step !== "loading") return;
-    const timer = setTimeout(() => setStep("result"), 2200);
+    const timer = setTimeout(() => {
+      if (
+        !document.startViewTransition ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        setStep("result");
+        return;
+      }
+      const transition = document.startViewTransition(() => {
+        flushSync(() => setStep("result"));
+      });
+      void transition.finished.catch(() => {});
+    }, 2200);
     return () => clearTimeout(timer);
   }, [step]);
   function start() {
