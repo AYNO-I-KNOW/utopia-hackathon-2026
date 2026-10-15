@@ -1,5 +1,6 @@
 "use client";
 import { HomeHero } from "./home-hero";
+import { ActivityIcon } from "./activity-icon";
 import { growthCopy } from "@/content/development";
 import { copy } from "@/content";
 import { useEffect, useState } from "react";
@@ -153,6 +154,7 @@ export function ActivityScreen() {
             .sort((a, b) => a.from.localeCompare(b.from))
             .map((item) => (
               <article key={item.id} className="card activity-card">
+                <ActivityIcon kind={item.activity} />
                 <div className="home-activity-body">
                   <h2>{activityLabel(item.activity)}</h2>
                   <p>
