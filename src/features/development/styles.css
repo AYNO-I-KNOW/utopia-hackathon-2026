@@ -799,3 +799,8 @@ dialog.growth-overlay:not([open]) {
 .home-record-fab {
   view-transition-name: scene-microphone;
 }
+
+/* Floating forms retain visible space below their rounded card. */
+dialog.growth-overlay {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}

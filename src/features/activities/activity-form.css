@@ -330,3 +330,10 @@
     animation: none;
   }
 }
+
+.activity-modal {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+.activity-modal .activity-editor {
+  max-height: calc(100dvh - 48px);
+}
