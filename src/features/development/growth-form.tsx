@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { growthCopy as text } from "@/content/development";
 import { dateKey } from "@/lib/date";
 import {
@@ -19,14 +19,21 @@ export function GrowthForm({
   onClose: () => void;
 }) {
   const [kind, setKind] = useState(initial);
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    dialog.current?.showModal();
+  }, []);
   return (
-    <div className="growth-overlay">
-      <section
-        className="growth-dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="growth-form-title"
-      >
+    <dialog
+      ref={dialog}
+      className="growth-overlay"
+      aria-labelledby="growth-form-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
+      <section className="growth-dialog">
         <h2 id="growth-form-title">{text.add}</h2>
         <form
           onSubmit={(e) => {
@@ -88,6 +95,6 @@ export function GrowthForm({
           </div>
         </form>
       </section>
-    </div>
+    </dialog>
   );
 }

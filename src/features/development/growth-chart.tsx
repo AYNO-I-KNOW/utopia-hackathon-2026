@@ -129,26 +129,37 @@ export function GrowthChart({
           </div>
           {item.chart === "line" ? (
             <>
-              <div className="growth-line-art">
-                <img
-                  src={
+              <svg
+                className="growth-line-art"
+                viewBox="0 0 300 216"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <image
+                  href={
                     "/images/development/" +
                     (metric === "weight"
                       ? "3-430-imgVector7.svg"
                       : "3-506-imgVector7.svg")
                   }
-                  alt=""
+                  x="0"
+                  y="25"
+                  width={metric === "weight" ? 295 : 296}
+                  height="183"
                 />
-                <img
-                  src={
+                <image
+                  href={
                     "/images/development/" +
                     (metric === "weight"
                       ? "3-430-imgVector6.svg"
                       : "3-506-imgVector6.svg")
                   }
-                  alt=""
+                  x="0"
+                  y="76"
+                  width={metric === "weight" ? 300 : 298}
+                  height="132"
                 />
-              </div>
+              </svg>
               <span className="growth-tooltip">
                 {text.current}
                 <br />
@@ -157,16 +168,23 @@ export function GrowthChart({
             </>
           ) : (
             <>
-              <img
+              <svg
                 className="growth-average-line"
-                src={
-                  "/images/development/" +
-                  (metric === "sleep"
-                    ? "3-260-imgLine3.svg"
-                    : "3-345-imgLine3.svg")
-                }
-                alt=""
-              />
+                viewBox="0 0 310 2"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <image
+                  href={
+                    "/images/development/" +
+                    (metric === "sleep"
+                      ? "3-260-imgLine3.svg"
+                      : "3-345-imgLine3.svg")
+                  }
+                  width="310"
+                  height="2"
+                />
+              </svg>
               <div className="growth-bars">
                 {bars.map((value, i) => (
                   <div key={i} className={selected === i ? "selected" : ""}>
@@ -182,16 +200,20 @@ export function GrowthChart({
         </div>
       </div>
       <div className="growth-chart-labels">
-        {labels.map((label, i) => (
-          <button
-            key={label}
-            onClick={() => setSelected(i)}
-            aria-pressed={selected === i}
-            aria-label={`${label} ${item.chart === "bar" ? bars[i] : item.value} ${item.unit}`}
-          >
-            {label}
-          </button>
-        ))}
+        {labels.map((label, i) =>
+          item.chart === "line" ? (
+            <span key={label}>{label}</span>
+          ) : (
+            <button
+              key={label}
+              onClick={() => setSelected(i)}
+              aria-pressed={selected === i}
+              aria-label={`${label} ${bars[i]} ${item.unit}`}
+            >
+              {label}
+            </button>
+          ),
+        )}
       </div>
       <div className="growth-legend">
         <span>
