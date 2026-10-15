@@ -1,9 +1,10 @@
 .growth-page {
+  --growth-page-background: var(--color-result-background);
   display: flex;
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  background: var(--color-result-background);
+  background: var(--growth-page-background);
 }
 .growth-header {
   flex-shrink: 0;
@@ -13,7 +14,7 @@
     to bottom,
     #c3baff 0%,
     #e1dfff 55%,
-    var(--color-result-background) 100%
+    var(--growth-page-background) 100%
   );
   z-index: 1;
 }
@@ -37,7 +38,7 @@
   display: block;
 }
 .growth-overview {
-  background: var(--color-growth-background);
+  --growth-page-background: var(--color-growth-background);
 }
 
 .growth-heading {
