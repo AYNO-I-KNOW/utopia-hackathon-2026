@@ -89,7 +89,7 @@ export const en = {
   exitRecording: "Discard recording",
   storageReadError: "Could not read local data",
   storageWriteError: "Could not save. Please try again.",
-  greeting: "Hello,",
+  greeting: "Hello, AYNO",
   greetingSubtitle: "How is your baby today?",
   sun: "Sun",
   mon: "Mon",

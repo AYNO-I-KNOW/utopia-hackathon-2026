@@ -35,7 +35,7 @@ export const growthCopy = {
   saveError: "Could not save. Please try again.",
   history: "View all history",
   daily: "Daily activities",
-  greeting: "Hello,",
+  greeting: "Hello, AYNO",
   greetingSubtitle: "How is your baby today?",
   noHistory: "No activities yet",
   viewGrowth: "View baby’s growth",
