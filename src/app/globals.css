@@ -1169,3 +1169,13 @@ h2 {
 html[data-scene-direction="return"] .activity-sheet {
   animation: none;
 }
+
+/* Hide scroll chrome without changing native scrolling or keyboard behavior. */
+* {
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
