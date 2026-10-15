@@ -21,6 +21,7 @@ export function ActivityForm({
   initialActivity?: string;
 }) {
   const modal = useRef<HTMLDialogElement>(null);
+  const outside = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [closing, setClosing] = useState(false);
   useEffect(() => {
@@ -37,7 +38,7 @@ export function ActivityForm({
         modal.current?.close();
         onCancel();
       },
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 200,
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 240,
     );
   }
   const [time] = useState(currentTime);
@@ -49,6 +50,13 @@ export function ActivityForm({
   const picker = useRef<HTMLDetailsElement>(null);
   return (
     <dialog
+      onPointerDown={(event) => {
+        outside.current = event.target === event.currentTarget;
+      }}
+      onClick={(event) => {
+        if (outside.current && event.target === event.currentTarget) close();
+        outside.current = false;
+      }}
       ref={modal}
       className="activity-modal"
       data-closing={closing}

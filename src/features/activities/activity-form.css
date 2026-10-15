@@ -245,7 +245,7 @@
   max-height: calc(100dvh - 32px);
   border-radius: 24px;
   background: white;
-  animation: activity-modal-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: activity-modal-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
   box-shadow: 0 12px 48px #30265b20;
 }
 .activity-modal .activity-editor-header {
@@ -282,7 +282,7 @@
   overflow-y: auto;
 }
 .activity-modal[data-closing="true"] .activity-editor {
-  animation: activity-modal-out 200ms ease both;
+  animation: activity-modal-out 240ms ease both;
   pointer-events: none;
 }
 .activity-modal[data-closing="true"]::backdrop {
@@ -291,7 +291,7 @@
 @keyframes activity-modal-in {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.98);
+    transform: translateY(calc(100% + 24px));
   }
   to {
     opacity: 1;
@@ -305,7 +305,7 @@
   }
   to {
     opacity: 0;
-    transform: translateY(16px) scale(0.98);
+    transform: translateY(calc(100% + 24px));
   }
 }
 @keyframes activity-backdrop-in {
@@ -336,4 +336,8 @@
 }
 .activity-modal .activity-editor {
   max-height: calc(100dvh - 48px);
+}
+
+.activity-modal .footer {
+  border-radius: 0 0 24px 24px;
 }
