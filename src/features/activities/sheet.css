@@ -21,7 +21,9 @@
   border-radius: 32px 32px 0 0;
   box-shadow: 0 -8px 32px #5746cf0d;
   animation: activity-sheet-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  transition: height 360ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    height 360ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 360ms cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
 }
 .activity-sheet[data-dragging="true"] {
@@ -120,7 +122,7 @@
   padding: 8px 16px;
   min-height: 40px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
 }
 .activity-sheet-add span {
   font-size: 20px;
@@ -195,6 +197,8 @@
   cursor: inherit;
 }
 .activity-week-page small {
+  color: var(--color-text-secondary);
+  font-weight: 400;
   font-size: 12px;
 }
 .activity-week-page b {

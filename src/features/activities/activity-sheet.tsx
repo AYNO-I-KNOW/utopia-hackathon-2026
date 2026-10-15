@@ -111,13 +111,20 @@ export function ActivitySheet({
     origin.current = null;
     setDrag(0);
   }
+  const parentHeight = sheet.current?.parentElement?.clientHeight ?? 720;
+  const topGap = ((100 - snap) / 100) * parentHeight + drag;
+  const cornerRadius = Math.min(32, Math.max(0, topGap / 3));
   return (
     <section
       ref={sheet}
       className="activity-sheet"
       aria-label={growthCopy.daily}
       data-dragging={origin.current !== null}
-      style={{ height: `calc(${snap}% - ${drag}px)` }}
+      style={{
+        height: `calc(${snap}% - ${drag}px)`,
+        borderTopLeftRadius: cornerRadius,
+        borderTopRightRadius: cornerRadius,
+      }}
     >
       <button
         className="activity-sheet-handle"
