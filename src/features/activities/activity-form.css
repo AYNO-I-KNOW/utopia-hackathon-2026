@@ -210,3 +210,9 @@
   position: relative;
   z-index: 2;
 }
+
+.activity-editor textarea:focus {
+  border-color: #a6a5af;
+  outline: none;
+  box-shadow: none;
+}

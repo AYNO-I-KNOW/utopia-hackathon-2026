@@ -1499,3 +1499,23 @@ html[data-scene-direction] .analysis-intro {
   pointer-events: none;
   color: var(--color-text-muted);
 }
+
+/* Focus styling stays quiet; notes use their existing border as feedback. */
+button:focus,
+a:focus,
+summary:focus,
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+textarea:focus {
+  border-color: #a6a5af;
+}
