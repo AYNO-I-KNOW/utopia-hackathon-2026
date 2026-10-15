@@ -14,7 +14,6 @@
   background: var(--color-surface);
 }
 .ubot-back,
-.ubot-more,
 .ubot-send {
   display: grid;
   place-items: center;
@@ -104,11 +103,6 @@
   align-items: center;
   gap: 8px;
 }
-.ubot-more {
-  background: var(--color-brand-soft);
-  color: var(--color-brand-pressed);
-  font-size: 28px;
-}
 .ubot-input-wrap {
   display: flex;
   align-items: center;
@@ -145,20 +139,6 @@
 .ubot-send:disabled {
   opacity: 0.45;
 }
-.ubot-suggestions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-bottom: 16px;
-}
-.ubot-suggestions button {
-  border: 0;
-  border-radius: 999px;
-  background: var(--color-brand-soft);
-  color: var(--color-brand-pressed);
-  padding: 8px 12px;
-  font-size: 14px;
-}
 @keyframes ubot-message-in {
   from {
     opacity: 0;
@@ -175,12 +155,59 @@
   }
 }
 
-/* Focus belongs to the composed pill, not the rectangular inner input. */
-.ubot-input-wrap:focus-within {
-  outline: 2px solid var(--color-brand);
-  outline-offset: 2px;
-}
 .ubot-input-wrap input:focus-visible {
   outline: none;
   box-shadow: none;
+}
+
+.ubot-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 12px 16px;
+}
+.ubot-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  animation: ubot-typing-dot 1.2s ease-in-out infinite;
+}
+.ubot-typing span:nth-child(2) {
+  animation-delay: 150ms;
+}
+.ubot-typing span:nth-child(3) {
+  animation-delay: 300ms;
+}
+.ubot-send {
+  transition:
+    opacity 180ms ease,
+    transform 160ms ease;
+}
+.ubot-send:not(:disabled):active {
+  transform: scale(0.92);
+}
+.ubot-user {
+  transform-origin: bottom right;
+}
+@keyframes ubot-typing-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ubot-typing span {
+    animation: none;
+  }
+  .ubot-send {
+    transition: none;
+  }
 }

@@ -10,24 +10,42 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
     { text: copy.chatGreeting, user: false },
   ]);
   const [draft, setDraft] = useState("");
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [replying, setReplying] = useState(false);
+  const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const following = useRef(true);
+  const input = useRef<HTMLInputElement>(null);
   const log = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    if (!following.current) return;
     log.current?.scrollTo({
       top: log.current.scrollHeight,
-      behavior: "smooth",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
     });
-  }, [messages]);
+  }, [messages, replying]);
+  useEffect(
+    () => () => {
+      if (replyTimer.current) clearTimeout(replyTimer.current);
+    },
+    [],
+  );
   function send(text: string) {
     const trimmed = text.trim();
-    if (!trimmed) return;
-    setMessages((previous) => [
-      ...previous,
-      { text: trimmed, user: true },
-      { text: copy.chatMockReply, user: false },
-    ]);
+    if (!trimmed || replyTimer.current) return;
+    following.current = true;
+    setMessages((previous) => [...previous, { text: trimmed, user: true }]);
+    setReplying(true);
+    replyTimer.current = setTimeout(() => {
+      setMessages((previous) => [
+        ...previous,
+        { text: copy.chatMockReply, user: false },
+      ]);
+      setReplying(false);
+      replyTimer.current = null;
+    }, 1200);
     setDraft("");
-    setShowSuggestions(false);
+    input.current?.focus();
   }
   return (
     <div className="ubot-chat">
@@ -47,6 +65,12 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
         aria-label={copy.chat}
         aria-live="polite"
         ref={log}
+        onScroll={(event) => {
+          const element = event.currentTarget;
+          following.current =
+            element.scrollHeight - element.scrollTop - element.clientHeight <
+            64;
+        }}
       >
         {messages.map((message, index) => (
           <div
@@ -56,35 +80,28 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
             {message.text}
           </div>
         ))}
-      </div>
-      <footer className="ubot-composer">
-        {showSuggestions && (
-          <div className="ubot-suggestions" id="ubot-suggestions">
-            {copy.chatSuggestedQuestions.map((question) => (
-              <button key={question} onClick={() => send(question)}>
-                {question}
-              </button>
-            ))}
+        {replying && (
+          <div
+            className="ubot-bubble ubot-typing"
+            role="status"
+            aria-label={copy.botTyping}
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
           </div>
         )}
+      </div>
+      <footer className="ubot-composer">
         <form
           onSubmit={(event) => {
             event.preventDefault();
             send(draft);
           }}
         >
-          <button
-            type="button"
-            className="ubot-more"
-            aria-label={copy.chatSuggestions}
-            aria-expanded={showSuggestions}
-            aria-controls="ubot-suggestions"
-            onClick={() => setShowSuggestions(!showSuggestions)}
-          >
-            +
-          </button>
           <div className="ubot-input-wrap">
             <input
+              ref={input}
               name="message"
               aria-label={copy.message}
               placeholder={copy.messagePlaceholder}
@@ -95,7 +112,7 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
             <button
               className="ubot-send"
               aria-label={copy.send}
-              disabled={!draft.trim()}
+              disabled={!draft.trim() || replying}
             >
               <img src="/images/chat/send.svg" alt="" />
             </button>

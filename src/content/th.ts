@@ -29,6 +29,7 @@ export const th = {
   back: "ย้อนกลับ",
   chat: "คุยกับ U-Bot",
   chatMockReply: "ลูกมีอาการอะไรเพิ่มเติมบ้าง เล่าให้ฟังได้เลยค่ะ",
+  botTyping: "ผู้ช่วยกำลังพิมพ์",
   botName: "ผู้ช่วยส่วนตัว",
   botStatus: "ผู้ช่วยดูแลลูกน้อย",
   chatSuggestions: "คำถามแนะนำ",
