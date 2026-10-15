@@ -1,18 +1,47 @@
 "use client";
 import { copy } from "@/content";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MobileShell } from "@/components/mobile-shell";
+import { buildContext } from "@/features/activities/context";
+import { loadActivities } from "@/features/activities/storage";
 import { ChatScreen } from "@/features/chat/chat-screen";
-import { AnalysisResult } from "./analysis-result";
+import { AnalysisResult, headline } from "./analysis-result";
 import { AnalysisCapture } from "./analysis-capture";
-type Step = "ready" | "record" | "loading" | "result" | "chat";
+import { AnalysisError } from "./analysis-error";
+import { ExitDialog } from "./exit-dialog";
+import { analyzeCry, ApiError, isAbort, MAX_UPLOAD_BYTES } from "./api";
+import type { AnalysisContext, AnalysisResult as Result } from "./parse";
+import "./styles.css";
+type Step = "ready" | "record" | "loading" | "result" | "error" | "chat";
+
+const EMPTY_CONTEXT: AnalysisContext = {
+  last_feed_min: null,
+  last_diaper_min: null,
+  last_sleep_end_min: null,
+};
+
+function savedContext(): AnalysisContext {
+  try {
+    return buildContext(loadActivities(), new Date());
+  } catch {
+    return EMPTY_CONTEXT;
+  }
+}
+
 export function AnalysisScreen() {
   const [step, setStep] = useState<Step>("ready"),
     [elapsed, setElapsed] = useState(0),
     [started, setStarted] = useState(0),
     [confirm, setConfirm] = useState(false);
   const [paused, setPaused] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [canRetry, setCanRetry] = useState(false);
+  const [result, setResult] = useState<Result | null>(null);
+  const [failure, setFailure] = useState<ApiError | null>(null);
   const recordedMs = useRef(0);
+  const audio = useRef<Blob | null>(null);
+  const context = useRef<AnalysisContext>(EMPTY_CONTEXT);
+  const request = useRef({ id: 0, controller: new AbortController() });
   function togglePause() {
     if (paused) setStarted(performance.now() - recordedMs.current);
     else {
@@ -22,80 +51,163 @@ export function AnalysisScreen() {
     setPaused((value) => !value);
   }
   useEffect(() => {
-    if (step !== "record" || paused) return;
+    if (step !== "record" || paused || !ready) return;
     const update = () =>
       setElapsed(Math.floor((performance.now() - started) / 1000));
     update();
     const timer = setInterval(update, 250);
     return () => clearInterval(timer);
-  }, [step, started, paused]);
-  useEffect(() => {
-    if (step !== "loading") return;
-    const timer = setTimeout(() => setStep("result"), 2200);
-    return () => clearTimeout(timer);
-  }, [step]);
+  }, [step, started, paused, ready]);
+  // Drop any in-flight request when leaving the screen; late replies are ignored.
+  useEffect(
+    () => () => {
+      request.current.id++;
+      request.current.controller.abort();
+    },
+    [],
+  );
+  async function analyze(blob: Blob, next: AnalysisContext) {
+    request.current.controller.abort();
+    const current = {
+      id: request.current.id + 1,
+      controller: new AbortController(),
+    };
+    request.current = current;
+    audio.current = blob;
+    context.current = next;
+    setStep("loading");
+    try {
+      const reply = await analyzeCry(
+        blob,
+        "th",
+        next,
+        current.controller.signal,
+      );
+      if (current.id !== request.current.id) return;
+      setResult(reply);
+      setStep("result");
+    } catch (error) {
+      if (current.id !== request.current.id || isAbort(error)) return;
+      fail(error instanceof ApiError ? error : new ApiError("generic"));
+    }
+  }
+  function fail(error: ApiError) {
+    setCanRetry(audio.current !== null && error.kind !== "too_big");
+    setFailure(error);
+    setStep("error");
+  }
+  function cancelAnalysis() {
+    request.current.id++;
+    request.current.controller.abort();
+    audio.current = null;
+    setStep("ready");
+  }
+  function reset() {
+    audio.current = null;
+    setStep("ready");
+  }
+  function confirmRecording(blob: Blob | null) {
+    if (blob) void analyze(blob, savedContext());
+    else fail(new ApiError("bad_audio"));
+  }
+  function chooseFile(file: File) {
+    audio.current = null;
+    if (file.size > MAX_UPLOAD_BYTES) fail(new ApiError("too_big"));
+    else void analyze(file, savedContext());
+  }
   function start() {
+    audio.current = null;
     setPaused(false);
+    setReady(false);
     recordedMs.current = 0;
-    setStarted(performance.now());
     setElapsed(0);
     setStep("record");
   }
-  if (step === "ready" || step === "record")
-    return (
-      <MobileShell>
-        <AnalysisCapture
-          recording={step === "record"}
-          elapsed={elapsed}
-          paused={paused}
-          onTogglePause={togglePause}
-          onStart={start}
-          onConfirm={() => setStep("loading")}
-          onCancel={() => setConfirm(true)}
-        />
-        {confirm && (
-          <div className="overlay">
-            <div
-              className="dialog"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="exit-title"
-            >
-              <h2 id="exit-title">{copy.exitRecordingTitle}</h2>
-              <p>{copy.discardAudio}</p>
-              <div className="actions">
-                <button autoFocus onClick={() => setConfirm(false)}>
-                  {copy.continueRecording}
-                </button>
-                <button
-                  className="primary"
-                  onClick={() => {
-                    setConfirm(false);
-                    setStep("ready");
-                  }}
-                >
-                  {copy.exitRecording}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </MobileShell>
-    );
+  // The clock starts when MediaRecorder has really started, not at the tap.
+  const markReady = useCallback(() => {
+    recordedMs.current = 0;
+    setStarted(performance.now());
+    setElapsed(0);
+    setReady(true);
+  }, []);
+  const capture = step === "ready" || step === "record";
   return (
     <MobileShell>
-      {step === "chat" ? (
-        <ChatScreen onBack={() => setStep("result")} />
+      <p className="sr-only" aria-live="polite">
+        {announcement(step, result, failure)}
+      </p>
+      {capture ? (
+        <>
+          <AnalysisCapture
+            recording={step === "record"}
+            elapsed={elapsed}
+            paused={paused}
+            onTogglePause={togglePause}
+            onStart={start}
+            onReady={markReady}
+            onConfirm={confirmRecording}
+            onMicError={() => fail(new ApiError("mic"))}
+            onFile={chooseFile}
+            onCancel={() => setConfirm(true)}
+          />
+          {confirm && (
+            <ExitDialog
+              onContinue={() => setConfirm(false)}
+              onExit={() => {
+                setConfirm(false);
+                setStep("ready");
+              }}
+            />
+          )}
+        </>
+      ) : step === "chat" && result ? (
+        <ChatScreen result={result} onBack={() => setStep("result")} />
       ) : step === "loading" ? (
-        <section className="content loading-content">
-          <div className="center" role="status">
-            <div className="spinner" />
-            <h1>{copy.analyzing}</h1>
-          </div>
-        </section>
-      ) : step === "result" ? (
-        <AnalysisResult onChat={() => setStep("chat")} />
+        <>
+          <section className="content loading-content">
+            <div className="center">
+              <div className="spinner" />
+              <h1>{copy.analyzing}</h1>
+            </div>
+          </section>
+          <footer className="footer">
+            <button onClick={cancelAnalysis}>{copy.cancelAnalysis}</button>
+          </footer>
+        </>
+      ) : step === "error" && failure ? (
+        <AnalysisError
+          message={failure.message}
+          canRetry={canRetry}
+          onRetry={() =>
+            audio.current && void analyze(audio.current, context.current)
+          }
+          onReset={reset}
+        />
+      ) : step === "result" && result ? (
+        <AnalysisResult
+          result={result}
+          onChat={() => setStep("chat")}
+          onRetry={reset}
+          onAnswer={(field, minutes) =>
+            audio.current &&
+            void analyze(audio.current, {
+              ...context.current,
+              [field]: minutes,
+            })
+          }
+        />
       ) : null}
     </MobileShell>
   );
+}
+
+function announcement(
+  step: Step,
+  result: Result | null,
+  failure: ApiError | null,
+) {
+  if (step === "loading") return copy.analyzing;
+  if (step === "error") return failure?.message ?? "";
+  if (step === "result" && result) return headline(result).title;
+  return "";
 }

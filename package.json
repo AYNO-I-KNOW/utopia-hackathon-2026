@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start --hostname 127.0.0.1 --port 4175",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/lib/*.test.ts src/features/activities/*.test.ts src/features/development/*.test.ts",
+    "test": "node --experimental-strip-types --test src/lib/*.test.ts src/features/activities/*.test.ts src/features/development/*.test.ts src/features/analysis/*.test.ts src/features/chat/*.test.ts",
     "format": "prettier --write src docs/*.md README.md",
     "format:check": "prettier --check src docs/*.md README.md",
     "check": "npm run typecheck && npm run format:check && npm test"

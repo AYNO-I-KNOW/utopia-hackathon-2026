@@ -1,6 +1,8 @@
 import { copy } from "@/content";
 import { SceneLink } from "@/components/scene-navigation";
 import { formatElapsed } from "@/lib/date";
+import { useEffect, useRef } from "react";
+import { MAX_RECORD_SECONDS, MIN_RECORD_SECONDS } from "./recorder";
 import { useAudioLevel } from "./use-audio-level";
 
 type Props = {
@@ -9,7 +11,10 @@ type Props = {
   paused: boolean;
   onTogglePause: () => void;
   onStart: () => void;
-  onConfirm: () => void;
+  onReady: () => void;
+  onConfirm: (audio: Blob | null) => void;
+  onMicError: () => void;
+  onFile: (file: File) => void;
   onCancel: () => void;
 };
 
@@ -20,10 +25,32 @@ export function AnalysisCapture({
   paused,
   onTogglePause,
   onStart,
+  onReady,
   onConfirm,
+  onMicError,
+  onFile,
   onCancel,
 }: Props) {
-  const { canvasRef, error } = useAudioLevel(recording, paused);
+  const { canvasRef, error, ready, finish } = useAudioLevel(recording, paused);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const finishing = useRef(false);
+  const tooShort = elapsed < MIN_RECORD_SECONDS;
+  async function confirm() {
+    if (finishing.current) return;
+    if (error) return onMicError();
+    finishing.current = true;
+    onConfirm(await finish());
+  }
+  useEffect(() => {
+    if (!recording) finishing.current = false;
+  }, [recording]);
+  useEffect(() => {
+    if (recording && ready) onReady();
+  }, [recording, ready, onReady]);
+  useEffect(() => {
+    if (recording && !paused && elapsed >= MAX_RECORD_SECONDS) void confirm();
+    // confirm is guarded by `finishing`, so re-running on identity change is safe.
+  }, [recording, paused, elapsed, confirm]);
   return (
     <section
       className="analysis-ready"
@@ -82,7 +109,9 @@ export function AnalysisCapture({
               ? copy.microphoneError
               : paused
                 ? copy.recordingPaused
-                : copy.recording}
+                : tooShort
+                  ? copy.minRecording
+                  : copy.recording}
           </p>
           <span className="recording-time">{formatElapsed(elapsed)}</span>
         </div>
@@ -92,6 +121,7 @@ export function AnalysisCapture({
               className="capture-exit"
               onClick={onTogglePause}
               aria-pressed={paused}
+              disabled={!ready}
               tabIndex={recording ? 0 : -1}
               aria-hidden={!recording}
             >
@@ -116,9 +146,9 @@ export function AnalysisCapture({
           </div>
           <button
             className="analysis-microphone"
-            onClick={recording ? onConfirm : onStart}
+            onClick={recording ? confirm : onStart}
             aria-label={recording ? copy.stopRecording : copy.startAnalysis}
-            disabled={recording && error}
+            disabled={recording && (error || !ready || tooShort)}
           >
             <img
               className="capture-mic-icon"
@@ -135,6 +165,25 @@ export function AnalysisCapture({
         >
           {copy.tapToListen}
         </p>
+        <button
+          className="capture-upload"
+          onClick={() => fileInput.current?.click()}
+          tabIndex={recording ? -1 : 0}
+          aria-hidden={recording}
+        >
+          {copy.uploadAudio}
+        </button>
+        <input
+          ref={fileInput}
+          type="file"
+          accept="audio/*"
+          hidden
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) onFile(file);
+          }}
+        />
       </div>
     </section>
   );

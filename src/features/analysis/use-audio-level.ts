@@ -1,14 +1,20 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createRecorder, type Recorder } from "./recorder";
 
 /** Draw live volume outside React; sample history scrolls at a continuous speed. */
 export function useAudioLevel(enabled: boolean, paused = false) {
   const pausedRef = useRef(paused);
+  const recorderRef = useRef<Recorder | null>(null);
   useEffect(() => {
     pausedRef.current = paused;
+    if (paused) recorderRef.current?.pause();
+    else recorderRef.current?.resume();
   }, [paused]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState(false);
+  // True once MediaRecorder has actually started; the recording clock keys off this.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
     if (!enabled) return;
     let disposed = false,
@@ -16,6 +22,7 @@ export function useAudioLevel(enabled: boolean, paused = false) {
       context: AudioContext | undefined,
       frame = 0;
     setError(false);
+    setReady(false);
     async function connect() {
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -23,6 +30,16 @@ export function useAudioLevel(enabled: boolean, paused = false) {
           stream.getTracks().forEach((track) => track.stop());
           return;
         }
+        recorderRef.current = createRecorder(stream);
+        if (pausedRef.current) recorderRef.current.pause();
+        setReady(true);
+      } catch {
+        stream?.getTracks().forEach((track) => track.stop());
+        if (!disposed) setError(true);
+        return;
+      }
+      // The waveform is optional: if AudioContext fails (e.g. Safari resume()), keep recording.
+      try {
         context = new AudioContext();
         await context.resume();
         if (disposed) return;
@@ -89,13 +106,15 @@ export function useAudioLevel(enabled: boolean, paused = false) {
               const barHeight = 4 + amplitude * 76;
               paint.globalAlpha = 0.35 + (0.65 * i) / count;
               paint.beginPath();
-              paint.roundRect(
+              const bar = [
                 i * pitch - offset,
                 (height - barHeight) / 2,
                 4,
                 barHeight,
-                2,
-              );
+              ] as const;
+              if (typeof paint.roundRect === "function")
+                paint.roundRect(...bar, 2);
+              else paint.rect(...bar);
               paint.fill();
             }
             paint.globalAlpha = 1;
@@ -104,17 +123,23 @@ export function useAudioLevel(enabled: boolean, paused = false) {
         }
         frame = requestAnimationFrame(draw);
       } catch {
-        stream?.getTracks().forEach((track) => track.stop());
-        if (!disposed) setError(true);
+        // Waveform dropped; the recorder and stream stay alive.
       }
     }
     void connect();
     return () => {
       disposed = true;
+      recorderRef.current?.dispose();
+      recorderRef.current = null;
+      setReady(false);
       cancelAnimationFrame(frame);
       stream?.getTracks().forEach((track) => track.stop());
       if (context && context.state !== "closed") void context.close();
     };
   }, [enabled]);
-  return { canvasRef, error };
+  const finish = useCallback(
+    () => recorderRef.current?.finish() ?? Promise.resolve(null),
+    [],
+  );
+  return { canvasRef, error, ready, finish };
 }
