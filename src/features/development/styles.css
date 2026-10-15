@@ -532,7 +532,7 @@
 .home-activity-body h2 {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 500;
   color: #000;
   line-height: normal;
 }
@@ -781,4 +781,21 @@ dialog.growth-overlay:not([open]) {
   .home-record-fab {
     transition: none;
   }
+}
+
+.home-hero-baby {
+  position: absolute;
+  width: 185px;
+  height: 185px;
+  object-fit: contain;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  view-transition-name: scene-baby;
+}
+.home-hero-background {
+  view-transition-name: scene-background;
+}
+.home-record-fab {
+  view-transition-name: scene-microphone;
 }

@@ -20,7 +20,13 @@ export function HomeHero() {
         href="/development"
         className="home-hero-scene"
         aria-label={copy.viewDevelopment}
-      />
+      >
+        <img
+          className="home-hero-baby"
+          src="/images/analysis/baby.png"
+          alt={copy.cryingBabyAlt}
+        />
+      </Link>
     </div>
   );
 }

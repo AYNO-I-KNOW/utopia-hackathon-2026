@@ -4,7 +4,7 @@ import { ActivityIcon } from "./activity-icon";
 import { ActivitySheet } from "./activity-sheet";
 import { copy } from "@/content";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { SceneLink } from "@/components/scene-navigation";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MobileShell } from "@/components/mobile-shell";
 import { dateKey } from "@/lib/date";
@@ -87,13 +87,13 @@ export function ActivityScreen() {
           </div>
         </ActivitySheet>
       </section>
-      <Link
+      <SceneLink
         href="/analysis"
         className="home-record-fab"
         aria-label={copy.startAnalysis}
       >
         <img src="/images/analysis/microphone.svg" alt="" />
-      </Link>
+      </SceneLink>
     </MobileShell>
   );
 }

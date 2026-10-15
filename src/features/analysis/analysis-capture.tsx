@@ -1,5 +1,5 @@
 import { copy } from "@/content";
-import Link from "next/link";
+import { SceneLink } from "@/components/scene-navigation";
 import { formatElapsed } from "@/lib/date";
 import { useAudioLevel } from "./use-audio-level";
 
@@ -44,9 +44,13 @@ export function AnalysisCapture({
           <img src="/images/analysis/back.svg" alt="" />
         </button>
       ) : (
-        <Link href="/" className="analysis-back" aria-label={copy.backHome}>
+        <SceneLink
+          href="/"
+          className="analysis-back"
+          aria-label={copy.backHome}
+        >
           <img src="/images/analysis/back.svg" alt="" />
-        </Link>
+        </SceneLink>
       )}
       <div className="analysis-heading">
         <h1>{recording ? copy.listening : copy.analysisTitle}</h1>

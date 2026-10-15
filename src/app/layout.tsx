@@ -5,6 +5,7 @@ import "@/design-system/tokens.css";
 import "./globals.css";
 import "@/features/development/styles.css";
 import "@/design-system/components.css";
+import { SceneNavigationProvider } from "@/components/scene-navigation";
 import { activeLocale } from "@/content";
 export const metadata: Metadata = {
   title: "Crybaby",
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang={activeLocale}>
-      <body>{children}</body>
+      <body>
+        <SceneNavigationProvider>{children}</SceneNavigationProvider>
+      </body>
     </html>
   );
 }
