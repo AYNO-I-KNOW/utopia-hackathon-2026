@@ -35,9 +35,28 @@ def test_request_shape_and_voice_by_lang():
     assert str(req.url) == "https://api.elevenlabs.io/v1/text-to-speech/vth"
     assert req.headers["xi-api-key"] == "secret-key"
     assert req.headers["accept"] == "audio/mpeg"
-    assert json.loads(req.content) == {"text": "สวัสดี", "model_id": "eleven_v3"}
+    assert json.loads(req.content) == {
+        "text": "สวัสดี",
+        "model_id": "eleven_v3",
+        "voice_settings": {"speed": 1.15},
+    }
     run(svc.synthesize("hello", "en"))
     assert seen[1].url.path.endswith("/ven")
+
+
+def test_payload_uses_configured_speed():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(json.loads(request.content))
+        return httpx.Response(200, content=b"mp3")
+
+    svc = TtsService(
+        make_settings(elevenlabs_api_key="k", voice_id_en="ven", tts_speed=0.9),
+        transport=httpx.MockTransport(handler),
+    )
+    run(svc.synthesize("hi", "en"))
+    assert seen[0]["voice_settings"] == {"speed": 0.9}
 
 
 def test_text_capped():

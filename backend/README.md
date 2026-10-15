@@ -51,6 +51,7 @@ fallback summary from the advice files; no ElevenLabs key/voice → `/speak` ret
 | `PANNS_CHECKPOINT` | optional path to `Cnn14_mAP=0.431.pth` |
 | `FINETUNED_MODEL` | optional TorchScript from `ml/finetune_cnn14.py` (e.g. `models/cry_net.pt`); unset = `classifier.joblib` |
 | `TTS_DAILY_CHAR_BUDGET` | max characters sent to ElevenLabs per UTC day, in-process (default `50000`); `/speak` returns 503 when used up |
+| `TTS_SPEED` | ElevenLabs speaking speed (default `1.15`; clamped to `0.7`-`1.2`; malformed = default) |
 | `TRUSTED_PROXY_HOPS` | number N of trusted reverse proxies in front of the app (int ≥ 1). Unset = rate limits key on the TCP peer and ignore `X-Forwarded-For` |
 
 Limits: `/analyze` 30 req/min per IP, `/speak` 5 req/min per IP, max 2 concurrent analyses (503 `busy, retry`),

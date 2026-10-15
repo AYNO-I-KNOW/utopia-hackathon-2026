@@ -1,5 +1,6 @@
 """Env vars (ARCHITECTURE.md §7) and tuning constants (§4). Missing keys never crash startup."""
 
+import math
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -55,6 +56,9 @@ LLM_TIMEOUT_S = 8
 TTS_TIMEOUT_S = 15
 TTS_MAX_CHARS = 600
 TTS_MODEL_ID = "eleven_v3"
+DEFAULT_TTS_SPEED = 1.15
+TTS_SPEED_MIN = 0.7  # ElevenLabs voice_settings.speed range
+TTS_SPEED_MAX = 1.2
 ELEVENLABS_TTS_URL = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
 
 # --- API hygiene ---
@@ -75,6 +79,18 @@ def _int_env(name: str, default: int, minimum: int) -> int:
     return value if value >= minimum else default
 
 
+def _float_env(name: str, default: float, minimum: float, maximum: float) -> float:
+    """Float env var clamped to [minimum, maximum]; unset, malformed or non-finite -> default."""
+    raw = os.environ.get(name, "").strip()
+    try:
+        value = float(raw)
+    except ValueError:
+        return default
+    if not math.isfinite(value):
+        return default
+    return min(max(value, minimum), maximum)
+
+
 @dataclass(frozen=True)
 class Settings:
     openai_api_key: str
@@ -85,6 +101,7 @@ class Settings:
     allowed_origins: tuple[str, ...]
     panns_checkpoint: str | None
     tts_daily_char_budget: int = DEFAULT_TTS_DAILY_CHAR_BUDGET
+    tts_speed: float = DEFAULT_TTS_SPEED
     trusted_proxy_hops: int = 0  # 0 = ignore X-Forwarded-For
     finetuned_model: str | None = None  # TorchScript from ml/finetune_cnn14.py; None = joblib
 
@@ -104,6 +121,7 @@ class Settings:
             ),
             panns_checkpoint=env("PANNS_CHECKPOINT") or None,
             tts_daily_char_budget=_int_env("TTS_DAILY_CHAR_BUDGET", DEFAULT_TTS_DAILY_CHAR_BUDGET, 0),
+            tts_speed=_float_env("TTS_SPEED", DEFAULT_TTS_SPEED, TTS_SPEED_MIN, TTS_SPEED_MAX),
             trusted_proxy_hops=_int_env("TRUSTED_PROXY_HOPS", 0, 1),
             finetuned_model=env("FINETUNED_MODEL") or None,
         )

@@ -80,7 +80,11 @@ class TtsService:
                         "xi-api-key": self._settings.elevenlabs_api_key,
                         "Accept": "audio/mpeg",
                     },
-                    json={"text": text, "model_id": TTS_MODEL_ID},
+                    json={
+                        "text": text,
+                        "model_id": TTS_MODEL_ID,
+                        "voice_settings": {"speed": self._settings.tts_speed},
+                    },
                 )
                 resp.raise_for_status()
         except httpx.HTTPStatusError as exc:

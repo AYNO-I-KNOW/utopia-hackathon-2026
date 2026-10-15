@@ -48,3 +48,26 @@ def test_daily_budget_env(monkeypatch, raw, expected):
     if raw is not None:
         monkeypatch.setenv("TTS_DAILY_CHAR_BUDGET", raw)
     assert Settings.from_env().tts_daily_char_budget == expected
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (None, 1.15),
+        ("", 1.15),
+        ("abc", 1.15),
+        ("nan", 1.15),
+        ("inf", 1.15),
+        ("1.0", 1.0),
+        ("0.7", 0.7),
+        ("0.1", 0.7),
+        ("-3", 0.7),
+        ("1.2", 1.2),
+        ("5", 1.2),
+    ],
+)
+def test_tts_speed_env(monkeypatch, raw, expected):
+    monkeypatch.delenv("TTS_SPEED", raising=False)
+    if raw is not None:
+        monkeypatch.setenv("TTS_SPEED", raw)
+    assert Settings.from_env().tts_speed == expected
