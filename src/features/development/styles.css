@@ -482,6 +482,7 @@
   flex-shrink: 0;
 }
 .home-hero-scene {
+  display: block;
   height: 210px;
   position: relative;
 }
@@ -723,4 +724,34 @@ dialog.growth-overlay:not([open]) {
 .growth-metric-card .growth-chip {
   font-size: 12px;
   padding: 8px;
+}
+
+.home-record-fab {
+  position: absolute;
+  right: 24px;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  box-shadow: 0 8px 24px #5746cf33;
+  transition: transform 220ms ease;
+}
+.home-record-fab img {
+  width: 32px;
+  height: 32px;
+}
+.home-record-fab:active {
+  transform: scale(0.94);
+}
+.home-timeline {
+  padding-bottom: 112px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-record-fab {
+    transition: none;
+  }
 }

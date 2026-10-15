@@ -60,40 +60,6 @@ export function ActivityScreen() {
     <MobileShell>
       <section className="content timeline-content home-timeline">
         <HomeHero />
-        <div className="home-shortcuts">
-          <Link href="/analysis" className="shortcut primary">
-            <svg
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <rect x="9" y="2" width="6" height="12" rx="3" />
-              <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8" />
-            </svg>
-            <span>{copy.analyzeCry}</span>
-          </Link>
-          <Link href="/development" className="shortcut">
-            <svg
-              width="26"
-              height="26"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M4 4v16h16M8 15l4-5 4 2 4-7" />
-            </svg>
-            <span>{copy.viewDevelopment}</span>
-          </Link>
-        </div>
         <div className="activities-heading">
           <h2>{growthCopy.daily}</h2>
           <button
@@ -172,6 +138,13 @@ export function ActivityScreen() {
           )}
         </div>
       </section>
+      <Link
+        href="/analysis"
+        className="home-record-fab"
+        aria-label={copy.startAnalysis}
+      >
+        <img src="/images/analysis/microphone.svg" alt="" />
+      </Link>
     </MobileShell>
   );
 }

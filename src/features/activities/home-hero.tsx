@@ -15,11 +15,12 @@ export function HomeHero() {
           <h2>{text.greeting}</h2>
           <p>{text.greetingSubtitle}</p>
         </div>
-        <Link href="/analysis" aria-label={copy.startAnalysis}>
-          <img src="/images/development/3-705-imgGroup.svg" alt="" />
-        </Link>
       </div>
-      <div className="home-hero-scene" aria-hidden="true" />
+      <Link
+        href="/development"
+        className="home-hero-scene"
+        aria-label={copy.viewDevelopment}
+      />
     </div>
   );
 }
