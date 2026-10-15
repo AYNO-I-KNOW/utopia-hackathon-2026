@@ -1,5 +1,6 @@
 /** Thai drafting copy for the development flow. */
 export const growthCopy = {
+  addShort: "เพิ่ม",
   resizeSheet: "ขยายหรือย่อกิจกรรม",
   today: "วันนี้",
   chooseDate: "เลือกวันที่ดูกิจกรรม",
