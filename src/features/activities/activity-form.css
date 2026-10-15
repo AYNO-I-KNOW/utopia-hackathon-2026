@@ -34,13 +34,13 @@
 .activity-editor .activity-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 .activity-editor label,
 .activity-picker-field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   color: var(--color-text-secondary);
   font-size: 13px;
   font-weight: 400;
