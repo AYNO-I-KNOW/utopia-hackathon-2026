@@ -22,7 +22,18 @@ export function HomeHero() {
         className="home-hero-scene"
         aria-label={copy.viewDevelopment}
       >
+        <span className="home-hero-ground" aria-hidden="true" />
         <CryingBaby className="home-hero-baby" alt={copy.cryingBabyAlt} />
+        <img
+          className="home-hero-moon"
+          src="/images/development/3-705-imgImage28.png"
+          alt=""
+        />
+        <img
+          className="home-hero-bottle"
+          src="/images/development/3-705-imgImage27.png"
+          alt=""
+        />
       </SceneLink>
     </div>
   );
