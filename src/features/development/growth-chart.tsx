@@ -49,6 +49,8 @@ export function GrowthChart({
               </g>
             ))}
             <polyline
+              className="growth-live-line"
+              pathLength={1}
               fill="none"
               stroke="var(--chart-color)"
               strokeWidth="3"
@@ -69,6 +71,7 @@ export function GrowthChart({
                       Math.max(item.max, ...actual.map((e) => e.value))) *
                       200
                   }
+                  className="growth-live-point"
                   r="4"
                   fill="var(--chart-color)"
                 />
@@ -225,7 +228,6 @@ export function GrowthChart({
           {text.comparison}
         </span>
       </div>
-      <p className="growth-demo-label">{text.sample}</p>
     </div>
   );
 }

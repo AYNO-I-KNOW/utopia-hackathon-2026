@@ -72,5 +72,8 @@
   --color-action: #5746cf;
   --focus-ring: 0 0 0 3px #776dfd55;
   --mobile-max-width: 430px;
+  --motion-chart-draw: 1100ms;
+  --motion-chart-start: 100ms;
+  --motion-chart-pop: 280ms;
   --duration-fast: 160ms;
 }

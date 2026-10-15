@@ -5,6 +5,18 @@
   min-height: 0;
   background: var(--color-result-background);
 }
+.growth-header {
+  flex-shrink: 0;
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  background: linear-gradient(
+    to bottom,
+    #c3baff 0%,
+    #e1dfff 55%,
+    var(--color-result-background) 100%
+  );
+  z-index: 1;
+}
 .growth-content {
   padding: 16px;
   overflow: auto;
@@ -19,7 +31,6 @@
   height: 40px;
   background: white;
   border-radius: 999px;
-  margin-bottom: 24px;
   transform: rotate(180deg);
 }
 .growth-back img {
@@ -28,12 +39,7 @@
 .growth-overview {
   background: var(--color-growth-background);
 }
-.growth-overview .growth-content {
-  background-image: url("/images/analysis/background.png");
-  background-repeat: no-repeat;
-  background-position: center -410px;
-  background-size: 591px 646px;
-}
+
 .growth-heading {
   display: flex;
   align-items: center;
@@ -76,9 +82,6 @@
   transition:
     transform 180ms,
     background 180ms;
-}
-.growth-metric-card:hover {
-  background: var(--color-brand-soft);
 }
 .growth-metric-card:active {
   transform: scale(0.98);
@@ -406,106 +409,19 @@
   padding-top: 0;
 }
 .home-hero {
-  position: relative;
-  isolation: isolate;
-  margin: 0 calc(-1 * var(--page-gutter));
-  overflow: hidden;
-  padding: 24px 16px 0;
-  min-height: 288px;
-}
-.home-hero-background {
-  position: absolute;
-  z-index: -1;
-  width: 591px;
-  height: 646px;
-  max-width: none;
-  left: 50%;
-  top: -156px;
-  transform: translateX(-50%);
-  object-fit: cover;
-}
-.home-hero-greeting {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.home-hero-greeting > img {
-  flex-shrink: 0;
-}
-.home-hero-greeting > div {
-  flex: 1;
-  min-width: 0;
+  padding: 24px 0;
 }
 .home-hero-greeting h2 {
-  font-size: 16px;
+  font-size: 24px;
   font-weight: 600;
-  line-height: normal;
   margin: 0;
 }
 .home-hero-greeting p {
-  font-size: 14px;
-  line-height: normal;
-  margin: 4px 0 0;
-  color: var(--color-text);
-}
-.home-hero-greeting a {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background: white;
-  flex-shrink: 0;
-}
-.home-hero-scene {
-  height: 210px;
-  position: relative;
-}
-.home-hero-baby {
-  position: absolute;
-  width: 185px;
-  height: 185px;
-  object-fit: contain;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-}
-.home-hero-sun {
-  position: absolute;
-  width: 84px;
-  height: 84px;
-  object-fit: contain;
-  left: 0;
-  top: 0;
-}
-.home-hero-moon {
-  position: absolute;
-  width: 62px;
-  height: 62px;
-  object-fit: contain;
-  right: 16px;
-  top: 0;
-  transform: rotate(-4deg);
-}
-.home-hero-bottle {
-  position: absolute;
-  width: 66px;
-  height: 66px;
-  object-fit: contain;
-  left: 40px;
-  bottom: 16px;
-  transform: rotate(-36deg);
+  font-size: 16px;
+  margin: 8px 0 0;
 }
 .home-history {
   margin-top: 16px;
-}
-.home-history summary {
-  text-align: right;
-  color: var(--color-growth-link);
-  font-size: 14px;
-  cursor: pointer;
-  list-style: none;
-  min-height: 32px;
 }
 .home-history .calendar-top {
   margin: 0;
@@ -534,7 +450,7 @@
   gap: 16px;
   border: 0;
   border-radius: 24px;
-  padding: 12px 16px;
+  padding: 16px;
 }
 .home-activity-body {
   flex: 1;
@@ -648,4 +564,98 @@ dialog.growth-overlay::backdrop {
 }
 dialog.growth-overlay:not([open]) {
   display: none;
+}
+
+/* Both Figma line layers share one reveal, followed by the current-value label. */
+.growth-line-art {
+  animation: growth-line-reveal var(--motion-chart-draw)
+    cubic-bezier(0.4, 0, 0.2, 1) var(--motion-chart-start) both;
+}
+.growth-tooltip {
+  transform-origin: 85% 100%;
+  animation: growth-tooltip-pop var(--motion-chart-pop)
+    cubic-bezier(0.16, 1, 0.3, 1)
+    calc(var(--motion-chart-start) + var(--motion-chart-draw)) both;
+}
+.growth-live-line {
+  stroke-dasharray: 1;
+  animation: growth-live-draw var(--motion-chart-draw)
+    cubic-bezier(0.4, 0, 0.2, 1) var(--motion-chart-start) both;
+}
+.growth-live-point {
+  animation: growth-point-reveal var(--motion-chart-pop) ease-out
+    calc(var(--motion-chart-start) + var(--motion-chart-draw)) both;
+}
+@keyframes growth-line-reveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes growth-live-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes growth-tooltip-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.88);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes growth-point-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .growth-line-art,
+  .growth-tooltip,
+  .growth-live-line,
+  .growth-live-point {
+    animation: none;
+    clip-path: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.home-timeline .activities-heading {
+  gap: 8px;
+}
+.home-timeline .activities-heading h2 {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+}
+.home-timeline .home-history-toggle {
+  padding: 0;
+  font-size: 12px;
+  color: var(--color-growth-link);
+  border: 0;
+  background: transparent;
+}
+.growth-chip {
+  white-space: nowrap;
+}
+.growth-metric-card .growth-chip {
+  font-size: 12px;
+  padding: 8px;
 }

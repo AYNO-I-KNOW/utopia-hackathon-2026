@@ -48,7 +48,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
   return (
     <MobileShell>
       <div className={"growth-page " + (!metric ? "growth-overview" : "")}>
-        <section className="growth-content">
+        <header className="growth-header">
           <Link
             className="growth-back"
             href={metric ? "/development" : "/"}
@@ -56,6 +56,8 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
           >
             <img src="/images/analysis/back.svg" alt="" />
           </Link>
+        </header>
+        <section className="growth-content">
           {metric && item ? (
             <>
               <div className="growth-summary">
@@ -178,7 +180,6 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
                   );
                 })}
               </div>
-              <p className="growth-demo-label">{text.sample}</p>
             </>
           )}
           {error && <p role="alert">{error}</p>}
