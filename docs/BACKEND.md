@@ -90,7 +90,7 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 | field     | type                   | หมายเหตุ                                                                                                                      |
 | --------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `audio`   | file                   | webm/opus (Chrome), mp4/aac (Safari), wav; > 30 s ถูกตัดเหลือ 30 s แรก, ≤ 5 MB                                                               |
+| `audio`   | file                   | webm/opus (Chrome), mp4/aac (Safari), wav; > 30 s ถูกตัดเหลือ 30 s แรก, ≤ 5 MB                                                |
 | `lang`    | `th` \| `en`           |                                                                                                                               |
 | `context` | JSON string (optional) | จาก activity log: `{"last_feed_min": 45, "last_diaper_min": 120, "last_sleep_end_min": 90}` (นาทีที่ผ่านมา, `null` = ไม่ทราบ) |
 
