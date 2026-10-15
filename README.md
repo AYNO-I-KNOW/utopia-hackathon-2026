@@ -49,3 +49,7 @@ Audio waveform, analysis, and chat replies are simulated. Microphone capture, ba
 ## Working conventions
 
 Keep route files thin; put feature logic under `features/<feature>`. Reuse `components` only for genuinely shared UI. Put external-service calls behind feature adapters. Use Bangkok dates for activity defaults. Keep UI copy concise and layouts mobile only. Never commit credentials or `.env` files. Run the commands above before handing changes to the team.
+
+## Design system and copy
+
+See `docs/DESIGN-SYSTEM.md`. Tokens: `src/design-system/tokens.css`; live reference: `/design-system`. Nunito is the global primary font with Noto Sans Thai as the Thai glyph fallback. Product copy is centralized in `src/content/th.ts`; refine Thai before adding a complete English dictionary for release.

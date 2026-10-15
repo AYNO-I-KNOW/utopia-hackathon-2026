@@ -1,8 +1,11 @@
 "use client";
+import { copy } from "@/content";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MobileShell } from "@/components/mobile-shell";
 import { dateKey } from "@/lib/date";
+import { activityLabel } from "./options";
 import { ActivityForm } from "./activity-form";
 import { loadActivities, saveActivities, type Activity } from "./storage";
 export function ActivityScreen() {
@@ -17,7 +20,7 @@ export function ActivityScreen() {
     try {
       setItems(loadActivities());
     } catch {
-      setError("อ่านข้อมูลในเครื่องไม่ได้");
+      setError(copy.storageReadError);
     }
     setEditing(params.get("add") === "1");
   }, [params]);
@@ -39,7 +42,7 @@ export function ActivityScreen() {
               setEditing(false);
               router.replace("/");
             } catch {
-              setError("บันทึกไม่ได้ ลองอีกครั้ง");
+              setError(copy.storageWriteError);
             }
           }}
         />
@@ -56,8 +59,8 @@ export function ActivityScreen() {
           <div className="greeting">
             <div className="profile-circle" />
             <div>
-              <h2>สวัสดี,</h2>
-              <p>วันนี้เป็นอย่างไรบ้าง?</p>
+              <h2>{copy.greeting}</h2>
+              <p>{copy.greetingSubtitle}</p>
             </div>
           </div>
           <div className="week">
@@ -72,7 +75,17 @@ export function ActivityScreen() {
                   onClick={() => setDate(key)}
                 >
                   <small>
-                    {["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."][d.getDay()]}
+                    {
+                      [
+                        copy.sun,
+                        copy.mon,
+                        copy.tue,
+                        copy.wed,
+                        copy.thu,
+                        copy.fri,
+                        copy.sat,
+                      ][d.getDay()]
+                    }
                   </small>
                   <b>{d.getDate()}</b>
                 </button>
@@ -81,9 +94,46 @@ export function ActivityScreen() {
           </div>
           <div className="calendar-handle" />
         </div>
+        <div className="home-shortcuts">
+          <Link href="/analysis" className="shortcut primary">
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8" />
+            </svg>
+            <span>{copy.analyzeCry}</span>
+          </Link>
+          <Link href="/development" className="shortcut">
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 4v16h16M8 15l4-5 4 2 4-7" />
+            </svg>
+            <span>{copy.viewDevelopment}</span>
+          </Link>
+        </div>
         <div className="activities-heading">
-          <h2>กิจกรรม</h2>
-          <button aria-label="เพิ่มกิจกรรม" onClick={() => setEditing(true)}>
+          <h2>{copy.activities}</h2>
+          <button
+            aria-label={copy.addActivity}
+            onClick={() => setEditing(true)}
+          >
             +
           </button>
         </div>
@@ -94,18 +144,18 @@ export function ActivityScreen() {
             .sort((a, b) => a.from.localeCompare(b.from))
             .map((item) => (
               <article key={item.id} className="card activity-card">
-                <h2>{item.activity}</h2>
+                <h2>{activityLabel(item.activity)}</h2>
                 <p>
                   {item.from === item.to
                     ? item.from
                     : `${item.from} – ${item.to}`}{" "}
-                  น.
+                  {copy.timeSuffix}
                 </p>
                 {item.note && <p>{item.note}</p>}
               </article>
             ))}
           {!items.some((item) => item.date === date) && (
-            <p className="center">ยังไม่มีกิจกรรม</p>
+            <p className="center">{copy.noActivities}</p>
           )}
         </div>
       </section>

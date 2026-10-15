@@ -1,9 +1,10 @@
 "use client";
+import { copy } from "@/content";
 import { useEffect, useRef, useState } from "react";
 type Message = { text: string; user: boolean };
 export function ChatScreen({ onBack }: { onBack: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
-    { text: "อยากถามเรื่องอะไรเพิ่มเติม?", user: false },
+    { text: copy.chatGreeting, user: false },
   ]);
   const bottom = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -12,10 +13,10 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
   return (
     <>
       <header className="top">
-        <button aria-label="ย้อนกลับ" onClick={onBack}>
+        <button aria-label={copy.back} onClick={onBack}>
           ‹
         </button>
-        <b>พูดคุยกับ AI</b>
+        <b>{copy.chat}</b>
       </header>
       <section className="content chat-content">
         <div id="messages" role="log" aria-live="polite">
@@ -39,7 +40,7 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
               ...m,
               { text, user: true },
               {
-                text: "ลูกมีอาการอะไรเพิ่มเติมบ้าง เล่าให้ฟังได้เลยค่ะ",
+                text: copy.chatMockReply,
                 user: false,
               },
             ]);
@@ -48,11 +49,11 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
         >
           <input
             name="message"
-            aria-label="ข้อความ"
-            placeholder="พิมพ์ข้อความ…"
+            aria-label={copy.message}
+            placeholder={copy.messagePlaceholder}
             required
           />
-          <button className="primary">ส่ง</button>
+          <button className="primary">{copy.send}</button>
         </form>
       </footer>
     </>

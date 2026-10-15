@@ -1,7 +1,5 @@
-import { BottomNav } from "./bottom-nav";
 export function MobileShell({
   children,
-  active,
   title,
 }: {
   children: React.ReactNode;
@@ -16,7 +14,6 @@ export function MobileShell({
         </header>
       )}
       {children}
-      {active && <BottomNav active={active} />}
     </main>
   );
 }

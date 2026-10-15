@@ -1,13 +1,14 @@
+import { copy } from "@/content";
 import Link from "next/link";
 const links = [
-  ["/", "หน้าแรก", "⌂"],
-  ["/development", "พัฒนาการลูก", "↗"],
-  ["/analysis", "วิเคราะห์แพทเทิร์นเสียง", "≋"],
-  ["/doctor", "ปรึกษาคุณหมอ", "＋"],
+  ["/", copy.home, "⌂"],
+  ["/development", copy.development, "↗"],
+  ["/analysis", copy.analysisMenu, "≋"],
+  ["/doctor", copy.doctor, "＋"],
 ];
 export function BottomNav({ active }: { active: string }) {
   return (
-    <nav className="bottom-nav" aria-label="เมนูหลัก">
+    <nav className="bottom-nav" aria-label={copy.navigation}>
       {links.map(([href, label, icon]) => (
         <Link
           key={href}

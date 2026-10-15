@@ -1,0 +1,79 @@
+.ui-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  transition: background var(--duration-fast);
+}
+.ui-button--primary {
+  background: var(--color-action);
+  border-color: var(--color-brand);
+  color: var(--color-on-brand);
+}
+.ui-button--primary:hover {
+  background: var(--color-brand-hover);
+}
+.ui-button--primary:active {
+  background: var(--color-brand-pressed);
+}
+.ui-button--secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.ui-button--secondary:hover {
+  background: var(--color-brand-soft);
+}
+.ui-button--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-brand-pressed);
+}
+.ui-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ds-page {
+  max-width: 960px;
+  margin: auto;
+  padding: var(--space-6);
+}
+.ds-section {
+  margin-block: var(--space-8);
+}
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+.ds-swatch {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+.ds-swatch-color {
+  height: 80px;
+  background: var(--swatch);
+}
+.ds-swatch p {
+  padding: var(--space-3);
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+.ds-controls {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.ds-example {
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
