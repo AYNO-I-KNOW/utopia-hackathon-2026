@@ -341,3 +341,24 @@
 .activity-modal .footer {
   border-radius: 0 0 24px 24px;
 }
+
+/* Open menus must escape the form scroller and remain above its footer. */
+.activity-modal .content:has(.activity-picker[open]) {
+  overflow: visible;
+  position: relative;
+  z-index: 3;
+}
+.measurement-modal .activity-picker-options {
+  top: auto;
+  bottom: calc(100% + 8px);
+  max-height: min(280px, 50dvh);
+}
+.measurement-modal .activity-picker::details-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.measurement-modal .activity-picker-options {
+  bottom: 8px;
+}
