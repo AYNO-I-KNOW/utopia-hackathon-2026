@@ -1376,3 +1376,43 @@ html[data-scene-direction] .analysis-intro {
   background: transparent;
   color: var(--color-text-secondary);
 }
+
+.result-exit-dialog {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    display 220ms allow-discrete,
+    overlay 220ms allow-discrete;
+}
+.result-exit-dialog[open] {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.result-exit-dialog::backdrop {
+  opacity: 0;
+  transition:
+    opacity 180ms ease,
+    display 220ms allow-discrete,
+    overlay 220ms allow-discrete;
+}
+.result-exit-dialog[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .result-exit-dialog[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  .result-exit-dialog[open]::backdrop {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .result-exit-dialog,
+  .result-exit-dialog::backdrop {
+    transition: none;
+    transform: none;
+  }
+}
