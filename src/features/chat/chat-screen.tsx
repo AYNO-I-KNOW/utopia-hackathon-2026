@@ -1,61 +1,109 @@
 "use client";
 import { copy } from "@/content";
 import { useEffect, useRef, useState } from "react";
+import "./styles.css";
+
 type Message = { text: string; user: boolean };
+
 export function ChatScreen({ onBack }: { onBack: () => void }) {
   const [messages, setMessages] = useState<Message[]>([
     { text: copy.chatGreeting, user: false },
   ]);
-  const bottom = useRef<HTMLDivElement>(null);
+  const [draft, setDraft] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const log = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    bottom.current?.scrollIntoView({ block: "end" });
+    log.current?.scrollTo({
+      top: log.current.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages]);
+  function send(text: string) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setMessages((previous) => [
+      ...previous,
+      { text: trimmed, user: true },
+      { text: copy.chatMockReply, user: false },
+    ]);
+    setDraft("");
+    setShowSuggestions(false);
+  }
   return (
-    <>
-      <header className="top">
-        <button aria-label={copy.back} onClick={onBack}>
-          ‹
+    <div className="ubot-chat">
+      <header className="ubot-header">
+        <button className="ubot-back" aria-label={copy.back} onClick={onBack}>
+          <img src="/images/chat/back.svg" alt="" />
         </button>
-        <b>{copy.chat}</b>
-      </header>
-      <section className="content chat-content">
-        <div id="messages" role="log" aria-live="polite">
-          {messages.map((m, i) => (
-            <div key={i} className={"bubble" + (m.user ? " user" : "")}>
-              {m.text}
-            </div>
-          ))}
-          <div ref={bottom} />
+        <div className="ubot-avatar" aria-hidden="true">
+          U
         </div>
-      </section>
-      <footer className="footer">
+        <div className="ubot-identity">
+          <h1>{copy.botName}</h1>
+          <p>{copy.botStatus}</p>
+        </div>
+      </header>
+      <div
+        className="ubot-messages"
+        role="log"
+        aria-label={copy.chat}
+        aria-live="polite"
+        ref={log}
+      >
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={"ubot-bubble" + (message.user ? " ubot-user" : "")}
+          >
+            {message.text}
+          </div>
+        ))}
+      </div>
+      <footer className="ubot-composer">
+        {showSuggestions && (
+          <div className="ubot-suggestions" id="ubot-suggestions">
+            {copy.chatSuggestedQuestions.map((question) => (
+              <button key={question} onClick={() => send(question)}>
+                {question}
+              </button>
+            ))}
+          </div>
+        )}
         <form
-          className="chat-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = e.currentTarget;
-            const text = String(new FormData(form).get("message")).trim();
-            if (!text) return;
-            setMessages((m) => [
-              ...m,
-              { text, user: true },
-              {
-                text: copy.chatMockReply,
-                user: false,
-              },
-            ]);
-            form.reset();
+          onSubmit={(event) => {
+            event.preventDefault();
+            send(draft);
           }}
         >
-          <input
-            name="message"
-            aria-label={copy.message}
-            placeholder={copy.messagePlaceholder}
-            required
-          />
-          <button className="primary">{copy.send}</button>
+          <button
+            type="button"
+            className="ubot-more"
+            aria-label={copy.chatSuggestions}
+            aria-expanded={showSuggestions}
+            aria-controls="ubot-suggestions"
+            onClick={() => setShowSuggestions(!showSuggestions)}
+          >
+            +
+          </button>
+          <div className="ubot-input-wrap">
+            <input
+              name="message"
+              aria-label={copy.message}
+              placeholder={copy.messagePlaceholder}
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              autoComplete="off"
+            />
+            <button
+              className="ubot-send"
+              aria-label={copy.send}
+              disabled={!draft.trim()}
+            >
+              <img src="/images/chat/send.svg" alt="" />
+            </button>
+          </div>
         </form>
       </footer>
-    </>
+    </div>
   );
 }

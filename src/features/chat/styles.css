@@ -1,0 +1,155 @@
+.ubot-chat {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--color-growth-background);
+}
+.ubot-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  padding-top: max(16px, env(safe-area-inset-top));
+  background: var(--color-surface);
+}
+.ubot-back,
+.ubot-more,
+.ubot-send {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+}
+.ubot-back {
+  background: transparent;
+}
+.ubot-back img,
+.ubot-send img {
+  width: 24px;
+  height: 24px;
+}
+.ubot-avatar {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand-pressed);
+  font-size: 24px;
+  font-weight: 700;
+}
+.ubot-identity h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.ubot-identity p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.ubot-messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 16px;
+  overscroll-behavior: contain;
+}
+.ubot-bubble {
+  flex-shrink: 0;
+  max-width: 84%;
+  padding: 8px 12px;
+  border-radius: 20px 20px 20px 0;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: normal;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  animation: ubot-message-in 220ms ease-out both;
+}
+.ubot-user {
+  align-self: flex-end;
+  border-radius: 20px 20px 0 20px;
+  background: var(--color-brand-pressed);
+  color: var(--color-on-brand);
+}
+.ubot-composer {
+  padding: 16px 24px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: var(--color-surface);
+}
+.ubot-composer form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ubot-more {
+  background: var(--color-brand-soft);
+  color: var(--color-brand-pressed);
+  font-size: 28px;
+}
+.ubot-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--color-brand-soft);
+}
+.ubot-input-wrap input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+}
+.ubot-send {
+  background: var(--color-brand-pressed);
+}
+.ubot-send:disabled {
+  opacity: 0.45;
+}
+.ubot-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 16px;
+}
+.ubot-suggestions button {
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-brand-soft);
+  color: var(--color-brand-pressed);
+  padding: 8px 12px;
+  font-size: 14px;
+}
+@keyframes ubot-message-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ubot-bubble {
+    animation: none;
+  }
+}

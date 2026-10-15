@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { copy } from "@/content";
 import { MOCK_RESULT as result } from "./mock";
-export function AnalysisResult({ onRetry }: { onRetry: () => void }) {
+export function AnalysisResult({ onChat }: { onChat: () => void }) {
   return (
     <div className="analysis-result">
       <section className="result-content">
@@ -36,7 +36,7 @@ export function AnalysisResult({ onRetry }: { onRetry: () => void }) {
         </div>
       </section>
       <footer className="result-actions">
-        <button onClick={onRetry}>{copy.retry}</button>
+        <button onClick={onChat}>{copy.chat}</button>
         <Link href="/?add=1">{copy.addAction}</Link>
       </footer>
     </div>
