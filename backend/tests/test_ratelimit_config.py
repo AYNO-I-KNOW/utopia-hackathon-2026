@@ -51,6 +51,16 @@ def test_daily_budget_env(monkeypatch, raw, expected):
 
 
 @pytest.mark.parametrize(
+    ("raw", "expected"), [(None, 300), ("abc", 300), ("-5", 300), ("0", 0), ("40", 40)]
+)
+def test_chat_daily_llm_calls_env(monkeypatch, raw, expected):
+    monkeypatch.delenv("CHAT_DAILY_LLM_CALLS", raising=False)
+    if raw is not None:
+        monkeypatch.setenv("CHAT_DAILY_LLM_CALLS", raw)
+    assert Settings.from_env().chat_daily_llm_calls == expected
+
+
+@pytest.mark.parametrize(
     ("raw", "expected"),
     [
         (None, 1.15),

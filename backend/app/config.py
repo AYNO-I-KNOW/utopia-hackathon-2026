@@ -66,8 +66,15 @@ ELEVENLABS_TTS_URL = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
 # --- API hygiene ---
 RATE_LIMIT_PER_MIN = 30
 SPEAK_RATE_LIMIT_PER_MIN = 5
+CHAT_RATE_LIMIT_PER_MIN = 10
+CHAT_MAX_MESSAGES = 8
+CHAT_MAX_TOTAL_CHARS = 4000
+CHAT_MAX_BODY_BYTES = 64 * 1024
+CHAT_MAX_OUTPUT_TOKENS = 300
+DEFAULT_CHAT_DAILY_LLM_CALLS = 300
+CHAT_MESSAGE_MAX_CHARS = 1000
+CHAT_REPLY_MAX_CHARS = 600
 DEFAULT_TTS_DAILY_CHAR_BUDGET = 50_000
-CODESANDBOX_ORIGIN_REGEX = r"https://[a-z0-9-]+\.(codesandbox\.io|csb\.app)"
 DEFAULT_ALLOWED_ORIGINS = "http://127.0.0.1:4175,http://localhost:4175"
 
 
@@ -109,6 +116,7 @@ class Settings:
     tts_speed: float = DEFAULT_TTS_SPEED
     trusted_proxy_hops: int = 0  # 0 = ignore X-Forwarded-For
     finetuned_model: str | None = None  # TorchScript from ml/finetune_cnn14.py; None = joblib
+    chat_daily_llm_calls: int = DEFAULT_CHAT_DAILY_LLM_CALLS  # OpenAI calls/UTC day for /chat
     use_llm: bool = False  # False = fixed advice templates only, /analyze never calls OpenAI
     tts_cache_dir: Path = DEFAULT_TTS_CACHE_DIR
 
@@ -122,7 +130,7 @@ class Settings:
             elevenlabs_api_key=env("ELEVENLABS_API_KEY", "").strip(),
             voice_id_th=env("ELEVENLABS_VOICE_ID_TH", "").strip(),
             voice_id_en=env("ELEVENLABS_VOICE_ID_EN", "").strip(),
-            # "*" entries (e.g. https://*.codesandbox.io) are covered by the regex, not the list
+            # wildcard entries are dropped: only exact origins are allowed
             allowed_origins=tuple(
                 o.strip() for o in origins.split(",") if o.strip() and "*" not in o
             ),
@@ -131,6 +139,9 @@ class Settings:
             tts_speed=_float_env("TTS_SPEED", DEFAULT_TTS_SPEED, TTS_SPEED_MIN, TTS_SPEED_MAX),
             trusted_proxy_hops=_int_env("TRUSTED_PROXY_HOPS", 0, 1),
             finetuned_model=env("FINETUNED_MODEL") or None,
+            chat_daily_llm_calls=_int_env(
+                "CHAT_DAILY_LLM_CALLS", DEFAULT_CHAT_DAILY_LLM_CALLS, 0
+            ),
             use_llm=env("USE_LLM", "").strip().lower() in TRUTHY,
             tts_cache_dir=Path(env("TTS_CACHE_DIR", "").strip() or DEFAULT_TTS_CACHE_DIR),
         )

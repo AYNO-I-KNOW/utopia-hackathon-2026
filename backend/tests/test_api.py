@@ -160,22 +160,18 @@ class TestSpeak:
         assert make_client().post("/speak", json=body).status_code == 400
 
 
-def test_cors_allows_sandbox_and_configured_origins_only(make_client):
+def test_cors_allows_configured_origins_only(make_client):
     client = make_client()
-    allowed = (
-        "https://abc-123.codesandbox.io",
-        "https://abc-3000.csb.app",
-        "http://127.0.0.1:4175",
-    )
+    allowed = ("http://127.0.0.1:4175",)
     for origin in allowed:
         res = client.get("/health", headers={"Origin": origin})
         assert res.headers["access-control-allow-origin"] == origin
     denied = (
         "https://evil.example",
+        "https://abc-123.codesandbox.io",
+        "https://abc-3000.csb.app",
         "https://evil.example/.codesandbox.io",
-        "https://a.b.codesandbox.io",
-        "https://codesandbox.io.evil.example",
-        "http://abc.codesandbox.io",
+        "http://127.0.0.1:4176",
     )
     for origin in denied:
         res = client.get("/health", headers={"Origin": origin})

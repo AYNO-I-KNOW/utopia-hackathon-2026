@@ -15,17 +15,21 @@ from pydantic import BaseModel, Field, StringConstraints, ValidationError
 
 from app import config as C
 from app.audio import AudioError, DecoderUnavailableError, decode_audio
+from app.chat import ChatIn, ChatOut, Chatter, ChatService, Lang
 from app.decision import Decision, decide, top_as_dicts
 from app.llm import LlmService, Summariser, no_cry_result
 from app.model import CryModel, ModelUnavailableError, get_model
 from app.ratelimit import RateLimiter
 from app.tts import Speaker, TtsService, TtsUnavailableError, TtsUpstreamError
 
-Lang = Literal["th", "en"]
 # Decode + inference are CPU-heavy; shed load instead of queueing behind them.
 _INFLIGHT = threading.BoundedSemaphore(C.MAX_CONCURRENT_ANALYSES)
 UPLOAD_CHUNK = 64 * 1024
 MULTIPART_OVERHEAD = 64 * 1024
+BODY_LIMITS = {  # POST path -> (max Content-Length, 413 message)
+    "/analyze": (C.MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD, "audio file too large (max 5 MB)"),
+    "/chat": (C.CHAT_MAX_BODY_BYTES, "request too large (max 64 KB)"),
+}
 MinutesAgo = Annotated[int, Field(strict=True, ge=0)] | None
 
 
@@ -68,6 +72,10 @@ def get_llm(settings: Annotated[C.Settings, Depends(get_settings)]) -> Summarise
     return _llm_for(settings)
 
 
+def get_chat(settings: Annotated[C.Settings, Depends(get_settings)]) -> Chatter:
+    return _chat_for(settings)
+
+
 def get_tts(settings: Annotated[C.Settings, Depends(get_settings)]) -> Speaker:
     return _tts_for(settings)
 
@@ -75,6 +83,11 @@ def get_tts(settings: Annotated[C.Settings, Depends(get_settings)]) -> Speaker:
 @lru_cache
 def _tts_for(settings: C.Settings) -> TtsService:
     return TtsService(settings)  # cached so the daily character budget persists across requests
+
+
+@lru_cache
+def _chat_for(settings: C.Settings) -> ChatService:
+    return ChatService(settings)  # cached so the OpenAI client is reused
 
 
 @lru_cache
@@ -148,6 +161,10 @@ def enforce_speak_rate_limit(request: Request) -> None:
     request.app.state.speak_limiter.check(request)
 
 
+def enforce_chat_rate_limit(request: Request) -> None:
+    request.app.state.chat_limiter.check(request)
+
+
 router = APIRouter()
 
 
@@ -184,6 +201,11 @@ async def speak(body: SpeakIn, tts: Annotated[Speaker, Depends(get_tts)]) -> Res
     return Response(content=audio, media_type="audio/mpeg")
 
 
+@router.post("/chat", response_model=ChatOut, dependencies=[Depends(enforce_chat_rate_limit)])
+async def chat(body: ChatIn, chatter: Annotated[Chatter, Depends(get_chat)]) -> ChatOut:
+    return await chatter.reply(body)
+
+
 def _warm_up() -> None:
     model = get_model()
     if hasattr(model, "warm_up"):
@@ -197,12 +219,14 @@ async def lifespan(_: FastAPI):
 
 
 async def reject_oversize(request: Request, call_next):
-    if request.method == "POST" and request.url.path == "/analyze":
+    limit = BODY_LIMITS.get(request.url.path) if request.method == "POST" else None
+    if limit is not None:
+        max_bytes, too_large = limit
         length = request.headers.get("content-length", "")
         if not length.isdigit():  # chunked / missing: can't bound the body up front
             return JSONResponse({"detail": "Content-Length required"}, status_code=411)
-        if int(length) > C.MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD:
-            return JSONResponse({"detail": "audio file too large (max 5 MB)"}, status_code=413)
+        if int(length) > max_bytes:
+            return JSONResponse({"detail": too_large}, status_code=413)
     return await call_next(request)
 
 
@@ -217,11 +241,11 @@ def create_app() -> FastAPI:
     # per app instance, so tests start with a clean budget
     app.state.limiter = RateLimiter(trusted_hops=hops)
     app.state.speak_limiter = RateLimiter(limit=C.SPEAK_RATE_LIMIT_PER_MIN, trusted_hops=hops)
+    app.state.chat_limiter = RateLimiter(limit=C.CHAT_RATE_LIMIT_PER_MIN, trusted_hops=hops)
     app.middleware("http")(reject_oversize)
     app.add_middleware(  # added last = outermost, so CORS headers also cover 413/429 replies
         CORSMiddleware,
         allow_origins=list(get_settings().allowed_origins),
-        allow_origin_regex=C.CODESANDBOX_ORIGIN_REGEX,
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["*"],
     )

@@ -12,12 +12,13 @@ pinned: false
 
 FastAPI service: decode audio → PANNs CNN14 cry detection + embedding classifier →
 activity priors / case logic → OpenAI summary (grounded on `knowledge/advice/`) →
-ElevenLabs speech. Contract: [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) §3.
+ElevenLabs speech, plus a grounded follow-up chat. Contract: [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md) §3.
 
 | Route | Purpose |
 |---|---|
 | `POST /analyze` | multipart `audio` + `lang` (`th`/`en`) + optional `context` JSON |
 | `POST /speak` | JSON `{text, lang}` → `audio/mpeg` |
+| `POST /chat` | JSON `{lang, result, messages}` → `{reply, source}`; see `../docs/BACKEND.md` §3 |
 | `GET /health` | `{ok, model_loaded}` (wakes the Space) |
 
 ## Run locally
@@ -44,19 +45,20 @@ summary from the advice files; no ElevenLabs key/voice → `/speak` returns 503.
 | Name | Meaning |
 |---|---|
 | `OPENAI_API_KEY` | OpenAI key (secret) |
-| `OPENAI_MODEL` | model name that supports Structured Outputs; verify it before demo |
+| `OPENAI_MODEL` | model name that supports Structured Outputs; verify it before demo. With key and model set, `/chat` answers from OpenAI (grounded on the advice files); `USE_LLM` only gates `/analyze` |
 | `ELEVENLABS_API_KEY` | ElevenLabs key (secret) |
 | `ELEVENLABS_VOICE_ID_TH` / `ELEVENLABS_VOICE_ID_EN` | voice ids used with `eleven_v3` |
-| `ALLOWED_ORIGINS` | comma list, e.g. `https://your-app.vercel.app,http://127.0.0.1:4175`. `https://*.codesandbox.io` is always allowed via regex |
+| `ALLOWED_ORIGINS` | comma list, e.g. `https://your-app.vercel.app,http://127.0.0.1:4175`. Exact origins only (wildcards are ignored) |
 | `PANNS_CHECKPOINT` | optional path to `Cnn14_mAP=0.431.pth` |
 | `FINETUNED_MODEL` | optional TorchScript from `ml/finetune_cnn14.py` (e.g. `models/cry_net.pt`); unset = `classifier.joblib` |
 | `TTS_DAILY_CHAR_BUDGET` | max characters sent to ElevenLabs per UTC day, in-process (default `50000`); `/speak` returns 503 when used up |
+| `CHAT_DAILY_LLM_CALLS` | max OpenAI calls for `/chat` per UTC day, in-process (default `300`); once used up `/chat` replies from the fixed templates (`source: "template"`), not an error |
 | `USE_LLM` | `1`/`true`/`yes` = `/analyze` summaries come from OpenAI (templates stay as fallback). Default off: fixed text from `knowledge/advice/*.md`, no OpenAI call, same input = same summary |
 | `TTS_CACHE_DIR` | disk cache for `/speak` audio (default `backend/tts_cache`, committed). Hit = no ElevenLabs call and no budget spend; see `tts_cache/README.md` |
 | `TTS_SPEED` | ElevenLabs speaking speed (default `1.15`; clamped to `0.7`-`1.2`; malformed = default) |
 | `TRUSTED_PROXY_HOPS` | number N of trusted reverse proxies in front of the app (int ≥ 1). Unset = rate limits key on the TCP peer and ignore `X-Forwarded-For` |
 
-Limits: `/analyze` 30 req/min per IP, `/speak` 5 req/min per IP, max 2 concurrent analyses (503 `busy, retry`),
+Limits: `/analyze` 30 req/min per IP, `/speak` 5 req/min per IP, `/chat` 10 req/min per IP (1–8 messages, ≤ 1000 chars each, ≤ 4000 in total, body ≤ 64 KB, reply ≤ 600 chars, `max_output_tokens` 300; `Content-Length` required), max 2 concurrent analyses (503 `busy, retry`),
 `/speak` text ≤ 600 chars, `/analyze` requires `Content-Length` (411 otherwise).
 
 **Rate limits on Hugging Face Spaces:** the app sits behind HF's proxy, so every request looks like it
