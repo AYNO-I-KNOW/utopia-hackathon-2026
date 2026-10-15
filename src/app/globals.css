@@ -1165,3 +1165,7 @@ h2 {
     display: none;
   }
 }
+
+html[data-scene-direction="return"] .activity-sheet {
+  animation: none;
+}

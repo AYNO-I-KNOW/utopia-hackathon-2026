@@ -30,7 +30,9 @@ export function SceneNavigationProvider({ children }: { children: ReactNode }) {
       router.push(href);
       return;
     }
-    document.startViewTransition(
+    document.documentElement.dataset.sceneDirection =
+      href === "/" ? "return" : "forward";
+    const transition = document.startViewTransition(
       () =>
         new Promise<void>((resolve) => {
           const timeout = window.setTimeout(resolve, 2000);
@@ -41,6 +43,9 @@ export function SceneNavigationProvider({ children }: { children: ReactNode }) {
           router.push(href);
         }),
     );
+    void transition.finished.catch(() => {
+      /* Navigation still completes if the browser skips its visual transition. */
+    });
   }
   return (
     <SceneNavigation.Provider value={navigate}>
