@@ -33,7 +33,7 @@ src/
   features/
     activities/         Timeline, entry form, Activity type and storage adapter
     analysis/           Analysis flow and isolated mock result
-    chat/               Chat UI with simulated replies
+    chat/               In-app chat answered by the backend `/chat` (layout designed with U-bot U-Code)
   lib/                  Shared Bangkok date/time helpers and boundary tests
 docs/
   ARCHITECTURE.md        Implementation boundaries and next steps
@@ -44,7 +44,7 @@ docs/
 
 Next.js + React + strict TypeScript. No UI framework or external font dependency. Home → activity entry and analysis → recording → loading → result → chat / activity entry are interactive. Bottom navigation uses real routes. Existing `baby-activities` browser data is reused.
 
-The waveform measures live microphone volume after permission; audio clips are not saved or uploaded. Analysis and chat replies are simulated. Backend, authentication, doctor consultation are not implemented. Activity entries live only in this browser's localStorage. Do not describe this prototype as a health assessment.
+The waveform measures live microphone volume after permission; audio clips are not saved or uploaded. Analysis and chat replies come from the backend (no OpenAI key = fixed advice templates). Backend, authentication, doctor consultation are not implemented. Activity entries live only in this browser's localStorage. Do not describe this prototype as a health assessment.
 
 ## Working conventions
 

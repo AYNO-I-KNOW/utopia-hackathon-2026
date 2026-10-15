@@ -16,13 +16,17 @@ Dates use Asia/Bangkok. Each activity currently has one date, a start time, and 
 
 ## Backend integration
 
-`analysis/api.ts` calls the FastAPI backend at `NEXT_PUBLIC_API_BASE_URL` (see `.env.example`; unset shows an explicit error state, never a mock). `/analyze` receives the MediaRecorder blob (3–10 s, same mic stream as the waveform) or an uploaded file (≤ 5 MB) plus `context` from `activities/context.ts` (saved entries only). Results render by `case`; `close` offers tap-to-answer questions that re-POST the same blob. `/speak` plays the summary and hides when the backend returns 503. Chat embeds `https://u.bot/` and offers a copy-and-open handoff built from the result and the last 24 h of activities; it falls back to handoff-only if the iframe does not load. Audio is never persisted client-side.
+`analysis/api.ts` calls the FastAPI backend at `NEXT_PUBLIC_API_BASE_URL` (see `.env.example`; unset shows an explicit error state, never a mock). `/analyze` receives the MediaRecorder blob (3–10 s, same mic stream as the waveform) or an uploaded file (≤ 5 MB) plus `context` from `activities/context.ts` (saved entries only). Results render by `case`; `close` offers tap-to-answer questions that re-POST the same blob. `/speak` plays the summary and hides when the backend returns 503. Audio is never persisted client-side.
+
+## Chat
+
+`features/chat` is an in-app chat that answers from our backend, not from U-bot. The screen layout was designed with U-bot's U-Code and ported to TypeScript (original export kept untouched in `ubot-export/`, excluded from tsconfig and never built). `use-chat.ts` owns messages, loading, error and retry; the first bubble is the real analysis summary and a pinned card shows the real top label and confidence. `analysis/api.ts` `chat(messages, result, lang)` POSTs to `/chat` (30 s timeout, newest messages trimmed to 8 / 4000 characters, response validated by `parseChatReply`, aborted on unmount). `/chat` replies come from OpenAI grounded on `knowledge/advice/` when `OPENAI_API_KEY` and `OPENAI_MODEL` are set, otherwise (or on any LLM error) from fixed advice sections; `source` reports which. The secondary button "คุยต่อกับ U-bot" copies the handoff prompt (result + last 24 h of activities) and opens `https://u.bot/` in a new tab; U-bot is not embedded. Contract: `docs/BACKEND.md` §3.
 
 ## Suggested next work
 
 1. Agree Activity and analysis API contracts with the backend team.
 2. Add microphone permission, cancellation, recorder cleanup, and actual audio input behind a recording hook.
-3. Replace analysis and chat mocks with service adapters and explicit loading/error states.
+3. Keep service adapters honest: explicit loading/error states, no silent mocks.
 4. Design development and consultation flows before adding implementation.
 5. Add browser interaction checks for activity persistence, date switching, recording cancellation, and chat sends.
 

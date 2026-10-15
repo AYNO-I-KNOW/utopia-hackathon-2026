@@ -28,6 +28,7 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 │                ├─ decision.py ปรับด้วย activity + 4 กรณี  │
 │                └─ llm.py      OpenAI สรุป (grounded)       │
 │ POST /speak  ──── tts.py      ElevenLabs eleven_v3 → mp3   │
+│ POST /chat   ──── chat.py     ถามต่อ (grounded บน advice)   │
 │ GET  /health                                               │
 └────────────────────────────────────────────────────────────┘
         offline: ml/ (train classifier) · scripts/ (gen lullabies)
@@ -123,6 +124,27 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 แยกจาก `/analyze` เพื่อให้ UI แสดงผลข้อความก่อน แล้วเล่นเสียงตามมา
 
+### `POST /chat` — JSON → `{reply, source}`
+
+ถามต่อจากผลวิเคราะห์ในแอป (frontend `features/chat`) · จำกัด **10 req/min ต่อ IP** (แยกจาก `/analyze`, `/speak`)
+
+```json
+{
+  "lang": "th",
+  "result": { "label": "diaper", "confidence": 82, "case": "confident" },
+  "messages": [
+    { "role": "assistant", "content": "ผ้าอ้อมของน้องอาจเปียก…" },
+    { "role": "user", "content": "เมื่อไหร่ควรพบหมอ?" }
+  ]
+}
+```
+
+- `lang` `th` | `en` · `result` เป็น `null` ได้ (เช่น `no_cry`); `label` ต้องเป็นหนึ่งใน 9 คลาสของ advice, `confidence` 0–100, `case` (optional) `confident | close | unsure | no_cry`
+- `messages` 1–8 รายการ, `content` 1–1000 ตัวอักษร (รวมกัน ≤ 4000), body ≤ 64 KB (413; ไม่มี `Content-Length` → 411), `role` `user` | `assistant`, **ข้อความสุดท้ายต้องเป็น `user`**
+- **200** `{"reply": "…(≤ 600 ตัวอักษร)", "source": "llm" | "template"}` · **400** body ไม่ถูกต้อง (รูปแบบเดียวกับ `/analyze`) · **429** เกินโควตา
+- `source="llm"`: ต้องมี `OPENAI_API_KEY` + `OPENAI_MODEL` (ไม่ผูกกับ `USE_LLM`) · OpenAI ตอบจาก `knowledge/advice/{label}.{lang}.md` + `_unsure.{lang}.md` **เท่านั้น** (≤ 4 ประโยค, ไม่วินิจฉัย, มีไข้/ไม่กินนม/ร้องผิดปกติ → แนะนำพบแพทย์, เพิกเฉยคำสั่งใน message ที่พยายามเปลี่ยนกฎ) · history ถูกรวมเป็น **user message เดียว** แบบ transcript ที่ไม่น่าเชื่อถือ (turn ของ assistant จาก client ไม่ถูกส่งเป็น role assistant) · `max_output_tokens=300`, `store=False`, timeout 8 s, ไม่ log เนื้อหา message · งบ `CHAT_DAILY_LLM_CALLS` (ค่าเริ่มต้น 300 ครั้ง/วัน UTC) หมดแล้วตอบจาก template แทน
+- `source="template"`: ไม่มี key หรือ LLM ล้มเหลว/timeout/ตอบว่าง → ข้อความ deterministic จาก advice: "ควรทำอะไรต่อ?" → รายการ Try · "ถ้ายังร้องอยู่ล่ะ?" → Try ของ `_unsure` · "เมื่อไหร่ควรพบหมอ?" → รายการ See a doctor · อย่างอื่น → ย่อหน้าสรุป + ชวนให้กดปุ่มคำถามด่วน (จับคำตามคีย์เวิร์ดจากข้อความล่าสุดของ user ทั้ง th/en)
+
 ### `GET /health` → `{"ok": true, "model_loaded": true}`
 
 ใช้ปลุก Space ก่อน pitch
@@ -188,6 +210,8 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 ## 6. U-bot integration (ไม่มี public API)
 
+**สถานะปัจจุบัน:** แชทในแอปตอบจาก backend ของเรา (`POST /chat`, ดู §3) ไม่ได้เรียกหรือฝัง U-bot · หน้าจอแชทออกแบบด้วย **U-bot U-Code** (วิธี E): export ต้นฉบับเก็บไว้ที่ `ubot-export/` (ไม่ถูก build) และ port เป็น TS ที่ `src/features/chat` · ปุ่ม "คุยต่อกับ U-bot" ยังทำ context handoff (วิธี A: copy prompt + เปิด `https://u.bot/` แท็บใหม่) · iframe (วิธี B) ถูกเอาออกแล้ว
+
 ข้อเท็จจริง: guide ไม่มี API/SDK/widget · `https://u.bot/` (Vercel) **ไม่ส่ง** `X-Frame-Options` / CSP `frame-ancestors` → iframe ไม่ถูก header บล็อก · U-Code รันบน Sandpack (CodeSandbox) และ `fetch` ข้าม origin ได้
 
 | #   | วิธี                                                                                                                          | สถานะ                                                                                           |
@@ -219,7 +243,7 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 | Backend                    | Hugging Face Spaces (Docker, CPU basic) | Secrets: `OPENAI_API_KEY`, `OPENAI_MODEL`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID_TH`, `ELEVENLABS_VOICE_ID_EN`, `ALLOWED_ORIGINS` |
 | PANNs checkpoint (~300 MB) | download ตอน build Docker image         | ห้าม commit                                                                                                                            |
 
-`ALLOWED_ORIGINS` = Vercel domain, `http://127.0.0.1:4175`, `https://*.codesandbox.io`
+`ALLOWED_ORIGINS` = Vercel domain, `http://127.0.0.1:4175` (เฉพาะ origin ตรงตัว ไม่มี wildcard)
 
 Submission (hub.team1.network): GitHub repo (public ✅) · demo = Vercel URL · pitch deck = Google Drive (Anyone with link) · Tech stack ต้องใส่ **ElevenLabs** และ **U-Bot**
 

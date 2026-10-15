@@ -30,7 +30,7 @@ Activities are stored using stable identifiers (feeding, diaper, sleep, play, co
 
 ## Scope
 
-These foundations apply to every implemented screen. Development and consultation remain placeholders; analysis and chat remain mocks. This is a code design system, not a generated Figma component library. Native-looking status-bar and home-indicator decorations from Figma are intentionally excluded from the website.
+These foundations apply to every implemented screen. Development and consultation remain placeholders; analysis and chat call the backend (chat falls back to fixed advice templates). This is a code design system, not a generated Figma component library. Native-looking status-bar and home-indicator decorations from Figma are intentionally excluded from the website.
 
 ## Layout rhythm and accessibility targets
 
