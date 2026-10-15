@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef } from "react";
+import { DEMO_CURRENT_DATE } from "./demo";
 import { dateKey } from "@/lib/date";
 import { growthCopy } from "@/content/development";
 
@@ -21,9 +22,9 @@ export function WeekRail({
   );
   const suppressClick = useRef(false);
   const start = new Date(anchor + "T12:00:00+07:00");
-  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  start.setDate(start.getDate() - start.getDay());
   const chosen = new Date(selected + "T12:00:00+07:00");
-  const chosenIndex = (chosen.getDay() + 6) % 7;
+  const chosenIndex = chosen.getDay();
   useLayoutEffect(() => {
     const element = rail.current;
     if (element) element.scrollLeft = element.clientWidth * centerPage;
@@ -105,6 +106,7 @@ export function WeekRail({
             return (
               <button
                 key={key}
+                disabled={key > DEMO_CURRENT_DATE}
                 aria-pressed={selected === key}
                 aria-label={day.toLocaleDateString("th-TH", {
                   dateStyle: "full",

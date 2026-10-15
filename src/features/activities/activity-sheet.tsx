@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { copy } from "@/content";
 import { growthCopy } from "@/content/development";
-import { dateKey } from "@/lib/date";
+import { DEMO_CURRENT_DATE } from "./demo";
 import "./sheet.css";
 import { WeekRail } from "./week-rail";
 import { DateTransition } from "./date-transition";
@@ -94,7 +94,7 @@ export function ActivitySheet({
       element.removeEventListener("touchcancel", end);
     };
   }, [snap]);
-  const today = dateKey();
+  const today = DEMO_CURRENT_DATE;
   const selected = date || today;
   const anchor = new Date(selected + "T12:00:00+07:00");
   // Keep the rail stable while selecting nearby days so it does not jump.
@@ -171,11 +171,15 @@ export function ActivitySheet({
             {String(anchor.getFullYear() + 543).slice(-2)}
           </h2>
           <input
+            max={DEMO_CURRENT_DATE}
             type="date"
             aria-label={growthCopy.date}
             value={selected}
             onChange={(event) => {
-              if (event.target.value) {
+              if (
+                event.target.value &&
+                event.target.value <= DEMO_CURRENT_DATE
+              ) {
                 onDate(event.target.value);
                 setRailDate(event.target.value);
               }

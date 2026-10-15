@@ -274,3 +274,13 @@
     animation: none;
   }
 }
+
+.activity-week-page button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.activity-sheet-scroll {
+  mask-image: linear-gradient(to bottom, transparent, #000 24px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 24px);
+}

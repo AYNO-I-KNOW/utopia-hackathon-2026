@@ -37,7 +37,7 @@ export function AnalysisResult({ onChat }: { onChat: () => void }) {
       </section>
       <footer className="result-actions">
         <button onClick={onChat}>{copy.chat}</button>
-        <Link href="/?add=1">{copy.addAction}</Link>
+        <Link href="/?add=1&state=hungry">{copy.addAction}</Link>
       </footer>
     </div>
   );

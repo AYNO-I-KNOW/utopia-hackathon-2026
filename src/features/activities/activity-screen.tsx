@@ -7,19 +7,19 @@ import { useEffect, useState } from "react";
 import { SceneLink } from "@/components/scene-navigation";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MobileShell } from "@/components/mobile-shell";
-import { dateKey } from "@/lib/date";
+import { DEMO_CURRENT_DATE, demoActivities } from "./demo";
 import { activityLabel } from "./options";
 import { ActivityForm } from "./activity-form";
 import { loadActivities, saveActivities, type Activity } from "./storage";
 export function ActivityScreen() {
   const router = useRouter(),
     params = useSearchParams();
-  const [date, setDate] = useState(""),
+  const [date, setDate] = useState(DEMO_CURRENT_DATE),
     [items, setItems] = useState<Activity[]>([]),
     [editing, setEditing] = useState(false),
     [error, setError] = useState("");
   useEffect(() => {
-    setDate(dateKey());
+    setDate((current) => current || DEMO_CURRENT_DATE);
     try {
       setItems(loadActivities());
     } catch {
@@ -32,6 +32,7 @@ export function ActivityScreen() {
       <MobileShell>
         <ActivityForm
           date={date}
+          initialActivity={params.get("state") ?? "sleepy"}
           onCancel={() => {
             setEditing(false);
             router.replace("/");
@@ -52,6 +53,7 @@ export function ActivityScreen() {
         {error && <p role="alert">{error}</p>}
       </MobileShell>
     );
+  const visibleItems = [...demoActivities, ...items];
   return (
     <MobileShell>
       <section className="home-dashboard home-timeline">
@@ -63,7 +65,7 @@ export function ActivityScreen() {
         >
           {error && <p role="alert">{error}</p>}
           <div className="activity-list">
-            {items
+            {visibleItems
               .filter((item) => item.date === date)
               .sort((a, b) => a.from.localeCompare(b.from))
               .map((item) => (
@@ -81,7 +83,7 @@ export function ActivityScreen() {
                   </div>
                 </article>
               ))}
-            {!items.some((item) => item.date === date) && (
+            {!visibleItems.some((item) => item.date === date) && (
               <p className="center">{copy.noActivities}</p>
             )}
           </div>

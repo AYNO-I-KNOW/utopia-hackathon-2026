@@ -2,6 +2,7 @@
 import { Button } from "@/components/button";
 import { copy } from "@/content";
 import { useState } from "react";
+import { DEMO_CURRENT_DATE } from "./demo";
 import { currentTime, dateKey } from "@/lib/date";
 import { activityKinds, activityLabel } from "./options";
 import type { Activity } from "./storage";
@@ -9,10 +10,12 @@ export function ActivityForm({
   onSave,
   onCancel,
   date,
+  initialActivity = "sleepy",
 }: {
   onSave: (item: Activity) => void;
   onCancel: () => void;
   date: string;
+  initialActivity?: string;
 }) {
   const [time] = useState(currentTime);
   return (
@@ -42,7 +45,16 @@ export function ActivityForm({
         >
           <label>
             {copy.activities}
-            <select name="activity">
+            <select
+              name="activity"
+              defaultValue={
+                activityKinds.includes(
+                  initialActivity as (typeof activityKinds)[number],
+                )
+                  ? initialActivity
+                  : "sleepy"
+              }
+            >
               {activityKinds.map((kind) => (
                 <option key={kind} value={kind}>
                   {activityLabel(kind)}
@@ -53,6 +65,7 @@ export function ActivityForm({
           <label>
             {copy.date}
             <input
+              max={DEMO_CURRENT_DATE}
               type="date"
               name="date"
               defaultValue={date || dateKey()}
