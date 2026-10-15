@@ -941,6 +941,9 @@ h2 {
   padding: var(--space-4);
 }
 .result-close {
+  padding: 0;
+  border: 0;
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 48px;
@@ -949,6 +952,8 @@ h2 {
   background: var(--color-surface);
 }
 .result-close img {
+  width: 40px;
+  height: 40px;
   display: block;
 }
 .result-summary {
