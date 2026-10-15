@@ -6,3 +6,13 @@ out/
 !.env.example
 .DS_Store
 next-env.d.ts
+
+# Python backend / ML
+.venv/
+__pycache__/
+*.pyc
+*.pth
+*.pt
+ml/data/
+ml/*.npz
+.pytest_cache/

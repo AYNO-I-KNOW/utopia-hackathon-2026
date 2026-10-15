@@ -1,0 +1,17 @@
+# Runtime. Docker installs torch first from the CPU index (see Dockerfile); locally the
+# --extra-index-url below lets pip pick the +cpu wheel on Linux.
+--extra-index-url https://download.pytorch.org/whl/cpu
+fastapi==0.143.1
+uvicorn[standard]==0.54.0
+python-multipart==0.0.32
+numpy==2.4.6
+scikit-learn==1.9.1
+joblib==1.6.0
+httpx==0.28.1
+openai==3.31.0
+pydantic==2.14.1
+torch==2.14.1
+panns-inference==0.1.1
+librosa==0.11.0
+matplotlib==3.11.2
+torchlibrosa==0.1.0
