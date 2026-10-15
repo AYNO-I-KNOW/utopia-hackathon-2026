@@ -1,7 +1,6 @@
 "use client";
 // Chat layout adapted from the UI generated in U-bot's U-Code (ubot-export/).
 // Answers come from our own backend (POST /chat); U-bot is only a handoff link.
-import { ArrowUp, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/button";
 import { copy } from "@/content";
 import { summarizeRecent } from "@/features/activities/context";
@@ -89,21 +88,17 @@ export function ChatScreen({
   }
 
   return (
-    <div className="ubot-chat">
-      <header className="ubot-header">
-        <button className="ubot-back" aria-label={copy.back} onClick={onBack}>
-          <ChevronLeft size={22} strokeWidth={1.75} />
+    <div className="chat">
+      <header className="chat-header">
+        <button className="chat-back" aria-label={copy.back} onClick={onBack}>
+          <img src="/images/chat/back.svg" alt="" />
         </button>
-        <div className="ubot-profile">
-          <img
-            className="ubot-avatar"
-            src="/images/chat/assistant.svg"
-            alt=""
-          />
-          <div className="ubot-identity">
-            <h1>{copy.botName}</h1>
-            <span className="ubot-verified" aria-hidden="true" />
-          </div>
+        <div className="chat-identity">
+          <h1>{copy.botName}</h1>
+          <p>{copy.botStatus}</p>
+        </div>
+        <div className="chat-avatar" aria-hidden="true">
+          👶
         </div>
       </header>
       <ResultCard title={title} chip={chip} />
@@ -111,7 +106,7 @@ export function ChatScreen({
         {announcement}
       </p>
       <div
-        className="ubot-messages"
+        className="chat-list"
         role="log"
         aria-label={copy.chat}
         aria-live="off"
@@ -129,54 +124,58 @@ export function ChatScreen({
         {loading && <TypingBubble />}
         {error && <ErrorBubble text={error} onRetry={retry} />}
       </div>
-      <footer className="ubot-composer">
-        <div
-          className="ubot-quick-prompts"
-          role="group"
-          aria-label={copy.chatQuickLabel}
-        >
-          {QUICK_REPLIES.map((text) => (
-            <button
-              key={text}
-              type="button"
-              disabled={loading}
-              onClick={() => submit(text, true)}
-            >
-              {text}
-            </button>
-          ))}
-        </div>
+      <div className="chat-quick" role="group" aria-label={copy.chatQuickLabel}>
+        {QUICK_REPLIES.map((text) => (
+          <button
+            key={text}
+            type="button"
+            className="chat-chip"
+            disabled={loading}
+            onClick={() => submit(text, true)}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+      <footer className="chat-composer">
         <form
+          className="chat-form"
           onSubmit={(event) => {
             event.preventDefault();
             submit(draft);
           }}
         >
-          <div className="ubot-input-wrap">
-            <input
-              ref={input}
-              name="message"
-              aria-label={copy.chatInputLabel}
-              placeholder={copy.chatPlaceholder}
-              value={draft}
-              maxLength={MAX_INPUT_CHARS}
-              onChange={(event) => setDraft(event.target.value)}
-              autoComplete="off"
-              enterKeyHint="send"
-            />
-            <button
-              className="ubot-send"
-              aria-label={copy.chatSend}
-              disabled={!draft.trim() || loading}
-            >
-              <ArrowUp size={22} strokeWidth={1.75} />
-            </button>
-          </div>
+          <input
+            ref={input}
+            className="chat-input"
+            type="text"
+            name="message"
+            value={draft}
+            maxLength={MAX_INPUT_CHARS}
+            placeholder={copy.chatPlaceholder}
+            aria-label={copy.chatInputLabel}
+            autoComplete="off"
+            enterKeyHint="send"
+            onChange={(event) => setDraft(event.target.value)}
+          />
+          <button
+            className="chat-send"
+            type="submit"
+            aria-label={copy.chatSend}
+            disabled={!draft.trim() || loading}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"
+              />
+            </svg>
+          </button>
         </form>
-        <Button variant="ghost" className="ubot-handoff" onClick={handoff}>
+        <Button variant="ghost" className="chat-handoff" onClick={handoff}>
           {copy.ubotGo}
         </Button>
-        <p role="status" className="ubot-note">
+        <p role="status" className="chat-note">
           {status}
           {blocked && " "}
           {blocked && (
