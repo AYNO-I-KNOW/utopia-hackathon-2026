@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { CryingBaby } from "@/components/crying-baby";
+import { SceneLink } from "@/components/scene-navigation";
 import { copy } from "@/content";
 import { growthCopy as text } from "@/content/development";
 export function HomeHero() {
@@ -16,17 +17,24 @@ export function HomeHero() {
           <p>{text.greetingSubtitle}</p>
         </div>
       </div>
-      <Link
+      <SceneLink
         href="/development"
         className="home-hero-scene"
         aria-label={copy.viewDevelopment}
       >
+        <span className="home-hero-ground" aria-hidden="true" />
+        <CryingBaby className="home-hero-baby" alt={copy.cryingBabyAlt} />
         <img
-          className="home-hero-baby"
-          src="/images/analysis/baby.png"
-          alt={copy.cryingBabyAlt}
+          className="home-hero-moon"
+          src="/images/development/3-705-imgImage28.png"
+          alt=""
         />
-      </Link>
+        <img
+          className="home-hero-bottle"
+          src="/images/development/3-705-imgImage27.png"
+          alt=""
+        />
+      </SceneLink>
     </div>
   );
 }

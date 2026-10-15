@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { copy } from "@/content";
+import { activeLocale, copy } from "@/content";
 import { ApiError, isAbort, speak } from "./api";
 
 type Status = "idle" | "loading" | "playing" | "hidden";
@@ -34,7 +34,7 @@ export function useSpeech(text: string) {
     const ctl = new AbortController();
     controller.current = ctl;
     try {
-      const blob = await speak(text, "th", ctl.signal);
+      const blob = await speak(text, activeLocale, ctl.signal);
       if (ctl.signal.aborted) return;
       releaseAudio();
       url.current = URL.createObjectURL(blob);

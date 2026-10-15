@@ -21,6 +21,10 @@ export function activityKindForLabel(label: CryLabel): ActivityKind {
   return ACTIVITY_KIND[label];
 }
 
+export function capitalize(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 export function toPercent(prob: number) {
   return Math.round(Math.min(1, Math.max(0, prob)) * 100);
 }

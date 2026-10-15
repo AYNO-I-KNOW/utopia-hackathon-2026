@@ -30,6 +30,10 @@ export function SceneNavigationProvider({ children }: { children: ReactNode }) {
       router.push(href);
       return;
     }
+    document.documentElement.dataset.sceneFlow =
+      href === "/development" || path === "/development"
+        ? "growth"
+        : "analysis";
     document.documentElement.dataset.sceneDirection =
       href === "/" ? "return" : "forward";
     const transition = document.startViewTransition(

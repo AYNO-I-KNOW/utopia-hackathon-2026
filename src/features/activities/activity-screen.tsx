@@ -27,18 +27,21 @@ export function ActivityScreen() {
     }
     setEditing(params.get("add") === "1");
   }, [params]);
-  if (editing)
-    return (
-      <MobileShell>
+  const visibleItems = [...demoActivities, ...items];
+  return (
+    <MobileShell>
+      {editing && (
         <ActivityForm
           date={date}
           initialActivity={params.get("state") ?? "sleepy"}
           initialNote={params.get("note") ?? ""}
+          error={error}
           onCancel={() => {
             setEditing(false);
             router.replace("/");
           }}
           onSave={(item) => {
+            setError("");
             try {
               const next = [...items, item];
               saveActivities(next);
@@ -51,12 +54,7 @@ export function ActivityScreen() {
             }
           }}
         />
-        {error && <p role="alert">{error}</p>}
-      </MobileShell>
-    );
-  const visibleItems = [...demoActivities, ...items];
-  return (
-    <MobileShell>
+      )}
       <section className="home-dashboard home-timeline">
         <HomeHero />
         <ActivitySheet
@@ -64,7 +62,7 @@ export function ActivityScreen() {
           onDate={setDate}
           onAdd={() => setEditing(true)}
         >
-          {error && <p role="alert">{error}</p>}
+          {error && !editing && <p role="alert">{error}</p>}
           <div className="activity-list">
             {visibleItems
               .filter((item) => item.date === date)

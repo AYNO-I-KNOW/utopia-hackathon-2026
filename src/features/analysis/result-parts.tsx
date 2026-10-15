@@ -1,6 +1,6 @@
 "use client";
 import { copy } from "@/content";
-import { labelCopy, toPercent } from "./labels";
+import { capitalize, labelCopy, toPercent } from "./labels";
 import type { AnalysisContext, AskKey, TopItem } from "./parse";
 import { useSpeech } from "./use-speech";
 
@@ -59,7 +59,7 @@ export function TopBars({ top }: { top: TopItem[] }) {
       <ul>
         {top.map((item, index) => (
           <li key={`${index}-${item.label}`}>
-            <span>{labelCopy(item.label).name}</span>
+            <span>{capitalize(labelCopy(item.label).name)}</span>
             <b>{toPercent(item.prob)}%</b>
             <div className="result-bar" aria-hidden="true">
               <i style={{ width: `${toPercent(item.prob)}%` }} />

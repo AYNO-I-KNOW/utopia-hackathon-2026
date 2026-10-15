@@ -20,6 +20,8 @@ const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(
   "",
 );
 
+export type Lang = "th" | "en";
+
 export type ApiErrorKind =
   | "mic"
   | "config"
@@ -41,7 +43,7 @@ const MESSAGES: Record<ApiErrorKind, string> = {
   generic: copy.errGeneric,
 };
 
-/** Failure with a Thai, user-facing message chosen by `kind`. */
+/** Failure with a user-facing message chosen by `kind`. */
 export class ApiError extends Error {
   readonly kind: ApiErrorKind;
   constructor(kind: ApiErrorKind) {
@@ -116,7 +118,7 @@ function extension(type: string) {
 
 export async function analyzeCry(
   audio: Blob,
-  lang: "th",
+  lang: Lang,
   context: AnalysisContext,
   signal?: AbortSignal,
 ): Promise<AnalysisResult> {
@@ -139,7 +141,7 @@ export async function analyzeCry(
 
 export function speak(
   text: string,
-  lang: "th",
+  lang: Lang,
   signal?: AbortSignal,
 ): Promise<Blob> {
   return request(
@@ -159,7 +161,7 @@ export function speak(
 export function chat(
   messages: ChatMessage[],
   result: ChatResult | null,
-  lang: "th",
+  lang: Lang,
   signal?: AbortSignal,
 ): Promise<ChatReply> {
   return request(

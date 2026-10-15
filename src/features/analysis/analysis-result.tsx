@@ -1,3 +1,7 @@
+import { CryingBaby } from "@/components/crying-baby";
+import { X } from "lucide-react";
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { copy } from "@/content";
 import { activityKindForLabel, labelCopy, toPercent } from "./labels";
@@ -30,12 +34,14 @@ export function headline(result: Result) {
   const chip = `${copy.confidence} ${toPercent(first.prob)}%`;
   if (result.case === "close" && second)
     return {
-      title: `${copy.titleClosePrefix}${labelCopy(first.label).name}${copy.titleCloseJoin}${labelCopy(second.label).name}`,
+      title: copy.titleClose
+        .replace("{first}", labelCopy(first.label).name)
+        .replace("{second}", labelCopy(second.label).name),
       chip,
       hint: "",
     };
   return {
-    title: copy.titleConfident + labelCopy(first.label).name,
+    title: copy.titleConfident.replace("{label}", labelCopy(first.label).name),
     chip,
     hint: labelCopy(first.label).hint,
   };
@@ -58,17 +64,24 @@ function saveHref(result: Result) {
 export function AnalysisResult({ result, onChat, onAnswer, onRetry }: Props) {
   const { title, chip, hint } = headline(result);
   const heading = useFocusHeading();
+  const dialog = useRef<HTMLDialogElement>(null);
+  const router = useRouter();
   const noCry = result.case === "no_cry";
   const href = saveHref(result);
   return (
     <div className="analysis-result">
       <section className="result-content">
-        <Link href="/" className="result-close" aria-label={copy.backHome}>
-          <img src="/images/result/close.svg" alt="" />
-        </Link>
+        <button
+          type="button"
+          className="result-close"
+          aria-label={copy.backHome}
+          onClick={() => dialog.current?.showModal()}
+        >
+          <X size={22} strokeWidth={1.75} />
+        </button>
         <div className="result-summary">
           <div className="result-baby-mask">
-            <img src="/images/analysis/baby.png" alt={copy.cryingBabyAlt} />
+            <CryingBaby alt={copy.cryingBabyAlt} />
           </div>
           <h1 ref={heading} tabIndex={-1}>
             {title}
@@ -124,7 +137,29 @@ export function AnalysisResult({ result, onChat, onAnswer, onRetry }: Props) {
           )}
         </div>
         <p className="result-disclaimer">{copy.disclaimer}</p>
+        {!noCry && (
+          <button type="button" className="result-retry" onClick={onRetry}>
+            {copy.analyzeAgain}
+          </button>
+        )}
       </section>
+      <dialog
+        ref={dialog}
+        className="result-exit-dialog"
+        aria-labelledby="result-exit-title"
+        aria-describedby="result-exit-description"
+      >
+        <h2 id="result-exit-title">{copy.exitResultTitle}</h2>
+        <p id="result-exit-description">{copy.exitResultText}</p>
+        <div className="result-exit-actions">
+          <button autoFocus onClick={() => dialog.current?.close()}>
+            {copy.keepViewing}
+          </button>
+          <button onClick={() => router.push("/")}>
+            {copy.closeWithoutSaving}
+          </button>
+        </div>
+      </dialog>
       <footer className="result-actions">
         {noCry ? (
           <button className="primary" onClick={onRetry}>

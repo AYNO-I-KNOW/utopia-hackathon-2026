@@ -25,10 +25,10 @@ test("includes top two labels, case and 24 h activity", () => {
     lastDiaperMin: null,
     sleepMin: 600,
   });
-  assert.match(prompt, /หิว 51% \/ ง่วงนอน 31% \(case: ใกล้เคียงกัน\)/);
-  assert.doesNotMatch(prompt, /ผ้าอ้อม 10%/);
-  assert.match(prompt, /ให้นม 3 ครั้ง ล่าสุด 1 ชม\. 35 นาทีที่แล้ว/);
-  assert.match(prompt, /ผ้าอ้อม ล่าสุด ไม่มีข้อมูล · นอน 10 ชม\./);
+  assert.match(prompt, /hungry 51% \/ sleepy 31% \(case: close call\)/);
+  assert.doesNotMatch(prompt, /due for a diaper change 10%/);
+  assert.match(prompt, /3 feeds · last feed: 1 h 35 min ago/);
+  assert.match(prompt, /last diaper change: no data · sleep: 10 h/);
 });
 
 test("marks missing data and empty result", () => {
@@ -36,6 +36,6 @@ test("marks missing data and empty result", () => {
     { ...result, case: "no_cry", top: [] },
     { feeds: 0, lastFeedMin: null, lastDiaperMin: null, sleepMin: null },
   );
-  assert.match(prompt, /ผล: - \(case: ไม่พบเสียงร้อง\)/);
-  assert.match(prompt, /นอน ไม่มีข้อมูล/);
+  assert.match(prompt, /Result: - \(case: no crying detected\)/);
+  assert.match(prompt, /sleep: no data/);
 });

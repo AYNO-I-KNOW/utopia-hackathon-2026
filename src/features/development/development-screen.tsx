@@ -1,11 +1,14 @@
 "use client";
+import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { SceneLink } from "@/components/scene-navigation";
 import { MobileShell } from "@/components/mobile-shell";
 import { copy } from "@/content";
 import { growthCopy as text } from "@/content/development";
 import {
   metrics,
+  metricIds,
   parseEntries,
   type GrowthEntry,
   type MetricId,
@@ -48,14 +51,23 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
   return (
     <MobileShell>
       <div className={"growth-page " + (!metric ? "growth-overview" : "")}>
+        {!metric && (
+          <div className="growth-shared-scene" aria-hidden="true">
+            <img
+              src="/images/analysis/background.png"
+              className="growth-scene-background"
+              alt=""
+            />
+          </div>
+        )}
         <header className="growth-header">
-          <Link
+          <SceneLink
             className="growth-back"
             href={metric ? "/development" : "/"}
             aria-label={copy.back}
           >
-            <img src="/images/analysis/back.svg" alt="" />
-          </Link>
+            <ChevronLeft size={22} strokeWidth={1.75} />
+          </SceneLink>
         </header>
         <section className="growth-content">
           {metric && item ? (
@@ -147,16 +159,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
                 </button>
               </div>
               <div className="growth-card-grid">
-                {(
-                  [
-                    "weight",
-                    "height",
-                    "sleep",
-                    "feeding",
-                    "sleep",
-                    "feeding",
-                  ] as MetricId[]
-                ).map((id, index) => {
+                {metricIds.map((id) => {
                   const config = metrics[id],
                     entry = entries
                       .filter((e) => e.metric === id)
@@ -167,7 +170,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
                     <Link
                       href={"/development/" + id}
                       className="growth-metric-card"
-                      key={id + index}
+                      key={id}
                     >
                       <MetricIcon metric={id} />
                       <h2>{config.label}</h2>
@@ -193,6 +196,7 @@ export function DevelopmentScreen({ metric }: { metric?: MetricId }) {
       </div>
       {showForm && (
         <GrowthForm
+          entries={entries}
           initial={metric ?? "weight"}
           onSave={save}
           onClose={() => setShowForm(false)}

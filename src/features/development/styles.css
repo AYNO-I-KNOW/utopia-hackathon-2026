@@ -783,13 +783,13 @@ dialog.growth-overlay:not([open]) {
   }
 }
 
-.home-hero-baby {
+.home-hero-scene .home-hero-baby {
   position: absolute;
   width: 185px;
   height: 185px;
   object-fit: contain;
   left: 50%;
-  bottom: 0;
+  bottom: 6px;
   transform: translateX(-50%);
   view-transition-name: scene-baby;
 }
@@ -798,4 +798,80 @@ dialog.growth-overlay:not([open]) {
 }
 .home-record-fab {
   view-transition-name: scene-microphone;
+}
+
+/* Floating forms retain visible space below their rounded card. */
+dialog.growth-overlay {
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.growth-shared-scene {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 150px;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(black 45%, transparent);
+}
+.growth-scene-background {
+  position: absolute;
+  width: 591px;
+  height: 646px;
+  max-width: none;
+  left: 50%;
+  top: -480px;
+  transform: translateX(-50%);
+  object-fit: cover;
+  view-transition-name: scene-background;
+}
+html[data-scene-flow="growth"] .growth-overview .growth-content {
+  animation: growth-content-arrive 460ms 140ms both
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes growth-content-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-scene-flow="growth"] .growth-overview .growth-content {
+    animation: none;
+  }
+}
+
+/* Ground the replacement artwork on the floor and retain the original Figma props. */
+.home-hero-ground {
+  position: absolute;
+  width: 112px;
+  height: 12px;
+  left: 50%;
+  bottom: 15px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, #7562ba38 0%, #7562ba00 72%);
+  pointer-events: none;
+}
+.home-hero-moon,
+.home-hero-bottle {
+  position: absolute;
+  object-fit: contain;
+  pointer-events: none;
+}
+.home-hero-moon {
+  width: 62px;
+  height: 62px;
+  right: 16px;
+  top: 0;
+  transform: rotate(-4deg);
+}
+.home-hero-bottle {
+  width: 66px;
+  height: 66px;
+  left: calc(50% - 116px);
+  bottom: 16px;
+  transform: rotate(-36deg);
 }

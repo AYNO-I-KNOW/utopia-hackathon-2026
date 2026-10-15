@@ -108,7 +108,7 @@ export function WeekRail({
                 key={key}
                 disabled={key > DEMO_CURRENT_DATE}
                 aria-pressed={selected === key}
-                aria-label={day.toLocaleDateString("th-TH", {
+                aria-label={day.toLocaleDateString("en-GB", {
                   dateStyle: "full",
                 })}
                 onClick={() => onSelect(key)}

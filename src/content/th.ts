@@ -1,4 +1,6 @@
-/** Thai drafting source. Refine here before English translation. */
+import type { CopyDictionary } from "./index";
+
+/** Thai copy; kept in step with `en.ts` by the type below. */
 export const th = {
   resultAdviceTitle: "คำแนะนำ : ทานอาหาร",
   resultAdvice:
@@ -6,7 +8,6 @@ export const th = {
   resultCareTitle: "เคล็ดลับการดูแล",
   resultCare:
     "ทารกมักแสดงความหิวด้วยการหันหาเต้านมหรือเลียริมฝีปาก หากไม่แน่ใจ ลองสังเกตสัญญาณเหล่านี้ร่วมด้วย",
-  retry: "ลองใหม่อีกครั้ง",
   addAction: "เพิ่มการกระทำ",
   pause: "พัก",
   recordingPaused: "พักการบันทึก",
@@ -23,7 +24,6 @@ export const th = {
   back: "ย้อนกลับ",
   chat: "ปรึกษาผู้ช่วย",
   botName: "ปรึกษาผู้ช่วย",
-  botStatus: "จากผลวิเคราะห์ล่าสุด",
   saveActivity: "บันทึกกิจกรรม",
   activities: "กิจกรรม",
   sleepy: "ง่วงนอน",
@@ -53,9 +53,6 @@ export const th = {
   analyzing: "กำลังวิเคราะห์…",
   babyPlaceholderAlt: "พื้นที่สำหรับภาพเด็ก",
   confidence: "ความมั่นใจ",
-  observeHunger: "ลองสังเกตอาการหิวร่วมด้วย",
-  advice: "คำแนะนำ",
-  extraChecks: "เช็กเพิ่มเติม",
   analyzeAgain: "วิเคราะห์อีกครั้ง",
   cancelRecording: "ยกเลิกการบันทึก",
   analyzeCry: "วิเคราะห์เสียงร้อง",
@@ -67,6 +64,10 @@ export const th = {
   discardAudio: "เสียงนี้จะไม่ถูกบันทึก",
   continueRecording: "บันทึกต่อ",
   exitRecording: "ออกจากการบันทึก",
+  exitResultTitle: "ปิดผลลัพธ์นี้?",
+  exitResultText: "ผลลัพธ์นี้ยังไม่ได้บันทึก การปิดจะทิ้งผลวิเคราะห์นี้",
+  keepViewing: "ดูต่อ",
+  closeWithoutSaving: "ปิดโดยไม่บันทึก",
   storageReadError: "อ่านข้อมูลในเครื่องไม่ได้",
   storageWriteError: "บันทึกไม่ได้ ลองอีกครั้ง",
   greeting: "สวัสดี,",
@@ -95,9 +96,8 @@ export const th = {
   retryAnalysis: "ลองวิเคราะห์อีกครั้ง",
   uploadAudio: "หรืออัปโหลดไฟล์เสียง",
   minRecording: "บันทึกอย่างน้อย 3 วินาที",
-  titleConfident: "ลูกน่าจะ",
-  titleClosePrefix: "อาจเป็น",
-  titleCloseJoin: "หรือ",
+  titleConfident: "ลูกน่าจะ{label}",
+  titleClose: "อาจเป็น{first}หรือ{second}",
   titleUnsure: "ยังบอกไม่ได้แน่ชัด",
   titleNoCry: "ไม่พบเสียงร้อง",
   hintUnsure: "เสียงยังไม่ชัดพอ ลองเช็กตามรายการด้านล่างทีละข้อ",
@@ -163,4 +163,4 @@ export const th = {
   promptAgo: "{x}ที่แล้ว",
   hourUnit: "ชม.",
   minuteUnit: "นาที",
-};
+} satisfies CopyDictionary;

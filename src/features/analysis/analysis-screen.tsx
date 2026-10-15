@@ -1,10 +1,12 @@
 "use client";
-import { copy } from "@/content";
+import { activeLocale, copy } from "@/content";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { MobileShell } from "@/components/mobile-shell";
 import { buildContext } from "@/features/activities/context";
 import { loadActivities } from "@/features/activities/storage";
 import { ChatScreen } from "@/features/chat/chat-screen";
+import { AnalysisLoading } from "./analysis-loading";
 import { AnalysisResult, headline } from "./analysis-result";
 import { AnalysisCapture } from "./analysis-capture";
 import { AnalysisError } from "./analysis-error";
@@ -79,17 +81,44 @@ export function AnalysisScreen() {
     try {
       const reply = await analyzeCry(
         blob,
-        "th",
+        activeLocale,
         next,
         current.controller.signal,
       );
       if (current.id !== request.current.id) return;
-      setResult(reply);
-      setStep("result");
+      showResult(reply, current.id);
     } catch (error) {
       if (current.id !== request.current.id || isAbort(error)) return;
       fail(error instanceof ApiError ? error : new ApiError("generic"));
     }
+  }
+  // The result arrives when the backend answers; cross-fade into it when the browser can.
+  function showResult(reply: Result, id: number) {
+    const apply = () => {
+      // The transition callback runs later; a cancel or newer analyze may have won meanwhile.
+      if (id !== request.current.id) return;
+      setResult(reply);
+      setStep("result");
+    };
+    if (
+      !document.startViewTransition ||
+      document.hidden ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      apply();
+      return;
+    }
+    const transition = document.startViewTransition(() => {
+      flushSync(apply);
+    });
+    // A skipped transition (hidden page, superseded by another) rejects `ready`
+    // with InvalidStateError; the state update already happened, so ignore it.
+    for (const promise of [
+      transition.ready,
+      transition.updateCallbackDone,
+      transition.finished,
+    ])
+      promise.catch(() => {});
   }
   function fail(error: ApiError) {
     setCanRetry(audio.current !== null && error.kind !== "too_big");
@@ -164,12 +193,7 @@ export function AnalysisScreen() {
         <ChatScreen result={result} onBack={() => setStep("result")} />
       ) : step === "loading" ? (
         <>
-          <section className="content loading-content">
-            <div className="center">
-              <div className="spinner" />
-              <h1>{copy.analyzing}</h1>
-            </div>
-          </section>
+          <AnalysisLoading />
           <footer className="footer">
             <button onClick={cancelAnalysis}>{copy.cancelAnalysis}</button>
           </footer>
@@ -187,7 +211,7 @@ export function AnalysisScreen() {
         <AnalysisResult
           result={result}
           onChat={() => setStep("chat")}
-          onRetry={reset}
+          onRetry={start}
           onAnswer={(field, minutes) =>
             audio.current &&
             void analyze(audio.current, {

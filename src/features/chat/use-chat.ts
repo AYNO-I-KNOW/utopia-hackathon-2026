@@ -1,21 +1,15 @@
-import { copy } from "@/content";
+import { activeLocale, copy } from "@/content";
 import { ApiError, chat, isAbort } from "@/features/analysis/api";
 import type { AnalysisResult, ChatMessage } from "@/features/analysis/parse";
 import { useEffect, useRef, useState } from "react";
 import { toChatResult } from "./chat-result";
 
-export type Bubble = ChatMessage & { id: number; time: string };
-
-const timestamp = () =>
-  new Date().toLocaleTimeString("th-TH", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+export type Bubble = ChatMessage & { id: number };
 
 /** Chat state for one analysis result; the first bubble is the real summary. */
 export function useChat(result: AnalysisResult) {
   const [bubbles, setBubbles] = useState<Bubble[]>(() => [
-    { id: 0, role: "assistant", content: result.summary, time: timestamp() },
+    { id: 0, role: "assistant", content: result.summary },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +38,7 @@ export function useChat(result: AnalysisResult) {
       const reply = await chat(
         history.map(({ role, content }) => ({ role, content })),
         toChatResult(result),
-        "th",
+        activeLocale,
         current.controller.signal,
       );
       if (current.id !== request.current.id) return;
@@ -54,7 +48,6 @@ export function useChat(result: AnalysisResult) {
           id: nextId.current++,
           role: "assistant",
           content: reply.reply,
-          time: timestamp(),
         },
       ]);
     } catch (failure) {
@@ -73,7 +66,7 @@ export function useChat(result: AnalysisResult) {
     if (!content || loading) return;
     const next: Bubble[] = [
       ...bubbles,
-      { id: nextId.current++, role: "user", content, time: timestamp() },
+      { id: nextId.current++, role: "user", content },
     ];
     setBubbles(next);
     void ask(next);
