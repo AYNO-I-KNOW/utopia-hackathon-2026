@@ -1,0 +1,586 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #dedede;
+  color: #242424;
+  font:
+    15px/1.6 Arial,
+    Tahoma,
+    sans-serif;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  background: white;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  padding: 13px 16px;
+  color: inherit;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.primary {
+  background: #333;
+  color: white;
+  border-color: #333;
+}
+.phone {
+  width: 100%;
+  max-width: 430px;
+  height: 100dvh;
+  min-height: 600px;
+  margin: auto;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.top {
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid #ddd;
+}
+.top button {
+  padding: 3px 11px;
+  font-size: 22px;
+}
+.top span {
+  font-size: 12px;
+  color: #777;
+  margin-left: auto;
+}
+.content {
+  flex: 1;
+  overflow: auto;
+  padding: 25px 24px;
+}
+.center {
+  text-align: center;
+}
+h1 {
+  font-size: 23px;
+  line-height: 1.45;
+  margin: 12px 0;
+}
+h2 {
+  font-size: 17px;
+  margin: 0 0 8px;
+}
+p {
+  margin: 8px 0;
+  color: #666;
+}
+.placeholder {
+  height: 164px;
+  width: 164px;
+  margin: 30px auto;
+  border: 1px dashed #999;
+  background: #eee;
+  display: grid;
+  place-content: center;
+  color: #777;
+}
+.placeholder small {
+  font-size: 12px;
+}
+.footer {
+  padding: 16px 24px 25px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 10px;
+  background: #fafafa;
+}
+.footer button {
+  flex: 1;
+}
+.tag {
+  display: inline-block;
+  border: 1px solid #aaa;
+  padding: 4px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.card {
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  background: #fff;
+}
+.card p {
+  font-size: 14px;
+}
+.mic {
+  border: 1px solid #888;
+  border-radius: 50%;
+  width: 94px;
+  height: 94px;
+  margin: 25px auto 15px;
+  font-size: 16px;
+  display: grid;
+  place-content: center;
+  background: #eee;
+}
+.wave {
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 20px 0;
+}
+.wave i {
+  width: 4px;
+  background: #777;
+  animation: wave 0.7s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -0.09s);
+}
+@keyframes wave {
+  from {
+    height: 8px;
+  }
+  to {
+    height: var(--h);
+  }
+}
+.timer {
+  font-size: 28px;
+  letter-spacing: 3px;
+}
+.steps {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 24px;
+}
+.spinner {
+  width: 58px;
+  height: 58px;
+  border: 3px solid #ddd;
+  border-top-color: #555;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 70px auto 28px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: #0006;
+  display: grid;
+  align-items: center;
+  padding: 24px;
+  z-index: 2;
+}
+.dialog {
+  background: white;
+  border: 1px solid #aaa;
+  border-radius: 12px;
+  padding: 22px;
+}
+.dialog .actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 22px;
+}
+.dialog button {
+  flex: 1;
+  font-size: 13px;
+}
+.bubble {
+  padding: 14px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 12px 0;
+}
+.bubble.user {
+  margin-left: 40px;
+  background: white;
+}
+.chat-form {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid #aaa;
+  padding: 10px;
+  border-radius: 6px;
+}
+.note {
+  font-size: 12px;
+  color: #777;
+}
+.saved {
+  padding: 10px;
+  border: 1px dashed #999;
+  margin-top: 16px;
+}
+.hidden {
+  display: none;
+}
+@media (min-width: 500px) {
+  .phone {
+    height: calc(100dvh - 32px);
+    margin: 16px auto;
+    border: 1px solid #aaa;
+    border-radius: 20px;
+  }
+}
+.home-content {
+  display: flex;
+  flex-direction: column;
+  padding-top: 32px;
+  padding-bottom: 48px;
+}
+.home-content > .center {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+}
+.home-action {
+  margin-top: auto;
+  padding-top: 40px;
+}
+.home-action .mic {
+  margin: 0 auto 14px;
+}
+.home-action p {
+  font-size: 14px;
+  margin: 0;
+}
+@media (max-height: 700px) {
+  .home-content {
+    padding-bottom: 28px;
+  }
+}
+.loading-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading-content .spinner {
+  margin: 0 auto 24px;
+}
+.loading-content h1 {
+  font-size: 20px;
+}
+.baby-image {
+  width: 96px;
+  height: 96px;
+  border: 1px dashed #aaa;
+  border-radius: 50%;
+  background: #eee;
+  margin: 8px auto 24px;
+}
+.chat-content {
+  padding: 20px 16px;
+  min-height: 0;
+}
+.chat-content #messages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.chat-content .bubble {
+  align-self: flex-start;
+  max-width: 82%;
+  margin: 0;
+  padding: 12px 15px;
+  border-radius: 12px 12px 12px 3px;
+  overflow-wrap: anywhere;
+}
+.chat-content .bubble.user {
+  align-self: flex-end;
+  background: #333;
+  color: white;
+  border-color: #333;
+  border-radius: 12px 12px 3px 12px;
+}
+.chat-form button {
+  flex: 0 0 auto;
+}
+.chat-form input {
+  width: 0;
+}
+.top button {
+  background: transparent;
+  border: 0;
+}
+.activity-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.activity-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.activity-form input,
+.activity-form select,
+.activity-form textarea {
+  width: 100%;
+  font: inherit;
+  background: white;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  padding: 12px;
+  min-width: 0;
+}
+.time-fields {
+  display: flex;
+  gap: 12px;
+}
+.time-fields label {
+  flex: 1;
+  min-width: 0;
+}
+.date-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.date-heading label {
+  text-align: center;
+}
+.date-heading input {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+}
+.week {
+  display: flex;
+  gap: 4px;
+  margin-top: 22px;
+}
+.week button {
+  flex: 1;
+  padding: 8px 0;
+  min-width: 0;
+}
+.week small,
+.week b {
+  display: block;
+}
+.week small {
+  font-size: 11px;
+  font-weight: normal;
+}
+.activity-list {
+  border-left: 1px solid #bbb;
+  margin-left: 5px;
+  padding-left: 18px;
+}
+.activity-card {
+  position: relative;
+}
+.activity-card:before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 25px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #777;
+}
+.activity-card p {
+  margin: 4px 0;
+}
+.timeline-content {
+  padding-top: 0;
+}
+.calendar-top {
+  margin: 0 -24px;
+  padding: 28px 20px 12px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  border-radius: 0 0 28px 28px;
+}
+.greeting {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 4px 26px;
+}
+.profile-circle {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e5e5e5;
+}
+.greeting h2 {
+  font-size: 17px;
+  margin: 0;
+}
+.greeting p {
+  font-size: 13px;
+  margin: 3px 0 0;
+}
+.calendar-top .week {
+  margin: 0;
+  gap: 6px;
+}
+.calendar-top .week button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.calendar-top .week small {
+  color: #555;
+  font-size: 12px;
+}
+.calendar-top .week b {
+  font-size: 17px;
+  font-weight: normal;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.calendar-top .week .primary {
+  color: #242424;
+}
+.calendar-top .week .primary b {
+  background: #333;
+  color: white;
+}
+.calendar-handle {
+  width: 40px;
+  height: 4px;
+  background: #ddd;
+  border-radius: 4px;
+  margin: 18px auto 0;
+}
+.nav-footer {
+  padding: 10px 8px max(12px, env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+.nav-footer nav {
+  display: flex;
+  width: 100%;
+  gap: 2px;
+}
+.nav-footer nav button {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #888;
+  padding: 6px 1px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.nav-footer nav button span {
+  max-width: 90px;
+}
+.nav-footer nav button.active {
+  color: #222;
+  font-weight: bold;
+}
+.nav-footer nav button.active svg {
+  stroke-width: 2.2;
+}
+.activities-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+.activities-heading h2 {
+  margin: 0;
+}
+.activities-heading button {
+  padding: 2px 11px;
+  font-size: 23px;
+  border: 0;
+  background: transparent;
+}
+
+.button {
+  font: inherit;
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  padding: 13px 16px;
+  flex: 1;
+}
+.full {
+  width: 100%;
+  margin-top: 16px;
+}
+.bottom-nav {
+  display: flex;
+  flex-shrink: 0;
+  border-top: 1px solid #ddd;
+  padding: 12px 8px;
+  background: #fafafa;
+}
+.bottom-nav a {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  text-decoration: none;
+  color: #888;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 4px;
+}
+.bottom-nav a span {
+  display: block;
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+.bottom-nav a[aria-current] {
+  color: #222;
+  font-weight: bold;
+}
+.wave i {
+  animation: react-wave 0.7s ease-in-out infinite alternate;
+}
+@keyframes react-wave {
+  to {
+    transform: scaleY(0.15);
+  }
+}
+.phone {
+  min-height: 0;
+}
+.content {
+  min-height: 0;
+}
+.top {
+  flex-shrink: 0;
+}
