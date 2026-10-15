@@ -3,6 +3,22 @@ import { copy } from "@/content";
 import { useEffect, useRef, useState } from "react";
 import "./styles.css";
 
+function getDemoReply(text: string) {
+  if (/ไม่ตรง|ไม่ใช่|ผิด/.test(text))
+    return "ขอบคุณที่บอกค่ะ ผลวิเคราะห์เป็นเพียงการคาดการณ์ ตอนนี้ลูกมีท่าทางหรือเสียงร้องต่างจากที่ผลบอกอย่างไรบ้างคะ?";
+  if (/ยังร้อง|ร้องไม่หยุด/.test(text))
+    return "ลูกยังร้องอยู่ใช่ไหมคะ ร้องมานานแค่ไหนแล้ว และก่อนหน้านี้ลองทำอะไรไปบ้างคะ?";
+  if (/สังเกต|อาการ/.test(text))
+    return "เล่าได้เลยค่ะ ตอนร้องลูกมีท่าทางอย่างไร และมีอะไรเปลี่ยนไปจากปกติบ้างคะ?";
+  if (/ปลอบ|อุ้ม/.test(text))
+    return "ก่อนหน้านี้ลองปลอบลูกด้วยวิธีไหนบ้างคะ แล้วลูกตอบสนองอย่างไร เล่าให้ฟังทีละอย่างได้เลยค่ะ";
+  if (/ขอบคุณ/.test(text))
+    return "ยินดีค่ะ ถ้ามีอะไรเปลี่ยนไป หรืออยากเล่าเพิ่มเติม พิมพ์ต่อได้เลยนะคะ";
+  if (text.trim().length < 4)
+    return "อยากถามเรื่องไหนเกี่ยวกับลูกคะ พิมพ์เล่าเพิ่มอีกนิด หรือเลือกคำถามด้านล่างได้เลยค่ะ";
+  return "รับทราบค่ะ เรื่องนี้เริ่มตั้งแต่เมื่อไหร่ และตอนนี้ลูกเป็นอย่างไรบ้างคะ?";
+}
+
 type Message = { text: string; user: boolean };
 
 export function ChatScreen({ onBack }: { onBack: () => void }) {
@@ -39,7 +55,7 @@ export function ChatScreen({ onBack }: { onBack: () => void }) {
     replyTimer.current = setTimeout(() => {
       setMessages((previous) => [
         ...previous,
-        { text: copy.chatMockReply, user: false },
+        { text: getDemoReply(trimmed), user: false },
       ]);
       setReplying(false);
       replyTimer.current = null;

@@ -106,8 +106,8 @@
 .ubot-user {
   align-self: flex-end;
   border-radius: 20px 20px 0 20px;
-  background: #e8e3ff;
-  color: #40365e;
+  background: var(--color-brand);
+  color: var(--color-on-brand);
 }
 .ubot-composer {
   padding: 16px 24px;

@@ -75,7 +75,8 @@ export function AnalysisCapture({
             aria-hidden="true"
           />
           <p
-            className="analysis-caption"
+            className="analysis-caption recording-status"
+            data-error={error}
             role={recording ? "status" : undefined}
           >
             {error

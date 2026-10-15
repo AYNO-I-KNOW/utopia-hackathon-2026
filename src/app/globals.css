@@ -902,7 +902,7 @@ h2 {
   width: calc(50% - 8px);
   height: 56px;
   border-radius: var(--radius-pill);
-  background: var(--color-action);
+  background: var(--color-brand);
 }
 
 .analysis-ready[data-recording="true"] .capture-stop-icon {
@@ -1271,5 +1271,53 @@ html[data-scene-direction] .analysis-intro {
   ::view-transition-new(*) {
     animation-duration: 0s;
     animation-delay: 0s;
+  }
+}
+
+.recording-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.recording-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  animation: recording-pulse 1.6s ease-in-out infinite;
+}
+.analysis-ready[data-paused="true"] .recording-status::before,
+.recording-status[data-error="true"]::before {
+  animation: none;
+  background: var(--color-text-muted);
+}
+.recording-time {
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+.capture-exit {
+  color: var(--color-brand);
+  font-weight: 500;
+}
+@keyframes recording-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .recording-status::before {
+    animation: none;
   }
 }
