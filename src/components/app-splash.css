@@ -1,0 +1,68 @@
+.app-splash {
+  --app-splash-hold: 3000ms;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: var(--color-brand-soft);
+  animation: app-splash-out 520ms cubic-bezier(0.4, 0, 0.2, 1)
+    var(--app-splash-hold) forwards;
+}
+
+.app-splash-bottle {
+  width: 160px;
+  height: 160px;
+  transform-origin: 50% 85%;
+  animation:
+    app-splash-pop 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    app-splash-rock 2200ms ease-in-out 700ms infinite;
+}
+
+/* ends at the rock's 0% pose so the handoff has no jump */
+@keyframes app-splash-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+@keyframes app-splash-rock {
+  0%,
+  100% {
+    transform: scale(1) rotate(-8deg);
+  }
+  50% {
+    transform: scale(1) rotate(8deg);
+  }
+}
+
+@keyframes app-splash-out {
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+    filter: blur(4px);
+    visibility: hidden;
+  }
+}
+
+@keyframes app-splash-fade {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-splash {
+    animation: app-splash-fade 200ms 800ms forwards;
+  }
+
+  .app-splash-bottle {
+    animation: none;
+  }
+}

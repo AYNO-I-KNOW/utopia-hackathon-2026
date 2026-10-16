@@ -5,10 +5,11 @@ import "@/design-system/tokens.css";
 import "./globals.css";
 import "@/features/development/styles.css";
 import "@/design-system/components.css";
+import { AppSplash } from "@/components/app-splash";
 import { SceneNavigationProvider } from "@/components/scene-navigation";
 import { activeLocale } from "@/content";
 export const metadata: Metadata = {
-  title: "Crybaby",
+  title: "Cry for your Mom",
   description: "Mobile baby care wireframe",
 };
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <html lang={activeLocale}>
       <body>
         <SceneNavigationProvider>{children}</SceneNavigationProvider>
+        <AppSplash />
       </body>
     </html>
   );
