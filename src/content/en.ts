@@ -151,10 +151,9 @@ export const en = {
     unsure: "unsure",
     no_cry: "no crying detected",
   },
-  ubotGo: "Continue with U-bot",
+  ubotGo: "Open U-bot to continue the chat in a new tab",
   ubotCopyFailed: "Couldn’t copy. Select the text and copy it yourself.",
-  ubotBlocked:
-    "Your browser blocked the new tab. Use the Open U-bot link below.",
+  ubotBlocked: "Your browser blocked the new tab. Tap Open U-bot again.",
   ubotOpen: "Open U-bot",
   chatQuickNext: "What should I do next?",
   chatQuickStill: "What if they’re still crying?",

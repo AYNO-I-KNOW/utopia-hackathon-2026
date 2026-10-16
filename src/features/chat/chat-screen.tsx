@@ -1,8 +1,7 @@
 "use client";
 // Chat layout adapted from the UI generated in U-bot's U-Code (ubot-export/).
 // Answers come from our own backend (POST /chat); U-bot is only a handoff link.
-import { ArrowUp, ChevronLeft } from "lucide-react";
-import { Button } from "@/components/button";
+import { ArrowUp, ArrowUpRight, ChevronLeft } from "lucide-react";
 import { copy } from "@/content";
 import { summarizeRecent } from "@/features/activities/context";
 import { loadActivities } from "@/features/activities/storage";
@@ -49,7 +48,6 @@ export function ChatScreen({
   const { bubbles, loading, error, send, retry } = useChat(result);
   const [draft, setDraft] = useState("");
   const [status, setStatus] = useState("");
-  const [blocked, setBlocked] = useState(false);
   const following = useRef(true);
   const input = useRef<HTMLInputElement>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -82,7 +80,6 @@ export function ChatScreen({
     const copied = copyText(handoffPrompt(result));
     const tab = window.open(UBOT_URL, "_blank");
     if (tab) tab.opener = null;
-    setBlocked(!tab);
     void copied.then((ok) =>
       setStatus(!tab ? copy.ubotBlocked : ok ? "" : copy.ubotCopyFailed),
     );
@@ -101,7 +98,19 @@ export function ChatScreen({
             <span className="ubot-verified" aria-hidden="true" />
           </div>
         </div>
+        <button
+          type="button"
+          className="ubot-handoff"
+          aria-label={copy.ubotGo}
+          onClick={handoff}
+        >
+          <ArrowUpRight size={16} strokeWidth={2} aria-hidden="true" />
+          <span>{copy.ubotOpen}</span>
+        </button>
       </header>
+      <p role="status" aria-live="polite" className="ubot-note">
+        {status}
+      </p>
       <ResultCard title={title} chip={chip} />
       <p className="sr-only" aria-live="polite">
         {announcement}
@@ -169,18 +178,6 @@ export function ChatScreen({
             </button>
           </div>
         </form>
-        <Button variant="ghost" className="ubot-handoff" onClick={handoff}>
-          {copy.ubotGo}
-        </Button>
-        <p role="status" className="ubot-note">
-          {status}
-          {blocked && " "}
-          {blocked && (
-            <a href={UBOT_URL} target="_blank" rel="noreferrer">
-              {copy.ubotOpen}
-            </a>
-          )}
-        </p>
       </footer>
     </div>
   );

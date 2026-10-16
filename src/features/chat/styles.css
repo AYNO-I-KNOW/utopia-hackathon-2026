@@ -34,7 +34,7 @@
 .ubot-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding: 16px 24px;
   padding-top: max(16px, env(safe-area-inset-top));
   background: transparent;
@@ -60,6 +60,7 @@
 }
 .ubot-profile {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 10px;
   padding: 8px 14px 8px 8px;
@@ -68,6 +69,7 @@
 }
 .ubot-avatar {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   width: 36px;
   height: 36px;
@@ -82,6 +84,8 @@
 }
 .ubot-identity h1 {
   margin: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
   color: var(--ubot-brand-logo);
   font-size: 16px;
   font-weight: 600;
@@ -353,19 +357,61 @@
   font-size: 13px;
 }
 .ubot-handoff {
-  display: flex;
-  margin: 8px auto 0;
-}
-.ubot-chat .ubot-handoff {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: auto;
+  min-height: 40px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--ubot-blue-500);
+  border-radius: 999px;
+  background: var(--ubot-white);
   color: var(--ubot-blue-text);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ubot-handoff:hover {
+  background: var(--ubot-accent-pale);
+}
+.ubot-handoff:active {
+  background: var(--ubot-accent-pale);
+  border-color: var(--ubot-blue-600);
+  transform: scale(0.98);
 }
 .ubot-note {
-  margin: 0;
-  text-align: center;
+  margin: 0 24px 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--ubot-white);
   font-size: 12px;
   line-height: 1.5;
-  color: var(--ubot-ink-500);
+  color: var(--ubot-ink-700);
 }
 .ubot-note:empty {
   display: none;
+}
+@media (max-width: 380px) {
+  .ubot-header {
+    gap: 8px;
+    padding-inline: 16px;
+  }
+  .ubot-profile {
+    gap: 8px;
+    padding-right: 12px;
+  }
+  .ubot-verified {
+    display: none;
+  }
+  .ubot-handoff {
+    padding: 0 12px 0 10px;
+  }
+}
+@media (max-width: 340px) {
+  .ubot-avatar {
+    width: 32px;
+    height: 32px;
+  }
 }
