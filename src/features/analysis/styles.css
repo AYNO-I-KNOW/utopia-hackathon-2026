@@ -169,6 +169,18 @@
 .result-lullaby {
   background: var(--color-brand-soft);
 }
+.result-lullaby-player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.result-lullaby-player .result-listen {
+  padding: 0 var(--space-4);
+}
+.result-lullaby-player small {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
 .result-doctor {
   background: var(--color-error-soft);
 }

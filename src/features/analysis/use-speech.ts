@@ -1,10 +1,12 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { activeLocale, copy } from "@/content";
+import { claimPlayback, onOtherPlayback } from "./exclusive-playback";
 import { ApiError, isAbort, speak } from "./api";
 
 type Status = "idle" | "loading" | "playing" | "hidden";
 
+const OWNER = "speech";
 const FFT_SIZE = 1024;
 
 /**
@@ -68,6 +70,14 @@ export function useSpeech(text: string) {
     return analyser.current.context.sampleRate;
   }, []);
   useEffect(() => release, [release]);
+  useEffect(
+    () =>
+      onOtherPlayback(OWNER, () => {
+        release();
+        setStatus((now) => (now === "hidden" ? now : "idle"));
+      }),
+    [release],
+  );
   async function toggle() {
     if (status === "loading" || status === "playing") {
       release();
@@ -75,6 +85,7 @@ export function useSpeech(text: string) {
       return;
     }
     setError("");
+    claimPlayback(OWNER);
     setStatus("loading");
     closeAll();
     const opened = openContext();

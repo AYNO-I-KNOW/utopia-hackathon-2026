@@ -116,6 +116,12 @@ export const en = {
   listenStop: "Stop audio",
   lullabyTitle: "Try a lullaby",
   lullabyText: "Soft music can help your baby settle and fall asleep.",
+  lullabyPlay: "Play lullaby",
+  lullabyPlayShort: "Play",
+  lullabyStop: "Stop",
+  lullabyMusicBox: "Music box",
+  lullabyWarmRocking: "Warm rocking",
+  errLullaby: "Couldn’t play the lullaby. Please try again.",
   seeDoctorTitle: "Talk to a doctor",
   seeDoctorText:
     "If your baby cries nonstop, seems unusually drowsy, has a fever or breathes abnormally, see a doctor.",

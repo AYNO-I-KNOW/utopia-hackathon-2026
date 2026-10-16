@@ -12,6 +12,8 @@ import {
   TopBars,
   type AnswerContext,
 } from "./result-parts";
+import { LullabyPlayer } from "./lullaby-player";
+import { pickLullaby } from "./lullaby";
 import { useFocusHeading } from "./use-focus-heading";
 
 type Props = {
@@ -123,6 +125,7 @@ export function AnalysisResult({ result, onChat, onAnswer, onRetry }: Props) {
               <div>
                 <h2>{copy.lullabyTitle}</h2>
                 <p>{copy.lullabyText}</p>
+                <LullabyPlayer track={pickLullaby(result)} />
               </div>
             </article>
           )}
