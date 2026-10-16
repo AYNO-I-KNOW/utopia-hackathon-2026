@@ -21,7 +21,6 @@ export const en = {
   back: "Back",
   chat: "Chat with U-bot",
   botName: "Personal assistant",
-  botStatus: "From your latest analysis",
   saveActivity: "Log activity",
   activities: "Activity",
   sleepy: "Sleepy",

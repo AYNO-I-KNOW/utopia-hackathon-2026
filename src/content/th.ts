@@ -24,7 +24,6 @@ export const th = {
   back: "ย้อนกลับ",
   chat: "คุยกับ U-bot",
   botName: "ปรึกษาผู้ช่วย",
-  botStatus: "จากผลวิเคราะห์ล่าสุด",
   saveActivity: "บันทึกกิจกรรม",
   activities: "กิจกรรม",
   sleepy: "ง่วงนอน",
