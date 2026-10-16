@@ -117,8 +117,6 @@ export const en = {
   lullabyTitle: "Try a lullaby",
   lullabyText: "Soft music can help your baby settle and fall asleep.",
   lullabyPlay: "Play lullaby",
-  lullabyPlayShort: "Play",
-  lullabyStop: "Stop",
   lullabyMusicBox: "Music box",
   lullabyWarmRocking: "Warm rocking",
   errLullaby: "Couldn’t play the lullaby. Please try again.",

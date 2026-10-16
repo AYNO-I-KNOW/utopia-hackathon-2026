@@ -120,14 +120,7 @@ export function AnalysisResult({ result, onChat, onAnswer, onRetry }: Props) {
             </article>
           )}
           {result.suggest_lullaby && (
-            <article className="result-lullaby">
-              <span aria-hidden="true">🎵</span>
-              <div>
-                <h2>{copy.lullabyTitle}</h2>
-                <p>{copy.lullabyText}</p>
-                <LullabyPlayer track={pickLullaby(result)} />
-              </div>
-            </article>
+            <LullabyPlayer track={pickLullaby(result)} />
           )}
           {result.see_doctor && (
             <article className="result-doctor" role="alert">

@@ -118,8 +118,6 @@ export const th = {
   lullabyTitle: "ลองเปิดเพลงกล่อม",
   lullabyText: "เพลงเบา ๆ ช่วยให้ลูกสงบลงและหลับง่ายขึ้น",
   lullabyPlay: "เล่นเพลงกล่อม",
-  lullabyPlayShort: "เล่น",
-  lullabyStop: "หยุด",
   lullabyMusicBox: "กล่องดนตรี",
   lullabyWarmRocking: "โยกเบา ๆ อบอุ่น",
   errLullaby: "เล่นเพลงกล่อมไม่ได้ ลองอีกครั้ง",
