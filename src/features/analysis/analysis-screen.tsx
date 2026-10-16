@@ -11,7 +11,14 @@ import { AnalysisResult, headline } from "./analysis-result";
 import { AnalysisCapture } from "./analysis-capture";
 import { AnalysisError } from "./analysis-error";
 import { ExitDialog } from "./exit-dialog";
-import { analyzeCry, ApiError, isAbort, MAX_UPLOAD_BYTES } from "./api";
+import {
+  analyzeCry,
+  ApiError,
+  isAbort,
+  isPermanentError,
+  MAX_UPLOAD_BYTES,
+} from "./api";
+import { isSupportedAudio } from "./audio-types";
 import type { AnalysisContext, AnalysisResult as Result } from "./parse";
 import "./styles.css";
 type Step = "ready" | "record" | "loading" | "result" | "error" | "chat";
@@ -38,6 +45,7 @@ export function AnalysisScreen() {
   const [paused, setPaused] = useState(false);
   const [ready, setReady] = useState(false);
   const [canRetry, setCanRetry] = useState(false);
+  const [returnedFromError, setReturnedFromError] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [failure, setFailure] = useState<ApiError | null>(null);
   const recordedMs = useRef(0);
@@ -77,6 +85,7 @@ export function AnalysisScreen() {
     request.current = current;
     audio.current = blob;
     context.current = next;
+    setReturnedFromError(false);
     setStep("loading");
     try {
       const reply = await analyzeCry(
@@ -121,7 +130,7 @@ export function AnalysisScreen() {
       promise.catch(() => {});
   }
   function fail(error: ApiError) {
-    setCanRetry(audio.current !== null && error.kind !== "too_big");
+    setCanRetry(audio.current !== null && !isPermanentError(error.kind));
     setFailure(error);
     setStep("error");
   }
@@ -133,6 +142,7 @@ export function AnalysisScreen() {
   }
   function reset() {
     audio.current = null;
+    setReturnedFromError(true);
     setStep("ready");
   }
   function confirmRecording(blob: Blob | null) {
@@ -141,11 +151,13 @@ export function AnalysisScreen() {
   }
   function chooseFile(file: File) {
     audio.current = null;
-    if (file.size > MAX_UPLOAD_BYTES) fail(new ApiError("too_big"));
+    if (!isSupportedAudio(file)) fail(new ApiError("unsupported"));
+    else if (file.size > MAX_UPLOAD_BYTES) fail(new ApiError("too_big"));
     else void analyze(file, savedContext());
   }
   function start() {
     audio.current = null;
+    setReturnedFromError(false);
     setPaused(false);
     setReady(false);
     recordedMs.current = 0;
@@ -169,6 +181,7 @@ export function AnalysisScreen() {
         <>
           <AnalysisCapture
             recording={step === "record"}
+            focusHeading={returnedFromError}
             elapsed={elapsed}
             paused={paused}
             onTogglePause={togglePause}
@@ -202,6 +215,7 @@ export function AnalysisScreen() {
         <AnalysisError
           message={failure.message}
           canRetry={canRetry}
+          permanent={isPermanentError(failure.kind)}
           onRetry={() =>
             audio.current && void analyze(audio.current, context.current)
           }

@@ -4,11 +4,14 @@ import { copy } from "@/content";
 import { SceneLink } from "@/components/scene-navigation";
 import { formatElapsed } from "@/lib/date";
 import { useEffect, useRef } from "react";
+import { AUDIO_ACCEPT } from "./audio-types";
 import { MAX_RECORD_SECONDS, MIN_RECORD_SECONDS } from "./recorder";
 import { useAudioLevel } from "./use-audio-level";
 
 type Props = {
   recording: boolean;
+  /** Move focus to the heading on mount (after returning from the error screen). */
+  focusHeading: boolean;
   elapsed: number;
   paused: boolean;
   onTogglePause: () => void;
@@ -23,6 +26,7 @@ type Props = {
 /** Keep the same action mounted so its size and icon can transition continuously. */
 export function AnalysisCapture({
   recording,
+  focusHeading,
   elapsed,
   paused,
   onTogglePause,
@@ -35,6 +39,7 @@ export function AnalysisCapture({
 }: Props) {
   const { canvasRef, error, ready, finish } = useAudioLevel(recording, paused);
   const fileInput = useRef<HTMLInputElement>(null);
+  const heading = useRef<HTMLHeadingElement>(null);
   const finishing = useRef(false);
   const tooShort = elapsed < MIN_RECORD_SECONDS;
   async function confirm() {
@@ -43,6 +48,9 @@ export function AnalysisCapture({
     finishing.current = true;
     onConfirm(await finish());
   }
+  useEffect(() => {
+    if (focusHeading) heading.current?.focus();
+  }, [focusHeading]);
   useEffect(() => {
     if (!recording) finishing.current = false;
   }, [recording]);
@@ -84,7 +92,9 @@ export function AnalysisCapture({
         </SceneLink>
       )}
       <div className="analysis-heading">
-        <h1>{recording ? copy.listening : copy.analysisTitle}</h1>
+        <h1 ref={heading} tabIndex={-1}>
+          {recording ? copy.listening : copy.analysisTitle}
+        </h1>
         <p className="analysis-intro">
           {copy.analysisIntro}
           <br />
@@ -169,7 +179,7 @@ export function AnalysisCapture({
         <input
           ref={fileInput}
           type="file"
-          accept="audio/*"
+          accept={AUDIO_ACCEPT}
           hidden
           onChange={(event) => {
             const file = event.target.files?.[0];

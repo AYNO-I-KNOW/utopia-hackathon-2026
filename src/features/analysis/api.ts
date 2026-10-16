@@ -10,10 +10,10 @@ import {
   type ChatResult,
 } from "./parse";
 
-const ANALYZE_TIMEOUT_MS = 30_000;
+const ANALYZE_TIMEOUT_MS = 60_000;
 const SPEAK_TIMEOUT_MS = 15_000;
 const CHAT_TIMEOUT_MS = 30_000;
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 // Read at build time; Next inlines only the literal `process.env.NEXT_PUBLIC_*` form.
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(
   /\/+$/,
@@ -28,6 +28,7 @@ export type ApiErrorKind =
   | "network"
   | "bad_audio"
   | "too_big"
+  | "unsupported"
   | "busy"
   | "unavailable"
   | "generic";
@@ -38,10 +39,22 @@ const MESSAGES: Record<ApiErrorKind, string> = {
   network: copy.errNetwork,
   bad_audio: copy.errBadAudio,
   too_big: copy.errTooBig,
+  unsupported: copy.errUnsupported,
   busy: copy.errBusy,
   unavailable: copy.errUnavailable,
   generic: copy.errGeneric,
 };
+
+/** Re-sending the same file can't fix these; the user must pick or record another. */
+const PERMANENT_ERRORS: readonly ApiErrorKind[] = [
+  "bad_audio",
+  "too_big",
+  "unsupported",
+];
+
+export function isPermanentError(kind: ApiErrorKind) {
+  return PERMANENT_ERRORS.includes(kind);
+}
 
 /** Failure with a user-facing message chosen by `kind`. */
 export class ApiError extends Error {

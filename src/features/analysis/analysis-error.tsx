@@ -5,11 +5,13 @@ import { useFocusHeading } from "./use-focus-heading";
 export function AnalysisError({
   message,
   canRetry,
+  permanent,
   onRetry,
   onReset,
 }: {
   message: string;
   canRetry: boolean;
+  permanent: boolean;
   onRetry: () => void;
   onReset: () => void;
 }) {
@@ -30,7 +32,9 @@ export function AnalysisError({
             {copy.retryAnalysis}
           </Button>
         )}
-        <Button onClick={onReset}>{copy.recordAgain}</Button>
+        <Button variant={permanent ? "primary" : undefined} onClick={onReset}>
+          {permanent ? copy.tryAgain : copy.recordAgain}
+        </Button>
       </footer>
     </>
   );
