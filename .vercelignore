@@ -1,0 +1,17 @@
+# Frontend-only deploy: backend runs elsewhere
+backend
+ml
+demo
+assets
+docs
+scripts
+ubot-export
+tts-preview
+splash-preview
+.playwright-mcp
+.claude
+.next
+*.tsbuildinfo
+.env*
+.pytest_cache
+space
