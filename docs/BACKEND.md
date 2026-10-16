@@ -237,11 +237,11 @@ AYNO · U-Hackathon 2026 · AI track · ส่งงานรอบ Prototype �
 
 ## 7. Deploy & config
 
-| ส่วน                       | ที่ไหน                                  | config                                                                                                                                 |
-| -------------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Frontend                   | Vercel (static, root = repo root)       | `js/config.js` → `API_BASE_URL`                                                                                                        |
-| Backend                    | Hugging Face Spaces (Docker, CPU basic) | Secrets: `OPENAI_API_KEY`, `OPENAI_MODEL`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID_TH`, `ELEVENLABS_VOICE_ID_EN`, `ALLOWED_ORIGINS` |
-| PANNs checkpoint (~300 MB) | download ตอน build Docker image         | ห้าม commit                                                                                                                            |
+| ส่วน                       | ที่ไหน                             | config                                                                                                                                 |
+| -------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend                   | Vercel (Next.js, root = repo root) | project env `NEXT_PUBLIC_API_BASE_URL` → Space `/v1` (see `backend/README.md` § Deploy)                                                |
+| Backend                    | HF Space (Gradio + ZeroGPU, free)  | Secrets: `OPENAI_API_KEY`, `OPENAI_MODEL`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID_TH`, `ELEVENLABS_VOICE_ID_EN`, `ALLOWED_ORIGINS` |
+| PANNs checkpoint (~300 MB) | download ตอน build Docker image    | ห้าม commit                                                                                                                            |
 
 `ALLOWED_ORIGINS` = Vercel domain, `http://127.0.0.1:4175` (เฉพาะ origin ตรงตัว ไม่มี wildcard)
 

@@ -82,15 +82,26 @@ pip install -r requirements-dev.txt
 python -m pytest
 ```
 
-## Deploy (Hugging Face Spaces, Docker SDK)
+## Deploy
 
-1. Create a Space with SDK **Docker**, CPU basic.
-2. Push the contents of `backend/` as the Space repo root (this README's front-matter configures it).
-   Commit `models/classifier.joblib`, `models/labels.json`, `models/metrics.json` — the image copies `models/`.
-3. Space → Settings → Secrets: set the variables above.
-4. Wait for the build (it downloads the PANNs checkpoint), then `curl https://<space>.hf.space/health`.
-   Call `/health` about 5 minutes before the pitch to avoid a cold start.
-5. Put the Space URL in the frontend `js/config.js` (`API_BASE_URL`) and add the Vercel domain to `ALLOWED_ORIGINS`.
+Live: backend on the free ZeroGPU Space `PentaQ/cry-for-your-mom-api`
+(`https://pentaq-cry-for-your-mom-api.hf.space/v1`), frontend on Vercel (`https://cry-for-your-mom.vercel.app`).
+
+**Backend (HF Space, Gradio SDK + ZeroGPU).** Free accounts cannot run Docker or `cpu-basic` Spaces, so
+`space/space_app.py` mounts this FastAPI app on `gr.Server` under `/v1`; inference stays on CPU.
+
+1. `hf auth login`, then `scripts/deploy_space.sh` (use `HF_HUB_DISABLE_XET=1` if the upload stalls).
+   It uploads `app/`, `knowledge/`, `tts_cache/`, the models and the PANNs checkpoint (restart ≈ 1 min).
+2. Space secrets: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID_TH`, `ELEVENLABS_VOICE_ID_EN` (+ `OPENAI_*` if used).
+   Variables: `FINETUNED_MODEL=models/cry_net_demo.pt`, `PANNS_CHECKPOINT=models/Cnn14_mAP=0.431.pth`,
+   `GRADIO_SSR_MODE=false`, `ALLOWED_ORIGINS=<Vercel domains>`.
+3. Check `curl https://pentaq-cry-for-your-mom-api.hf.space/v1/health` → `"model_loaded":true`.
+
+`Dockerfile` still works for a paid Docker Space or any container host (routes at the root, no `/v1`).
+
+**Frontend (Vercel, team `ayno1`).** The project is not linked to GitHub: deploy with
+`vercel deploy --prod --scope ayno1`. `NEXT_PUBLIC_API_BASE_URL` is a project env var (Production + Preview);
+change it there and redeploy when the backend URL changes.
 
 Advice files in `knowledge/advice/` are DRAFTS: the business team must verify them against a
 reputable pediatric source before the demo.
