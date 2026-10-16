@@ -95,11 +95,7 @@ export function ChatScreen({
           <ChevronLeft size={22} strokeWidth={1.75} />
         </button>
         <div className="ubot-profile">
-          <img
-            className="ubot-avatar"
-            src="/images/chat/assistant.svg"
-            alt=""
-          />
+          <img className="ubot-avatar" src="/images/chat/ubot.svg" alt="" />
           <div className="ubot-identity">
             <h1>{copy.botName}</h1>
             <span className="ubot-verified" aria-hidden="true" />

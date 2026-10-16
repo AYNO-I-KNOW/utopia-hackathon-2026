@@ -44,6 +44,9 @@
   place-items: center;
   width: 36px;
   height: 36px;
+  box-sizing: border-box;
+  padding: 6px;
+  object-fit: contain;
   border-radius: 999px;
   background: var(--color-brand-soft);
   color: var(--color-brand-pressed);
