@@ -1,5 +1,6 @@
 import json
 import shutil
+import subprocess
 import threading
 
 import httpx
@@ -79,6 +80,24 @@ class TestAnalyze:
 
     def test_long_audio_truncated_200(self, make_client):
         assert post_analyze(make_client(), make_wav(39, rate=8000)).status_code == 200
+
+    def test_long_audio_scores_only_first_window_when_it_cries(self, make_client):
+        model = FakeModel()
+        assert post_analyze(make_client(model=model), make_wav(25, rate=8000)).status_code == 200
+        assert model.calls == 1
+
+    def test_long_audio_scores_all_windows_when_start_is_weak(self, make_client):
+        model = FakeModel(cry_prob=0.01)
+        assert post_analyze(make_client(model=model), make_wav(25, rate=8000)).status_code == 200
+        assert model.calls == 3
+
+    def test_decode_timeout_503_retryable(self, make_client, wav_bytes, monkeypatch):
+        def boom(*args, **kwargs):
+            raise subprocess.TimeoutExpired(cmd="ffmpeg", timeout=1)
+
+        monkeypatch.setattr("app.audio.subprocess.run", boom)
+        res = post_analyze(make_client(), wav_bytes)
+        assert res.status_code == 503 and res.json()["detail"] == "busy, retry"
 
     def test_garbage_audio_400(self, make_client):
         assert post_analyze(make_client(), b"not audio at all" * 50).status_code == 400

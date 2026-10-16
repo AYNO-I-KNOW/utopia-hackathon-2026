@@ -28,6 +28,9 @@ LANGS = ("th", "en")
 # 5th percentile of "Baby cry, infant cry" on Baidu train-split cries: keeps 96.7% of held-out cries;
 # 0/241 non-cries (speech, music, silence, ESC-50) pass (max 0.014). 0.3 dropped 28% of real cries.
 CRY_THRESHOLD = 0.05
+# Start barely contains crying but a later window clearly does (e.g. a spoken video intro): score that one.
+WEAK_CRY_PROB = 0.08
+CLEAR_CRY_PROB = 0.5
 CLOSE_MARGIN = 0.15
 UNSURE_MAX = 0.40
 LULLABY_LABELS = frozenset({"sleepy", "hug", "awake"})
@@ -43,7 +46,7 @@ SLEEP_END_LONG_MIN = 120
 SLEEPY_LONG_MULT = 1.3
 
 # --- upload / audio ---
-MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 MIN_AUDIO_SECONDS = 1.0
 MAX_AUDIO_SECONDS = 30.0
 SAMPLE_RATE = 32_000

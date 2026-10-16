@@ -26,6 +26,10 @@ class DecoderUnavailableError(RuntimeError):
     """ffmpeg is not installed on the server (maps to HTTP 503)."""
 
 
+class DecodeTimeoutError(RuntimeError):
+    """ffmpeg exceeded FFMPEG_TIMEOUT_S; retryable, not a bad file (maps to HTTP 503)."""
+
+
 def decode_audio(data: bytes) -> np.ndarray:
     if not data:
         raise AudioDecodeError("empty audio upload")
@@ -62,7 +66,7 @@ def _run_ffmpeg(ffmpeg: str, path: str) -> bytes:
     try:
         proc = subprocess.run(cmd, capture_output=True, timeout=FFMPEG_TIMEOUT_S, check=False)
     except subprocess.TimeoutExpired as exc:
-        raise AudioDecodeError("audio decode timed out") from exc
+        raise DecodeTimeoutError("audio decode timed out") from exc
     if proc.returncode != 0:
         raise AudioDecodeError("could not decode audio (corrupt or unsupported format)")
     return proc.stdout

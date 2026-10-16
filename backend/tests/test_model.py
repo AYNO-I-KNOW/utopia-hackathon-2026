@@ -5,8 +5,90 @@ import pytest
 
 from app.config import MODEL_CLIP_SECONDS, SAMPLE_RATE
 from app import model as model_mod
-from app.model import ModelUnavailableError, PannsCryModel, fit_length
+from app.model import ModelUnavailableError, PannsCryModel, fit_length, predict_clip, split_windows
 from tests.conftest import make_settings
+
+
+def _clip(seconds: float) -> np.ndarray:
+    return np.zeros(int(seconds * SAMPLE_RATE), dtype=np.float32)
+
+
+class _ScriptedModel:
+    """Returns one scripted (cry_prob, probs) per call, in order."""
+
+    def __init__(self, *results):
+        self.results = list(results)
+        self.calls = 0
+
+    loaded = True
+
+    def predict(self, waveform):
+        self.calls += 1
+        return self.results.pop(0)
+
+
+@pytest.mark.parametrize(
+    ("seconds", "windows"), [(2, 1), (10, 1), (25, 3), (20.5, 2), (21, 3), (30, 3), (0.5, 1)]
+)
+def test_split_windows_counts(seconds, windows):
+    assert len(split_windows(_clip(seconds))) == windows
+
+
+def test_predict_clip_short_clip_single_window():
+    model = _ScriptedModel((0.8, {"a": 0.6, "b": 0.4}))
+    cry_prob, probs = predict_clip(model, _clip(3))
+    assert model.calls == 1 and cry_prob == 0.8 and probs == pytest.approx({"a": 0.6, "b": 0.4})
+
+
+def test_predict_clip_keeps_first_window_even_if_later_cries_more():
+    model = _ScriptedModel((0.67, {"hungry": 0.81, "diaper": 0.19}), (0.92, {"hungry": 0.2, "diaper": 0.8}))
+    cry_prob, probs = predict_clip(model, _clip(20))
+    assert cry_prob == 0.67 and probs == pytest.approx({"hungry": 0.81, "diaper": 0.19})
+
+
+def test_predict_clip_skips_later_windows_when_first_cries():
+    model = _ScriptedModel(*[(0.5, {"a": 1.0})] * 3)
+    predict_clip(model, _clip(25))
+    assert model.calls == 1
+
+
+def test_predict_clip_switches_to_best_later_window_when_first_is_weak():
+    model = _ScriptedModel(
+        (0.0644, {"sleepy": 0.9, "diaper": 0.1}),
+        (0.72, {"sleepy": 0.2, "diaper": 0.8}),
+        (0.0001, {"sleepy": 0.5, "diaper": 0.5}),
+    )
+    cry_prob, probs = predict_clip(model, _clip(25))
+    assert model.calls == 3 and cry_prob == 0.72
+    assert probs == pytest.approx({"sleepy": 0.2, "diaper": 0.8})
+
+
+def test_predict_clip_picks_highest_of_later_windows():
+    model = _ScriptedModel((0.01, {"a": 1.0}), (0.6, {"a": 0.3}), (0.9, {"a": 0.7}))
+    assert predict_clip(model, _clip(25)) == (0.9, {"a": 0.7})
+
+
+def test_predict_clip_no_switch_when_later_window_not_clear():
+    model = _ScriptedModel((0.01, {"a": 1.0, "b": 0.0}), (0.49, {"a": 0.0, "b": 1.0}))
+    cry_prob, probs = predict_clip(model, _clip(20))
+    assert cry_prob == 0.01 and probs == pytest.approx({"a": 1.0, "b": 0.0})
+
+
+def test_predict_clip_tail_under_min_is_dropped():
+    model = _ScriptedModel(*[(0.0, {"a": 1.0})] * 2)
+    predict_clip(model, _clip(20.5))
+    assert model.calls == 2
+
+
+def test_predict_clip_handles_nan():
+    model = _ScriptedModel((float("nan"), {"a": float("nan"), "b": 0.5}), (0.7, {"a": 0.4, "b": float("nan")}))
+    cry_prob, probs = predict_clip(model, _clip(20))
+    assert cry_prob == 0.7 and probs == {"a": 0.4, "b": 0.0}
+
+
+def test_predict_clip_nan_first_window_without_switch_is_zero():
+    model = _ScriptedModel((float("nan"), {"a": float("nan"), "b": 0.5}))
+    assert predict_clip(model, _clip(2)) == (0.0, {"a": 0.0, "b": 0.5})
 
 
 def test_fit_length_pads_and_crops():

@@ -10,7 +10,15 @@ from typing import Protocol
 import httpx
 import numpy as np
 
-from app.config import MODEL_CLIP_SECONDS, MODELS_DIR, SAMPLE_RATE, Settings
+from app.config import (
+    CLEAR_CRY_PROB,
+    MIN_AUDIO_SECONDS,
+    MODEL_CLIP_SECONDS,
+    MODELS_DIR,
+    SAMPLE_RATE,
+    WEAK_CRY_PROB,
+    Settings,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +60,36 @@ def fit_length(waveform: np.ndarray, seconds: int = MODEL_CLIP_SECONDS) -> np.nd
     if waveform.size >= target:
         return waveform[:target]
     return np.pad(waveform, (0, target - waveform.size))
+
+
+def split_windows(waveform: np.ndarray) -> list[np.ndarray]:
+    """Consecutive MODEL_CLIP_SECONDS windows; a trailing partial one needs >= MIN_AUDIO_SECONDS."""
+    step = MODEL_CLIP_SECONDS * SAMPLE_RATE
+    min_tail = int(MIN_AUDIO_SECONDS * SAMPLE_RATE)
+    windows = [waveform[:step]]
+    for start in range(step, waveform.size, step):
+        chunk = waveform[start : start + step]
+        if chunk.size >= min_tail:
+            windows.append(chunk)
+    return windows
+
+
+def _safe_result(result: tuple[float, dict[str, float]]) -> tuple[float, dict[str, float]]:
+    cry_prob, probs = result
+    cry_prob = float(cry_prob) if np.isfinite(cry_prob) else 0.0
+    labels = list(probs)
+    values = np.nan_to_num(np.array([probs[k] for k in labels], dtype=np.float64), nan=0.0, posinf=0.0, neginf=0.0)
+    return cry_prob, dict(zip(labels, (float(v) for v in values)))
+
+
+def predict_clip(model: CryModel, waveform: np.ndarray) -> tuple[float, dict[str, float]]:
+    """First window wins; fall back to the best later window only if the start barely cries."""
+    windows = split_windows(waveform)
+    first = _safe_result(model.predict(windows[0]))
+    if len(windows) == 1 or first[0] >= WEAK_CRY_PROB:
+        return first
+    best = max((_safe_result(model.predict(w)) for w in windows[1:]), key=lambda r: r[0])
+    return best if best[0] >= CLEAR_CRY_PROB else first
 
 
 def _download(url: str, dest: Path, sha256: str | None = None) -> None:

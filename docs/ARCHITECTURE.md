@@ -16,7 +16,7 @@ Dates use Asia/Bangkok. Each activity currently has one date, a start time, and 
 
 ## Backend integration
 
-`analysis/api.ts` calls the FastAPI backend at `NEXT_PUBLIC_API_BASE_URL` (see `.env.example`; unset shows an explicit error state, never a mock). `/analyze` receives the MediaRecorder blob (3–10 s, same mic stream as the waveform) or an uploaded file (≤ 5 MB) plus `context` from `activities/context.ts` (saved entries only). Results render by `case`; `close` offers tap-to-answer questions that re-POST the same blob. `/speak` plays the summary and hides when the backend returns 503. Audio is never persisted client-side.
+`analysis/api.ts` calls the FastAPI backend at `NEXT_PUBLIC_API_BASE_URL` (see `.env.example`; unset shows an explicit error state, never a mock). `/analyze` receives the MediaRecorder blob (3–10 s, same mic stream as the waveform) or an uploaded file (≤ 10 MB) plus `context` from `activities/context.ts` (saved entries only). Results render by `case`; `close` offers tap-to-answer questions that re-POST the same blob. `/speak` plays the summary and hides when the backend returns 503. Audio is never persisted client-side.
 
 ## Chat
 

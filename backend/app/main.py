@@ -14,11 +14,11 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field, StringConstraints, ValidationError
 
 from app import config as C
-from app.audio import AudioError, DecoderUnavailableError, decode_audio
+from app.audio import AudioError, DecoderUnavailableError, DecodeTimeoutError, decode_audio
 from app.chat import ChatIn, ChatOut, Chatter, ChatService, Lang
 from app.decision import Decision, decide, top_as_dicts
 from app.llm import LlmService, Summariser, no_cry_result
-from app.model import CryModel, ModelUnavailableError, get_model
+from app.model import CryModel, ModelUnavailableError, get_model, predict_clip
 from app.ratelimit import RateLimiter
 from app.tts import Speaker, TtsService, TtsUnavailableError, TtsUpstreamError
 
@@ -27,7 +27,7 @@ _INFLIGHT = threading.BoundedSemaphore(C.MAX_CONCURRENT_ANALYSES)
 UPLOAD_CHUNK = 64 * 1024
 MULTIPART_OVERHEAD = 64 * 1024
 BODY_LIMITS = {  # POST path -> (max Content-Length, 413 message)
-    "/analyze": (C.MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD, "audio file too large (max 5 MB)"),
+    "/analyze": (C.MAX_UPLOAD_BYTES + MULTIPART_OVERHEAD, "audio file too large (max 10 MB)"),
     "/chat": (C.CHAT_MAX_BODY_BYTES, "request too large (max 64 KB)"),
 }
 MinutesAgo = Annotated[int, Field(strict=True, ge=0)] | None
@@ -110,7 +110,7 @@ async def _read_limited(upload: UploadFile) -> bytes:
     while chunk := await upload.read(UPLOAD_CHUNK):
         total += len(chunk)
         if total > C.MAX_UPLOAD_BYTES:
-            raise HTTPException(status_code=413, detail="audio file too large (max 5 MB)")
+            raise HTTPException(status_code=413, detail="audio file too large (max 10 MB)")
         chunks.append(chunk)
     if total == 0:
         raise HTTPException(status_code=400, detail="empty audio file")
@@ -122,9 +122,11 @@ async def _predict(model: CryModel, data: bytes) -> tuple[float, dict[str, float
         raise HTTPException(status_code=503, detail="busy, retry")
     try:
         waveform = await run_in_threadpool(decode_audio, data)
-        return await run_in_threadpool(model.predict, waveform)
+        return await run_in_threadpool(predict_clip, model, waveform)
     except AudioError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except DecodeTimeoutError as exc:
+        raise HTTPException(status_code=503, detail="busy, retry") from exc
     except DecoderUnavailableError as exc:
         raise HTTPException(status_code=503, detail="audio decoder unavailable") from exc
     except ModelUnavailableError as exc:
