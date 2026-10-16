@@ -20,7 +20,7 @@ export const en = {
   navigation: "Main navigation",
   back: "Back",
   chat: "Chat with U-bot",
-  botName: "Personal assistant",
+  botName: "U-bot",
   saveActivity: "Log activity",
   activities: "Activity",
   sleepy: "Sleepy",

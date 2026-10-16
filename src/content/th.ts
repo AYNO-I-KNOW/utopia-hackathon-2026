@@ -23,7 +23,7 @@ export const th = {
   navigation: "เมนูหลัก",
   back: "ย้อนกลับ",
   chat: "คุยกับ U-bot",
-  botName: "ปรึกษาผู้ช่วย",
+  botName: "U-bot",
   saveActivity: "บันทึกกิจกรรม",
   activities: "กิจกรรม",
   sleepy: "ง่วงนอน",
