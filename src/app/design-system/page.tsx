@@ -18,7 +18,7 @@ const colors = [
 export default function DesignSystem() {
   return (
     <main className="ds-page">
-      <h1>Crybaby · Design System</h1>
+      <h1>Cry for your Mom · Design System</h1>
       <p>Nunito · English UI reference</p>
       <section className="ds-section">
         <h2>Colors</h2>

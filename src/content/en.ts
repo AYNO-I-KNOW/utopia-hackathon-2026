@@ -171,7 +171,7 @@ export const en = {
   chatQuickLabel: "Common questions",
   chatLatestResult: "Latest analysis",
   promptIntro:
-    "I’m a parent using the Crybaby app to analyze my baby’s crying.",
+    "I’m a parent using the Cry for your Mom app to analyze my baby’s crying.",
   promptResult: "Result: {list} (case: {case})",
   promptActivity:
     "Last 24 h: {n} feeds · last feed: {feed} · last diaper change: {diaper} · sleep: {sleep}",

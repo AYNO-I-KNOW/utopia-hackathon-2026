@@ -158,7 +158,7 @@ export const th = {
   chatError: "ตอบไม่สำเร็จ ลองอีกครั้ง",
   chatQuickLabel: "คำถามที่พบบ่อย",
   chatLatestResult: "ผลวิเคราะห์ล่าสุด",
-  promptIntro: "ฉันเป็นพ่อ/แม่ ใช้แอป Crybaby วิเคราะห์เสียงลูกร้อง",
+  promptIntro: "ฉันเป็นพ่อ/แม่ ใช้แอป Cry for your Mom วิเคราะห์เสียงลูกร้อง",
   promptResult: "ผล: {list} (case: {case})",
   promptActivity:
     "24 ชม.ล่าสุด: ให้นม {n} ครั้ง ล่าสุด {feed} · ผ้าอ้อม ล่าสุด {diaper} · นอน {sleep}",
