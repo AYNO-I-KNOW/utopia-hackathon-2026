@@ -71,6 +71,7 @@ MIN_NOISE_SAMPLES = SAMPLE_RATE // 4  # drop clips that are (almost) all digital
 VAL_SIZE = 0.15  # of the train split, for early stopping + temperature
 EMBED_DIM = 2048
 ECE_BINS = 10
+MIN_NOISE_POWER = 1e-8  # mean square; below this a noise clip is treated as silence
 DOWNLOAD_RETRIES = 8
 LR_FLOOR = 0.01  # cosine decays to 1% of the base lr
 BEST_FILE = "best.pt"
@@ -273,6 +274,8 @@ class EMA:
         decay = min(self.decay, (1 + self.updates) / (10 + self.updates))  # short runs: don't lag the raw weights
         for ema_t, cur in zip(self.model.state_dict().values(), net.state_dict().values()):
             if ema_t.dtype.is_floating_point:
+                if not torch.isfinite(cur).all():  # fp16 overflow in a BN stat would poison the EMA for good
+                    continue
                 ema_t.mul_(decay).add_(cur.detach(), alpha=1 - decay)
             else:
                 ema_t.copy_(cur)
@@ -292,11 +295,14 @@ def augment(wav: torch.Tensor, noise: list[torch.Tensor] | None, args) -> torch.
         clip = clip.repeat(math.ceil(CLIP_SAMPLES / clip.numel()) + 1)  # tile, then random crop
         offset = np.random.randint(clip.numel() - CLIP_SAMPLES + 1)
         clip = clip[offset : offset + CLIP_SAMPLES]
+        noise_power = clip.pow(2).mean()
+        if noise_power < MIN_NOISE_POWER:  # near-silent after trimming: scale would explode
+            continue
         voiced = wav[i][wav[i] != 0]  # signal power ignores the zero padding
         if voiced.numel() == 0:
             continue
         snr_db = np.random.uniform(args.snr_min, args.snr_max)
-        scale = (voiced.pow(2).mean() / (clip.pow(2).mean() * 10 ** (snr_db / 10) + 1e-12)).sqrt()
+        scale = (voiced.pow(2).mean() / (noise_power * 10 ** (snr_db / 10))).sqrt()
         wav[i] = wav[i] + scale * clip
     return wav
 
@@ -322,8 +328,10 @@ def train_epoch(net, opt, sched, ema, scaler, X, y, class_weight, noise, args, d
         opt.zero_grad(set_to_none=True)
         scaler.scale(loss).backward()
         scaler.step(opt)
+        scale_before = scaler.get_scale()
         scaler.update()
-        sched.step()
+        if scaler.get_scale() >= scale_before:  # a skipped (inf grad) step must not advance the schedule
+            sched.step()
         if ema:
             ema.update(net)
         total += loss.item() * len(idx)
@@ -331,14 +339,18 @@ def train_epoch(net, opt, sched, ema, scaler, X, y, class_weight, noise, args, d
 
 
 @torch.no_grad()
-def predict_logits(net, X, batch_size, device) -> np.ndarray:
+def predict_logits(net, X, batch_size, device, what: str = "eval") -> np.ndarray:
+    """fp32 (no autocast: tiny sets, and fp16 overflow gave NaN). Non-finite logits are counted,
+    reported and zeroed (-> uniform probs) so metrics and temperature fitting stay valid."""
     net.eval()
-    out = []
-    for start in range(0, len(X), batch_size):
-        x = net.logmel(X[start : start + batch_size].to(device))
-        with torch.autocast(device_type=device.type, dtype=torch.float16, enabled=device.type == "cuda"):
-            out.append(net.classify(x).float().cpu())
-    return torch.cat(out).numpy()
+    out = [net.classify(net.logmel(X[s : s + batch_size].to(device))).float().cpu()
+           for s in range(0, len(X), batch_size)]  # fmt: skip
+    logits = torch.cat(out).numpy()
+    bad = int((~np.isfinite(logits).all(axis=1)).sum())
+    if bad:
+        print(f"WARNING: {what}: {bad}/{len(logits)} clips gave non-finite logits (zeroed)", file=sys.stderr, flush=True)
+        logits = np.nan_to_num(logits, nan=0.0, posinf=0.0, neginf=0.0)
+    return logits
 
 
 def softmax(logits: np.ndarray, temperature: float = 1.0) -> np.ndarray:
@@ -426,7 +438,7 @@ def fit(net, data, args, device, noise) -> nn.Module:
     for epoch in range(first_epoch, epochs):
         start = time.time()
         loss = train_epoch(net, opt, sched, ema, scaler, X_fit, y_fit, class_weight, noise, args, device)
-        val = report(softmax(predict_logits(eval_net, X_val, args.batch_size, device)), y_val.numpy())
+        val = report(softmax(predict_logits(eval_net, X_val, args.batch_size, device, f"val epoch {epoch + 1}")), y_val.numpy())
         print(f"epoch {epoch + 1}: loss={loss:.3f} val_acc={val['accuracy']:.3f} "
               f"val_f1={val['macro_f1']:.3f} ({time.time() - start:.0f}s)", flush=True)  # fmt: skip
         if val["macro_f1"] > best_f1:
@@ -508,8 +520,8 @@ def main() -> int:
 
     net = CryNet(len(LABELS)).to(device)
     net = fit(net, ((X["fit"], y[fit_idx]), (X["val"], y[val_idx])), args, device, noise)
-    temperature = fit_temperature(predict_logits(net, X["val"], args.batch_size, device), y[val_idx].numpy())
-    test_logits = predict_logits(net, X["test"], args.batch_size, device)
+    temperature = fit_temperature(predict_logits(net, X["val"], args.batch_size, device, "temperature fit (val)"), y[val_idx].numpy())
+    test_logits = predict_logits(net, X["test"], args.batch_size, device, "test")
     metrics = {
         "version": "v2",
         "model": "CNN14 fine-tuned + stats pooling (InfantCryNet-style)",
